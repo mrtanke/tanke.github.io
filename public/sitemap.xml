@@ -2,13 +2,16 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://my-blog-alpha-vert.vercel.app/posts/attention_is_all_you_need/</loc>
-    <lastmod>2025-10-25T00:36:58+00:00</lastmod>
-  </url><url>
     <loc>https://my-blog-alpha-vert.vercel.app/</loc>
-    <lastmod>2025-10-25T00:36:58+00:00</lastmod>
+    <lastmod>2025-10-27T22:50:43+00:00</lastmod>
   </url><url>
     <loc>https://my-blog-alpha-vert.vercel.app/posts/</loc>
+    <lastmod>2025-10-27T22:50:43+00:00</lastmod>
+  </url><url>
+    <loc>https://my-blog-alpha-vert.vercel.app/posts/rwkv/</loc>
+    <lastmod>2025-10-27T22:50:43+00:00</lastmod>
+  </url><url>
+    <loc>https://my-blog-alpha-vert.vercel.app/posts/attention_is_all_you_need/</loc>
     <lastmod>2025-10-25T00:36:58+00:00</lastmod>
   </url><url>
     <loc>https://my-blog-alpha-vert.vercel.app/posts/chain-of-thought-prompting/</loc>

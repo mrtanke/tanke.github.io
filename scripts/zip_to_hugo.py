@@ -108,6 +108,17 @@ def fix_markdown_image_links(md_text: str) -> str:
     - Leave `[Page Source](https://arxiv.org/...)` unchanged.
     """
 
+    # Protect math blocks ($$...$$, $...$, \[...\], \(...\)) so we don't rewrite
+    # parentheses that are part of LaTeX expressions.
+    math_patterns = re.compile(r'(\$\$.*?\$\$)|(\$.*?\$)|(\\\[.*?\\\])|(\\\(.*?\\\))', re.DOTALL)
+    math_blocks: list[str] = []
+
+    def _protect_math(m):
+        math_blocks.append(m.group(0))
+        return f"@@MATH{len(math_blocks)-1}@@"
+
+    protected = math_patterns.sub(_protect_math, md_text)
+
     # First, handle explicit image syntax: ![alt](url)
     def repl_image(match):
         alt = match.group(1)
@@ -124,7 +135,6 @@ def fix_markdown_image_links(md_text: str) -> str:
         return f'![{alt}]({base})'
 
     md_text = re.sub(r'!\[([^\]]*)\]\(([^)]+)\)', repl_image, md_text)
-
     # Then handle any explicit occurrences of assets/... in normal links
     def repl_assets_link(match):
         inner = match.group(1)
@@ -141,8 +151,15 @@ def fix_markdown_image_links(md_text: str) -> str:
             return f'({base})'
         return match.group(0)
 
-    md_text = re.sub(r'\(([^)]+)\)', repl_assets_link, md_text)
-    return md_text
+    protected = re.sub(r'\(([^)]+)\)', repl_assets_link, protected)
+
+    # restore math blocks
+    def _restore_math(match):
+        idx = int(match.group(1))
+        return math_blocks[idx]
+
+    protected = re.sub(r'@@MATH(\d+)@@', _restore_math, protected)
+    return protected
 
 
 def create_hugo_bundle(md_file: Path, assets_folder: Path, description: str) -> Path:
