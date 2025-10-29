@@ -1,6 +1,6 @@
 ---
 title: 'CrossNet: An End-to-end Reference-based Super Resolution Network using Cross-scale Warping'
-date: 2025-10-18T09:40:06+00:00
+date: 2025-10-21T09:40:06+00:00
 draft: false
 description: 'Paper-reading notes: CrossNet: An End-to-end Reference-based Super Resolution Network using Cross-scale Warping'
 ShowWordCount: true

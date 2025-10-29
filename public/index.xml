@@ -37,6 +37,13 @@
       <description>Paper-reading notes: Mastering the game of Go with MCTS and Deep Neural Networks</description>
     </item>
     <item>
+      <title>CrossNet: An End-to-end Reference-based Super Resolution Network using Cross-scale Warping</title>
+      <link>https://my-blog-alpha-vert.vercel.app/posts/crossnet_an_end-to-end_reference-based_super_resol/</link>
+      <pubDate>Tue, 21 Oct 2025 09:40:06 +0000</pubDate>
+      <guid>https://my-blog-alpha-vert.vercel.app/posts/crossnet_an_end-to-end_reference-based_super_resol/</guid>
+      <description>Paper-reading notes: CrossNet: An End-to-end Reference-based Super Resolution Network using Cross-scale Warping</description>
+    </item>
+    <item>
       <title>Chain-of-Thought Prompting Elicits Reasoning in Large Language Models</title>
       <link>https://my-blog-alpha-vert.vercel.app/posts/chain-of-thought-prompting/</link>
       <pubDate>Mon, 20 Oct 2025 13:58:55 +0200</pubDate>
@@ -44,11 +51,11 @@
       <description>Paper-reading notes: Chain-of-Thought Prompting Elicits Reasoning in Large Language Models</description>
     </item>
     <item>
-      <title>CrossNet: An End-to-end Reference-based Super Resolution Network using Cross-scale Warping</title>
-      <link>https://my-blog-alpha-vert.vercel.app/posts/crossnet_an_end-to-end_reference-based_super_resol/</link>
-      <pubDate>Sat, 18 Oct 2025 09:40:06 +0000</pubDate>
-      <guid>https://my-blog-alpha-vert.vercel.app/posts/crossnet_an_end-to-end_reference-based_super_resol/</guid>
-      <description>Paper-reading notes: CrossNet: An End-to-end Reference-based Super Resolution Network using Cross-scale Warping</description>
+      <title>Learning‑based light field imaging</title>
+      <link>https://my-blog-alpha-vert.vercel.app/posts/learningbased_light_field_imaging/</link>
+      <pubDate>Sun, 19 Oct 2025 09:50:58 +0000</pubDate>
+      <guid>https://my-blog-alpha-vert.vercel.app/posts/learningbased_light_field_imaging/</guid>
+      <description>Paper-reading notes: Learning‑based light field imaging</description>
     </item>
     <item>
       <title>Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks</title>
