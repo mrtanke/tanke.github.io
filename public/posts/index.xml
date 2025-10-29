@@ -9,11 +9,11 @@
     <lastBuildDate>Wed, 29 Oct 2025 08:23:31 +0000</lastBuildDate>
     <atom:link href="https://my-blog-alpha-vert.vercel.app/posts/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>CrossNet&#43;&#43;: Cross-Scale Large-Parallax Warping for</title>
+      <title>CrossNet&#43;&#43;: Cross-Scale Large-Parallax Warping for Reference-Based Super-Resolution</title>
       <link>https://my-blog-alpha-vert.vercel.app/posts/crossnet&#43;&#43;_cross-scale_large-parallax_warping_for/</link>
       <pubDate>Wed, 29 Oct 2025 08:23:31 +0000</pubDate>
       <guid>https://my-blog-alpha-vert.vercel.app/posts/crossnet&#43;&#43;_cross-scale_large-parallax_warping_for/</guid>
-      <description>Paper-reading notes: CrossNet&#43;&#43;: Cross-Scale Large-Parallax Warping for</description>
+      <description>Paper-reading notes: CrossNet&#43;&#43;: Cross-Scale Large-Parallax Warping for Reference-Based Super-Resolution</description>
     </item>
     <item>
       <title>xLSTM: Extended Long Short-Term Memory</title>
@@ -34,21 +34,28 @@
       <link>https://my-blog-alpha-vert.vercel.app/posts/mastering-go-mcts/</link>
       <pubDate>Fri, 24 Oct 2025 10:00:00 +0000</pubDate>
       <guid>https://my-blog-alpha-vert.vercel.app/posts/mastering-go-mcts/</guid>
-      <description>Paper-reading notes: Mastering the game of Go with deep</description>
+      <description>Paper-reading notes: Mastering the game of Go with MCTS and Deep Neural Networks</description>
     </item>
     <item>
-      <title>Chain-of-Thought Prompting</title>
+      <title>Chain-of-Thought Prompting Elicits Reasoning in Large Language Models</title>
       <link>https://my-blog-alpha-vert.vercel.app/posts/chain-of-thought-prompting/</link>
       <pubDate>Mon, 20 Oct 2025 13:58:55 +0200</pubDate>
       <guid>https://my-blog-alpha-vert.vercel.app/posts/chain-of-thought-prompting/</guid>
       <description>Paper-reading notes: Chain-of-Thought Prompting Elicits Reasoning in Large Language Models</description>
     </item>
     <item>
-      <title>CrossNet: An End-to-end Reference-based Super Resol</title>
+      <title>CrossNet: An End-to-end Reference-based Super Resolution Network using Cross-scale Warping</title>
       <link>https://my-blog-alpha-vert.vercel.app/posts/crossnet_an_end-to-end_reference-based_super_resol/</link>
       <pubDate>Sat, 18 Oct 2025 09:40:06 +0000</pubDate>
       <guid>https://my-blog-alpha-vert.vercel.app/posts/crossnet_an_end-to-end_reference-based_super_resol/</guid>
-      <description>Paper-reading notes: CrossNet An End-to-end Reference-based Super Resol</description>
+      <description>Paper-reading notes: CrossNet: An End-to-end Reference-based Super Resolution Network using Cross-scale Warping</description>
+    </item>
+    <item>
+      <title>Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks</title>
+      <link>https://my-blog-alpha-vert.vercel.app/posts/retrieval-augmented_generation_for_knowledge-inten/</link>
+      <pubDate>Wed, 15 Oct 2025 09:43:53 +0000</pubDate>
+      <guid>https://my-blog-alpha-vert.vercel.app/posts/retrieval-augmented_generation_for_knowledge-inten/</guid>
+      <description>Paper-reading notes: Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks</description>
     </item>
     <item>
       <title>Attention is All You Need</title>

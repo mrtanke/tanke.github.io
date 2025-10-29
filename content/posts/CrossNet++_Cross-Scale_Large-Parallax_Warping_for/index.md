@@ -1,8 +1,8 @@
 ---
-title: 'CrossNet++: Cross-Scale Large-Parallax Warping for'
+title: 'CrossNet++: Cross-Scale Large-Parallax Warping for Reference-Based Super-Resolution'
 date: 2025-10-29T08:23:31+00:00
 draft: false
-description: 'Paper-reading notes: CrossNet++: Cross-Scale Large-Parallax Warping for'
+description: 'Paper-reading notes: CrossNet++: Cross-Scale Large-Parallax Warping for Reference-Based Super-Resolution'
 ShowWordCount: true
 ShowReadingTime: false
 ---

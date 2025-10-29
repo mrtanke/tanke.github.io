@@ -2,7 +2,7 @@
 title: 'Mastering the game of Go with MCTS and Deep Neural Networks'
 date: 2025-10-24T10:00:00+00:00
 draft: false
-description: 'Paper-reading notes: Mastering the game of Go with deep'
+description: 'Paper-reading notes: Mastering the game of Go with MCTS and Deep Neural Networks'
 ShowWordCount: true
 ShowReadingTime: false
 ---
