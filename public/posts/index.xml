@@ -6,8 +6,15 @@
     <description>Recent content in Posts on Home</description>
     <generator>Hugo -- 0.152.1</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 29 Oct 2025 08:23:31 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 29 Oct 2025 12:30:04 +0000</lastBuildDate>
     <atom:link href="https://my-blog-alpha-vert.vercel.app/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>A Bridging Model for Parallel Computation</title>
+      <link>https://my-blog-alpha-vert.vercel.app/posts/a_bridging_model_for_parallel_computation/</link>
+      <pubDate>Wed, 29 Oct 2025 12:30:04 +0000</pubDate>
+      <guid>https://my-blog-alpha-vert.vercel.app/posts/a_bridging_model_for_parallel_computation/</guid>
+      <description>Paper-reading notes: A Bridging Model for Parallel Computation</description>
+    </item>
     <item>
       <title>CrossNet&#43;&#43;: Cross-Scale Large-Parallax Warping for Reference-Based Super-Resolution</title>
       <link>https://my-blog-alpha-vert.vercel.app/posts/crossnet&#43;&#43;_cross-scale_large-parallax_warping_for/</link>

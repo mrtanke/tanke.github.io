@@ -2,13 +2,16 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://my-blog-alpha-vert.vercel.app/posts/crossnet&#43;&#43;_cross-scale_large-parallax_warping_for/</loc>
-    <lastmod>2025-10-29T08:23:31+00:00</lastmod>
+    <loc>https://my-blog-alpha-vert.vercel.app/posts/a_bridging_model_for_parallel_computation/</loc>
+    <lastmod>2025-10-29T12:30:04+00:00</lastmod>
   </url><url>
     <loc>https://my-blog-alpha-vert.vercel.app/</loc>
-    <lastmod>2025-10-29T08:23:31+00:00</lastmod>
+    <lastmod>2025-10-29T12:30:04+00:00</lastmod>
   </url><url>
     <loc>https://my-blog-alpha-vert.vercel.app/posts/</loc>
+    <lastmod>2025-10-29T12:30:04+00:00</lastmod>
+  </url><url>
+    <loc>https://my-blog-alpha-vert.vercel.app/posts/crossnet&#43;&#43;_cross-scale_large-parallax_warping_for/</loc>
     <lastmod>2025-10-29T08:23:31+00:00</lastmod>
   </url><url>
     <loc>https://my-blog-alpha-vert.vercel.app/posts/xlstm_extended_long_short-term_memory/</loc>
