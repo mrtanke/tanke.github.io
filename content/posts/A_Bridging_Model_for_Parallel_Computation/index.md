@@ -1,6 +1,6 @@
 ---
 title: 'A Bridging Model for Parallel Computation'
-date: 2025-10-29T12:30:04+00:00
+date: 2025-10-10T12:30:04+00:00
 draft: false
 description: 'Paper-reading notes: A Bridging Model for Parallel Computation'
 ShowWordCount: true

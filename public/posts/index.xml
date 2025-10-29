@@ -6,15 +6,8 @@
     <description>Recent content in Posts on Home</description>
     <generator>Hugo -- 0.152.1</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 29 Oct 2025 12:30:04 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 29 Oct 2025 08:23:31 +0000</lastBuildDate>
     <atom:link href="https://my-blog-alpha-vert.vercel.app/posts/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>A Bridging Model for Parallel Computation</title>
-      <link>https://my-blog-alpha-vert.vercel.app/posts/a_bridging_model_for_parallel_computation/</link>
-      <pubDate>Wed, 29 Oct 2025 12:30:04 +0000</pubDate>
-      <guid>https://my-blog-alpha-vert.vercel.app/posts/a_bridging_model_for_parallel_computation/</guid>
-      <description>Paper-reading notes: A Bridging Model for Parallel Computation</description>
-    </item>
     <item>
       <title>CrossNet&#43;&#43;: Cross-Scale Large-Parallax Warping for Reference-Based Super-Resolution</title>
       <link>https://my-blog-alpha-vert.vercel.app/posts/crossnet&#43;&#43;_cross-scale_large-parallax_warping_for/</link>
@@ -60,9 +53,16 @@
     <item>
       <title>Learning‑based light field imaging</title>
       <link>https://my-blog-alpha-vert.vercel.app/posts/learningbased_light_field_imaging/</link>
-      <pubDate>Sun, 19 Oct 2025 09:50:58 +0000</pubDate>
+      <pubDate>Mon, 20 Oct 2025 09:50:58 +0000</pubDate>
       <guid>https://my-blog-alpha-vert.vercel.app/posts/learningbased_light_field_imaging/</guid>
       <description>Paper-reading notes: Learning‑based light field imaging</description>
+    </item>
+    <item>
+      <title>From Local to Global A GraphRAG Approach to Query-</title>
+      <link>https://my-blog-alpha-vert.vercel.app/posts/from_local_to_global_a_graphrag_approach_to_query-/</link>
+      <pubDate>Thu, 16 Oct 2025 19:42:01 +0000</pubDate>
+      <guid>https://my-blog-alpha-vert.vercel.app/posts/from_local_to_global_a_graphrag_approach_to_query-/</guid>
+      <description>Paper-reading notes: From Local to Global A GraphRAG Approach to Query-</description>
     </item>
     <item>
       <title>Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks</title>
@@ -70,6 +70,13 @@
       <pubDate>Wed, 15 Oct 2025 09:43:53 +0000</pubDate>
       <guid>https://my-blog-alpha-vert.vercel.app/posts/retrieval-augmented_generation_for_knowledge-inten/</guid>
       <description>Paper-reading notes: Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks</description>
+    </item>
+    <item>
+      <title>A Bridging Model for Parallel Computation</title>
+      <link>https://my-blog-alpha-vert.vercel.app/posts/a_bridging_model_for_parallel_computation/</link>
+      <pubDate>Fri, 10 Oct 2025 12:30:04 +0000</pubDate>
+      <guid>https://my-blog-alpha-vert.vercel.app/posts/a_bridging_model_for_parallel_computation/</guid>
+      <description>Paper-reading notes: A Bridging Model for Parallel Computation</description>
     </item>
     <item>
       <title>Attention is All You Need</title>

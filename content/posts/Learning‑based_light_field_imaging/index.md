@@ -1,6 +1,6 @@
 ---
 title: 'Learning‑based light field imaging'
-date: 2025-10-19T09:50:58+00:00
+date: 2025-10-20T09:50:58+00:00
 draft: false
 description: 'Paper-reading notes: Learning‑based light field imaging'
 ShowWordCount: true
