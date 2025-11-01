@@ -300,7 +300,7 @@ Parameters:
 1. If we evaluate a new point x, its value f(x) is uncertain. The **improvement** is how much better it is than the current best:
     
     $$
-    I(x) = [f(x) - f_n^*]^+ = \max(f(x) - f_n^*, 0)
+    I(x) = [f(x) - f_n^\*]^+ = \max(f(x) - f_n^\*, 0)
     $$
     
 2. Since f(x) is a random variable under the Gaussian Process model, we take the **expected value** of this improvement:
@@ -312,7 +312,7 @@ Parameters:
 3. Because $f(x) \sim \mathcal{N}(\mu_n(x), \sigma_n^2(x))$, EI can be computed in closed form:
     
     $$
-    EI_n(x) = (\mu_n(x) - f_n^*)\Phi(z) + \sigma_n(x)\phi(z), \quad z = \frac{\mu_n(x) - f_n^*}{\sigma_n(x)}
+    EI_n(x) = (\mu_n(x) - f_n^\*)\Phi(z) + \sigma_n(x)\phi(z), \quad z = \frac{\mu_n(x) - f_n^\*}{\sigma_n(x)}
     $$
     
     where $\Phi$ is the normal CDF and $\phi$ is the normal PDF.
@@ -367,7 +367,7 @@ Unlike Expected Improvement (EI), which focuses on immediate improvement at the 
 **Mathematical Form:**
 
 $$
-KG_n(x) = \mathbb{E}_n[\mu_{n+1}^* - \mu_n^*]
+KG_n(x) = E_n[\mu_{n+1}^\* - \mu_n^\*]
 $$
 
 where
@@ -496,7 +496,7 @@ Entropy measures uncertainty. If the posterior over the location of the global o
 - The expected reduction in entropy is
 
 $$
-ES_n(x) = H(P_n(x^*)) - \mathbb{E}_{f(x)}[H(P_n(x^*|f(x)))]
+ES_n(x) = H(P_n(x^\*)) - E_{f(x)}[H(P_n(x^\*|f(x)))]
 $$
 
 This means we prefer points x where observing $f(x)$ is expected to most reduce our uncertainty about $x^*$. Computing ES directly is difficult, because it requires calculating entropy over many possible function outcomes.
@@ -508,7 +508,7 @@ This means we prefer points x where observing $f(x)$ is expected to most reduce 
 PES **reformulates** the same idea in a simpler way. Instead of measuring the entropy of the optimum location directly, it measures the mutual information between $f(x)$ and $x^*$:
 
 $$
-PES_n(x) = H(P_n(f(x))) - \mathbb{E}_{x^*}[H(P_n(f(x)|x^*))]
+PES_n(x) = H(P_n(f(x))) - \mathbb{E}_{x^\*}[H(P_n(f(x)|x^\*))]
 $$
 
 This is mathematically equivalent to ES but easier to approximate in practice. PES estimates how much knowing the value of $f(x)$ would reduce uncertainty about where the optimum is.
