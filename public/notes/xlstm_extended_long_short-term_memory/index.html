@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>xLSTM: Extended Long Short-Term Memory | Home</title>
+<meta name="keywords" content="">
+<meta name="description" content="Paper-reading notes: xLSTM Extended Long Short-Term Memory">
+<meta name="author" content="">
+<link rel="canonical" href="http://localhost:1313/notes/xlstm_extended_long_short-term_memory/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.9bb7abd44394c0e0d2cecd8ad4322626054cd3f5709a6d890d5a408efaf1fa90.css" integrity="sha256-m7er1EOUwODSzs2K1DImJgVM0/Vwmm2JDVpAjvrx&#43;pA=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/selfile.png">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/selfile.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/selfile.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/selfile.png">
+<link rel="mask-icon" href="http://localhost:1313/selfile.png">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/notes/xlstm_extended_long_short-term_memory/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css" integrity="" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js" integrity="" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" integrity="" crossorigin="anonymous"></script>
+<script defer>
+  document.addEventListener("DOMContentLoaded", function() {
+    if (typeof renderMathInElement === 'function') {
+      renderMathInElement(document.body, {
+        
+        delimiters: [
+          {left: "$$", right: "$$", display: true},
+          {left: "\\[", right: "\\]", display: true},
+          {left: "$", right: "$", display: false},
+          {left: "\\(", right: "\\)", display: false}
+        ],
+        
+        throwOnError: false,
+        
+        ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      });
+    }
+  });
+</script>
+
+  
+  <style>
+     
+    ul#menu .tag-button {
+      background: none;
+      border: none;
+      padding: 0;
+      margin: 0;
+      font-weight: 500;
+      color: inherit;
+      cursor: pointer;
+      text-decoration: none;
+      opacity: 0.95;
+      display: inline-block;
+    }
+    ul#menu .tag-button:hover { text-decoration: underline; }
+    ul#menu .tag-button.active { text-decoration: underline; font-weight: 600; }
+
+     
+    body.is-home .post-entry { display: none; }
+    body.is-home .page-footer .pagination { display: none; }
+  </style>
+
+  
+  <script>
+    (function(){
+      function isRootPath() {
+        const p = location.pathname.replace(/\/+/g, '/');
+        return p === '/' || p === '' || p === '/index.html';
+      }
+
+      if (isRootPath()) document.body.classList.add('is-home');
+
+      
+      document.addEventListener('DOMContentLoaded', function(){
+        const menu = document.getElementById('menu');
+        if (!menu) return;
+        
+        if (menu.querySelector('.tag-button')) return;
+        const tags = ['Notes','Thoughts','Projects'];
+        tags.forEach(t => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+          a.className = 'tag-button';
+          a.href = `/tags/${t.toLowerCase()}/`;
+          a.textContent = t;
+          
+          if (location.pathname.toLowerCase().startsWith(`/tags/${t.toLowerCase()}`)) a.classList.add('active');
+          li.appendChild(a);
+          menu.appendChild(li);
+        });
+      });
+    })();
+  </script>
+<meta property="og:url" content="http://localhost:1313/notes/xlstm_extended_long_short-term_memory/">
+  <meta property="og:site_name" content="Home">
+  <meta property="og:title" content="xLSTM: Extended Long Short-Term Memory">
+  <meta property="og:description" content="Paper-reading notes: xLSTM Extended Long Short-Term Memory">
+  <meta property="og:locale" content="en-us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="notes">
+    <meta property="article:published_time" content="2025-10-28T13:18:30+00:00">
+    <meta property="article:modified_time" content="2025-10-28T13:18:30+00:00">
+      <meta property="og:image" content="http://localhost:1313/notes/xlstm_extended_long_short-term_memory/70fb722b-d8b5-4457-9578-08fc31fb92ce.png">
+      <meta property="og:image" content="http://localhost:1313/notes/xlstm_extended_long_short-term_memory/8fc4208a-dbba-4f38-8e50-c8d70b005011.png">
+      <meta property="og:image" content="http://localhost:1313/notes/xlstm_extended_long_short-term_memory/image.png">
+      <meta property="og:image" content="http://localhost:1313/notes/xlstm_extended_long_short-term_memory/image_1.png">
+      <meta property="og:image" content="http://localhost:1313/notes/xlstm_extended_long_short-term_memory/image_2.png">
+      <meta property="og:image" content="http://localhost:1313/notes/xlstm_extended_long_short-term_memory/image_3.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://localhost:1313/notes/xlstm_extended_long_short-term_memory/70fb722b-d8b5-4457-9578-08fc31fb92ce.png">
+<meta name="twitter:title" content="xLSTM: Extended Long Short-Term Memory">
+<meta name="twitter:description" content="Paper-reading notes: xLSTM Extended Long Short-Term Memory">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Notes",
+      "item": "http://localhost:1313/notes/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "xLSTM: Extended Long Short-Term Memory",
+      "item": "http://localhost:1313/notes/xlstm_extended_long_short-term_memory/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "xLSTM: Extended Long Short-Term Memory",
+  "name": "xLSTM: Extended Long Short-Term Memory",
+  "description": "Paper-reading notes: xLSTM Extended Long Short-Term Memory",
+  "keywords": [
+    
+  ],
+  "articleBody": "paper resource\nRWKV = a bridge between LSTM and Transformer (less computation and memory, parallel in training). Replace self-attention with a time-mixing mechanism that behaves like an LSTM in time but a Transformer in training and inference xLSTM = scale up the LSTM family to match or even surpass Transformer-level performance. Keep the recurrent spirit of LSTM, but redesign gates and memory (mLSTM) so it can train and scale efficiently like Transformers. Speciality: memory mixing, RWKV Abstract The paper revisits LSTMs, whose key innovations are the constant error carousel and gating mechanisms — originally solved the vanishing-gradient problem and made long-term memory possible. Although Transformers later surpassed LSTMs thanks to their parallelizable self-attention, the authors ask whether LSTMs can be scaled up, like modern LLMs, to billions of parameters while overcoming their known limits.\nTo achieve this, they introduce:\nExponential gating — a new gating function with improved normalization and stability. Modified memory structures: sLSTM — uses scalar memory and scalar updates with new “memory mixing.” → memory mixing mLSTM — introduces matrix-based memory that supports full parallelization and a covariance-based update rule. A new memory architecture → parallelization By stacking these enhanced cells into residual xLSTM blocks, they create architectures that combine the strengths of LSTMs and Transformers.\nExperiments show that xLSTMs can match or even outperform Transformers and State Space Models in both performance and scaling.\n👉 Code: github.com/NX-AI/xlstm\n1 Introduction 1.1 LSTM $$ c_t = f_t c_{t-1} + i_t z_t, \\quad h_t = o_t \\psi(c_t) $$\nUpdate the cell state / long-term memory: $$ c_t = f_t c_{t-1} + i_t z_t $$\n$c_t$: Cell state, real-valued vector, the internal long-term memory after update $f_t$: Forget gate, values in (0, 1), decide how much of $c_{t-1}$ to keep $c_{t-1}$: Previous cell state, vector, carries long-term memory $i_t$: Input gate, values in (0, 1), decides how much new info to write $z_t$: Cell input / candidate memory, usually $\\tanh(\\cdot)$ output, the new content that could be added Produce the output / hidden state / short-term memory: $$ \\quad h_t = o_t \\psi(c_t) $$\n$h_t$: Hidden state, vector, output of the cell (short-term memory) $o_t$: Output gate, values in (0, 1), controls what part of memory is shown outside $\\psi(c_t)$: Activation function (often $\\tanh(c_t$)), squashes memory to bounded range Three Main Limitations of LSTMs Can’t revise stored information Once an LSTM stores something in its cell state, it struggles to update or replace it later. xLSTM fix: introduces exponential gating, allowing flexible updating of stored values. Limited storage capacity Traditional LSTMs store information in a single scalar cell state, forcing compression and loss of details. xLSTM fix: uses a matrix memory, which can hold richer, multi-dimensional information. No parallelization LSTM depends on sequential hidden-to-hidden connections, meaning each step waits for the previous one. xLSTM fix: changes the memory mixing structure to make computation parallelizable across time steps. 2 Extended LSTM Two main modifications: exponential gating and novel memory structures. Two variants mombined into xLSTM blocks, stacked with residual connections to build xLSTM architectures, both can have multiple memory cells and heads: sLSTM – scalar memory, scalar update, memory mixing across cells. mLSTM – matrix memory, covariance (outer product) update, fully parallelizable. 2.2 sLSTM sLSTM = LSTM + exponential gates + normalization state + stabilizer state + multiple memory cells.\nThe exponential gates $i_t$ and $f_t$ make it easier to amplify or reduce memory dynamically.\n→ Helps sLSTM revise stored information better (a key limitation of classical LSTM).\nThe normalizer state $n_t$ keeps things numerically stable, so exponential growth doesn’t blow up.\nThe stabilizer state $m_t$ keeps their scale controlled, prevents numerical overflow during training.\nThe Multiple heads each with its own LSTM-like structure to compute its own $h_t$, then combined, just like multi-head attention in Transformers, allowing the network to learn different kinds of temporal patterns in parallel.\nNew Memory Mixing: In an sLSTM, each time step has multiple memory cells → a vector computed by recurrent matrices R, each cell stores part of the long-term memory, we allow these memory cells to talk to each other.\nMemory mixing = different parts (dimensions) of the memory cells communicate and influence each other.\n2.3 mLSTM mLSTM = LSTM + exponential gates + normalization state + stabilizer state + multiple memory cells.\nmLSTM replaces the small one-number memory $c_t$ of LSTM with a key–value memory matrix, so it can store, search, and update information like attention, but still works as a recurrent network (RNN).\n$q_k, k_t, v_t$ → same like query, key, value in transformer… uses a matrix memory because it wants to store relationships between features (keys and values), not just single values like traditional LSTM. The normalizer state $n_t$ is the weighted sum of key vectors, keeps record of the strength of the gates. Multiple heads and multiple cells are equivalent as there is no memory mixing. 2.4 xLSTM Architecture 2.4.1 xLSTM Blocks Each block takes an input (sequence or features), passes it through an sLSTM or mLSTM cell, adds some non-linear layers (MLPs) and residual/skip connections, finally outputs a transformed sequence representation.\nPatterns are easier to separate after mapping into a higher-dimensional space. Like for better points classification, we can map each point from 2D → 3D.\nWhen an xLSTM processes a sequence, it wants to distinguish different histories, for example:\n“The dog chased the cat” vs “The cat chased the dog.” These sequences may look similar in lower dimensions (both use same words), but when we map them into a higher-dimensional representation, the model can more easily tell them apart.\nSo each xLSTM block:\nexpands data into a higher space (“up-projection”), applies non-linear transformations, and then compresses back (“down-projection”). That makes it easier for the model to separate different contexts or meanings.\nType Memory type Recurrent connections Parallelization Up-proj position Storage capacity sLSTM Post up-projection Scalar memory (vector) ✅ via matrices R ❌ Sequential after LSTM Smaller mLSTM Pre up-projection Matrix memory ❌ No recurrent matrices ✅ parallelizable before LSTM Much larger 2.4.2 xLSTM Architecture Figure 1: The extended LSTM (xLSTM) family.\nFrom left to right:\nThe original LSTM memory cell with constant error carousel and gating. New sLSTM and mLSTM memory cells that introduce exponential gating. sLSTM offers a new memory mixing technique. mLSTM is fully parallelizable with a novel matrix memory cell state and new covariance update rule. mLSTM and sLSTM in residual blocks yield xLSTM blocks. Stacked xLSTM blocks give an xLSTM architecture. The constant error carousel is the additive update of the cell state $c_{t−1}$ (green) by cell inputs $z_t$ and moderated by sigmoid gates (blue).\nThe gating mechanisms:\nForget gate decides what to erase. Input gate decides what to add. Output gate decides what to show. 4 Experiments LSTM and xLSTM models far outperform Transformers and State Space Models on tasks that need long-term memory and state tracking; xLSTM, especially when combining sLSTM + mLSTM, achieves the best all-around performance, showing that recurrent memory architectures still beat attention models for logical and structured reasoning.\nThe paper uses perplexity (ppl) as the main evaluation metric for language modeling. It measures how well the model predicts the next token in a text sequence.\nThe model is confident and accurate → the model gives high probability to the correct next word → it’s confident → low perplexity. The model is confused and often wrong → the model gives low probability → it’s uncertain or wrong → high perplexity. Scaling Laws Next token prediction perplexity of xLSTM, RWKV-4, Llama, and Mamba on the SlimPajama validation set when trained on 300B tokens from SlimPajama. Model sizes are 125M, 350M, 760M, and 1.3B. The scaling laws indicate that for larger models xLSTM will perform well too.\n5 Limitations sLSTM not parallelizable:\nIts memory mixing prevents full parallel execution. Custom CUDA version is faster, but still ~2× slower than mLSTM. mLSTM kernels not optimized:\nCurrent CUDA implementation is ~4× slower than FlashAttention. Could be improved with better GPU kernels. High computation cost:\nmLSTM processes (d \\times d) matrices, which increases compute load,\nthough it can still be parallelized using standard matrix ops.\nGate initialization sensitivity:\nForget-gate parameters must be tuned carefully for stability. Memory limits at long contexts:\nLarge matrix memory may overload at very long sequence lengths,\nbut works fine up to ~16k tokens.\nNot fully optimized yet:\nArchitecture and hyperparameters weren’t exhaustively tuned due to cost. More optimization could further boost performance. ",
+  "wordCount" : "1394",
+  "inLanguage": "en",
+  "image": "http://localhost:1313/notes/xlstm_extended_long_short-term_memory/70fb722b-d8b5-4457-9578-08fc31fb92ce.png","datePublished": "2025-10-28T13:18:30Z",
+  "dateModified": "2025-10-28T13:18:30Z",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "http://localhost:1313/notes/xlstm_extended_long_short-term_memory/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Home",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "http://localhost:1313/selfile.png"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="Home (Alt + H)">Home</a>
+            <div class="logo-switches">
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a class="tag-button" href="http://localhost:1313/tags/notes/">
+                    <span>Notes</span>
+                </a>
+            </li>
+            <li>
+                <a class="tag-button" href="http://localhost:1313/tags/thoughts/">
+                    <span>Thoughts</span>
+                </a>
+            </li>
+            <li>
+                <a class="tag-button" href="http://localhost:1313/tags/projects/">
+                    <span>Projects</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="http://localhost:1313/">Home</a>&nbsp;»&nbsp;<a href="/notes/">Notes</a></div>
+    <h1 class="post-title entry-hint-parent">
+      xLSTM: Extended Long Short-Term Memory
+    </h1>
+    <div class="post-description">
+      Paper-reading notes: xLSTM Extended Long Short-Term Memory
+    </div>
+    <div class="post-meta"><span title='2025-10-28 13:18:30 +0000 +0000'>October 28, 2025</span>&nbsp;·&nbsp;<span>1394 words</span>
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#abstract" aria-label="Abstract">Abstract</a></li>
+                <li>
+                    <a href="#1-introduction" aria-label="1 Introduction">1 Introduction</a><ul>
+                        
+                <li>
+                    <a href="#11-lstm" aria-label="1.1 LSTM">1.1 LSTM</a><ul>
+                        
+                <li>
+                    <a href="#three-main-limitations-of-lstms" aria-label="Three Main Limitations of LSTMs">Three Main Limitations of LSTMs</a></li></ul>
+                </li></ul>
+                </li>
+                <li>
+                    <a href="#2-extended-lstm" aria-label="2 Extended LSTM">2 Extended LSTM</a><ul>
+                        
+                <li>
+                    <a href="#22-slstm" aria-label="2.2 sLSTM">2.2 sLSTM</a></li>
+                <li>
+                    <a href="#23-mlstm" aria-label="2.3 mLSTM">2.3 mLSTM</a></li>
+                <li>
+                    <a href="#24-xlstm-architecture" aria-label="2.4 xLSTM Architecture">2.4 xLSTM Architecture</a><ul>
+                        
+                <li>
+                    <a href="#241-xlstm-blocks" aria-label="2.4.1 xLSTM Blocks">2.4.1 xLSTM Blocks</a></li>
+                <li>
+                    <a href="#242-xlstm-architecture" aria-label="2.4.2 xLSTM Architecture">2.4.2 xLSTM Architecture</a></li></ul>
+                </li></ul>
+                </li>
+                <li>
+                    <a href="#4-experiments" aria-label="4 Experiments">4 Experiments</a><ul>
+                        
+                <li>
+                    <a href="#scaling-laws" aria-label="Scaling Laws">Scaling Laws</a></li></ul>
+                </li>
+                <li>
+                    <a href="#5-limitations" aria-label="5 Limitations">5 Limitations</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><p><a href="https://arxiv.org/abs/2405.04517">paper resource</a></p>
+<aside>
+<ul>
+<li><strong>RWKV</strong> = a <em>bridge</em> between LSTM and Transformer (less computation and memory, parallel in training). Replace self-attention with a time-mixing mechanism that behaves like an LSTM in time but a Transformer in training and inference</li>
+<li><strong>xLSTM</strong> = s<em>cale up</em> the LSTM family to match or even surpass Transformer-level performance. Keep the recurrent spirit of LSTM, but redesign gates and memory (mLSTM) so it can train and scale efficiently like Transformers.
+<ul>
+<li>Speciality: memory mixing, <del>RWKV</del></li>
+</ul>
+</li>
+</ul>
+</aside>
+<h1 id="abstract">Abstract<a hidden class="anchor" aria-hidden="true" href="#abstract">#</a></h1>
+<p>The paper revisits <strong>LSTMs</strong>, whose key innovations are the <strong>constant error carousel</strong> and <strong>gating mechanisms</strong> — originally solved the vanishing-gradient problem and made long-term memory possible. Although <strong>Transformers</strong> later surpassed LSTMs thanks to their <strong>parallelizable self-attention</strong>, the authors ask whether LSTMs can be scaled up, like modern LLMs, to <strong>billions of parameters</strong> while overcoming their known limits.</p>
+<p>To achieve this, they introduce:</p>
+<ol>
+<li><strong>Exponential gating</strong> — a new gating function with improved normalization and stability.</li>
+<li><strong>Modified memory structures:</strong>
+<ul>
+<li><strong>sLSTM</strong> — uses <strong>scalar memory</strong> and <strong>scalar updates</strong> with new “memory mixing.” <strong>→</strong> <strong>memory mixing</strong></li>
+<li><strong>mLSTM</strong> — introduces <strong>matrix-based memory</strong> that supports full parallelization and a <strong>covariance-based update</strong> rule. A new memory architecture <strong>→ parallelization</strong></li>
+</ul>
+</li>
+</ol>
+<p>By stacking these enhanced cells into <strong>residual xLSTM blocks</strong>, they create architectures that combine the strengths of LSTMs and Transformers.</p>
+<p>Experiments show that <strong>xLSTMs</strong> can match or even outperform <strong>Transformers</strong> and <strong>State Space Models</strong> in both <strong>performance and scaling</strong>.</p>
+<p>👉 <strong>Code:</strong> <a href="https://github.com/NX-AI/xlstm">github.com/NX-AI/xlstm</a></p>
+<h1 id="1-introduction">1 Introduction<a hidden class="anchor" aria-hidden="true" href="#1-introduction">#</a></h1>
+<h2 id="11-lstm">1.1 LSTM<a hidden class="anchor" aria-hidden="true" href="#11-lstm">#</a></h2>
+<p><img alt="image.png" loading="lazy" src="/notes/xlstm_extended_long_short-term_memory/image.png"></p>
+<p>$$
+c_t = f_t  c_{t-1} + i_t  z_t, \quad h_t = o_t  \psi(c_t)
+$$</p>
+<hr>
+<ol>
+<li><strong>Update the cell state / long-term memory:</strong></li>
+</ol>
+<p>$$
+c_t = f_t  c_{t-1} + i_t  z_t
+$$</p>
+<ul>
+<li>$c_t$: <strong>Cell state,</strong> real-valued vector, the internal <strong>long-term memory</strong> after update</li>
+<li>$f_t$: <strong>Forget gate,</strong> values in (0, 1), <strong>decide how much of $c_{t-1}$ to keep</strong></li>
+<li>$c_{t-1}$: <strong>Previous cell state</strong>, vector, carries long-term memory</li>
+<li>$i_t$: <strong>Input gate,</strong> values in (0, 1), <strong>decides how much new info to write</strong></li>
+<li>$z_t$: <strong>Cell input / candidate memory,</strong> usually $\tanh(\cdot)$ output, the <em>new content</em> that could be added</li>
+</ul>
+<hr>
+<ol>
+<li><strong>Produce the output / hidden state / short-term memory:</strong></li>
+</ol>
+<p>$$
+\quad h_t = o_t  \psi(c_t)
+$$</p>
+<ul>
+<li>$h_t$: <strong>Hidden state,</strong> vector, output of the cell (<strong>short-term memory</strong>)</li>
+<li>$o_t$: <strong>Output gate,</strong> values in (0, 1), controls what part of memory is shown outside</li>
+<li>$\psi(c_t)$: Activation function (often $\tanh(c_t$)), squashes memory to bounded range</li>
+</ul>
+<hr>
+<h3 id="three-main-limitations-of-lstms">Three Main Limitations of LSTMs<a hidden class="anchor" aria-hidden="true" href="#three-main-limitations-of-lstms">#</a></h3>
+<ol>
+<li><strong>Can’t revise stored information</strong>
+<ul>
+<li>Once an LSTM stores something in its cell state, it struggles to <em>update or replace</em> it later.</li>
+<li><strong>xLSTM fix:</strong> introduces <strong>exponential gating</strong>, allowing flexible updating of stored values.</li>
+</ul>
+</li>
+<li><strong>Limited storage capacity</strong>
+<ul>
+<li>Traditional LSTMs store information in a <strong>single scalar cell state</strong>, forcing compression and loss of details.</li>
+<li><strong>xLSTM fix:</strong> uses a <strong>matrix memory</strong>, which can hold richer, multi-dimensional information.</li>
+</ul>
+</li>
+<li><strong>No parallelization</strong>
+<ul>
+<li>LSTM depends on <strong>sequential hidden-to-hidden connections</strong>, meaning each step waits for the previous one.</li>
+<li><strong>xLSTM fix:</strong> changes the memory mixing structure to make computation <strong>parallelizable</strong> across time steps.</li>
+</ul>
+</li>
+</ol>
+<h1 id="2-extended-lstm">2 Extended LSTM<a hidden class="anchor" aria-hidden="true" href="#2-extended-lstm">#</a></h1>
+<ul>
+<li>Two main modifications: <strong>exponential gating</strong> and <strong>novel memory structures</strong>.</li>
+<li>Two variants mombined into <strong>xLSTM blocks</strong>, stacked with <strong>residual connections</strong> to build xLSTM architectures, both can have <strong>multiple memory cells and heads</strong>:
+<ul>
+<li><strong>sLSTM</strong> – scalar memory, scalar update, <strong>memory mixing across cells</strong>.</li>
+<li><strong>mLSTM</strong> – matrix memory, covariance (outer product) update, <strong>fully parallelizable</strong>.</li>
+</ul>
+</li>
+</ul>
+<h2 id="22-slstm">2.2 sLSTM<a hidden class="anchor" aria-hidden="true" href="#22-slstm">#</a></h2>
+<p>sLSTM = LSTM + <strong>exponential gates</strong> + <strong>normalization state</strong> + <strong>stabilizer state</strong> + m<strong>ultiple memory cells</strong>.</p>
+<ul>
+<li>
+<p>The <strong>exponential gates $i_t$</strong> and $f_t$ make it easier to <em>amplify or reduce</em> memory dynamically.</p>
+<p>→ Helps sLSTM revise stored information better (a key limitation of classical LSTM).</p>
+</li>
+<li>
+<p>The <strong>normalizer state $n_t$</strong> keeps things numerically stable, so exponential growth doesn’t blow up.</p>
+</li>
+<li>
+<p>The <strong>stabilizer state $m_t$</strong> keeps their scale controlled, <strong>prevents numerical overflow</strong> during training.</p>
+</li>
+<li>
+<p>The <strong>Multiple heads</strong> each with its own LSTM-like structure to compute its own $h_t$, then combined, just like multi-head attention in Transformers, allowing the network to learn different kinds of temporal patterns in parallel.</p>
+</li>
+</ul>
+<p><img alt="image.png" loading="lazy" src="/notes/xlstm_extended_long_short-term_memory/8fc4208a-dbba-4f38-8e50-c8d70b005011.png"></p>
+<p><img alt="image.png" loading="lazy" src="/notes/xlstm_extended_long_short-term_memory/70fb722b-d8b5-4457-9578-08fc31fb92ce.png"></p>
+<aside>
+<p><strong>New Memory Mixing:</strong> In an <strong>sLSTM</strong>, each time step has <strong>multiple memory cells → a vector</strong> computed by recurrent matrices R, each cell stores part of the long-term memory, we allow <strong>these memory cells to talk to each other.</strong></p>
+<p><strong>Memory mixing</strong> = different parts (dimensions) of the memory cells communicate and influence each other.</p>
+</aside>
+<h2 id="23-mlstm">2.3 mLSTM<a hidden class="anchor" aria-hidden="true" href="#23-mlstm">#</a></h2>
+<p>mLSTM = LSTM + <strong>exponential gates</strong> + <strong>normalization state</strong> + <strong>stabilizer state</strong> + <strong>multiple memory cells</strong>.</p>
+<p><strong>mLSTM</strong> replaces the small one-number memory $c_t$ of LSTM with a <strong>key–value memory matrix</strong>, so it can <em>store</em>, <em>search</em>, and <em>update</em> information like <strong>attention</strong>, but still works as a <strong>recurrent network</strong> (RNN).</p>
+<ul>
+<li>$q_k, k_t, v_t$ → same like query, key, value in transformer…</li>
+<li><strong>uses a matrix memory</strong> because it wants to <strong>store relationships</strong> between features (keys and values), not just single values like traditional LSTM.</li>
+<li>The <strong>normalizer state $n_t$</strong> is the weighted sum of key vectors, keeps record of the strength of the gates.</li>
+<li>Multiple heads and multiple cells are equivalent as there is <strong>no memory mixing</strong>.</li>
+</ul>
+<p><img alt="image.png" loading="lazy" src="/notes/xlstm_extended_long_short-term_memory/image_1.png"></p>
+<h2 id="24-xlstm-architecture">2.4 xLSTM Architecture<a hidden class="anchor" aria-hidden="true" href="#24-xlstm-architecture">#</a></h2>
+<h3 id="241-xlstm-blocks">2.4.1 xLSTM Blocks<a hidden class="anchor" aria-hidden="true" href="#241-xlstm-blocks">#</a></h3>
+<p>Each block takes an input (sequence or features), passes it through an <strong>sLSTM</strong> or <strong>mLSTM</strong> cell, adds some <strong>non-linear layers (MLPs)</strong> and <strong>residual/skip connections</strong>, finally outputs a transformed sequence representation.</p>
+<aside>
+<p><strong>Patterns are easier to separate after mapping into a higher-dimensional space.</strong> Like for better points classification, we can map each point from 2D → 3D.</p>
+<p>When an xLSTM processes a sequence, it wants to <strong>distinguish different histories,</strong> for example:</p>
+<ul>
+<li>“The dog chased the cat” vs “The cat chased the dog.”</li>
+</ul>
+<p>These sequences may look similar in lower dimensions (both use same words), but when we map them into a <strong>higher-dimensional representation</strong>, the model can more easily tell them apart.</p>
+<p>So each <strong>xLSTM block</strong>:</p>
+<ul>
+<li>expands data into a higher space (“up-projection”),</li>
+<li>applies non-linear transformations,</li>
+<li>and then compresses back (“down-projection”).</li>
+</ul>
+<p>That makes it easier for the model to <strong>separate different contexts or meanings</strong>.</p>
+</aside>
+<hr>
+<table>
+  <thead>
+      <tr>
+          <th></th>
+          <th>Type</th>
+          <th>Memory type</th>
+          <th>Recurrent connections</th>
+          <th>Parallelization</th>
+          <th>Up-proj position</th>
+          <th>Storage capacity</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>sLSTM</td>
+          <td><strong>Post up-projection</strong></td>
+          <td>Scalar memory (vector)</td>
+          <td>✅ via matrices R</td>
+          <td>❌ Sequential</td>
+          <td>after LSTM</td>
+          <td>Smaller</td>
+      </tr>
+      <tr>
+          <td>mLSTM</td>
+          <td><strong>Pre up-projection</strong></td>
+          <td>Matrix memory</td>
+          <td>❌ No recurrent matrices</td>
+          <td>✅ parallelizable</td>
+          <td>before LSTM</td>
+          <td>Much larger</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="242-xlstm-architecture">2.4.2 xLSTM Architecture<a hidden class="anchor" aria-hidden="true" href="#242-xlstm-architecture">#</a></h3>
+<p><img alt="image.png" loading="lazy" src="/notes/xlstm_extended_long_short-term_memory/image_2.png"></p>
+<aside>
+<p>Figure 1: <strong>The extended LSTM (xLSTM) family.</strong></p>
+<p>From left to right:</p>
+<ol>
+<li>The original LSTM memory cell with constant error carousel and gating.</li>
+<li>New sLSTM and mLSTM memory cells that introduce exponential gating. <strong>sLSTM</strong> offers a new memory mixing technique. <strong>mLSTM</strong> is fully parallelizable with a novel matrix memory cell state and new covariance update rule.</li>
+<li>mLSTM and sLSTM in residual blocks yield <strong>xLSTM blocks</strong>.</li>
+<li>Stacked xLSTM blocks give an <strong>xLSTM architecture</strong>.</li>
+</ol>
+</aside>
+<p>The <strong>constant error carousel</strong> is the <strong>additive update</strong> of the cell state $c_{t−1}$ (green) by cell inputs $z_t$ and moderated by sigmoid gates (blue).</p>
+<p>The gating mechanisms:</p>
+<ul>
+<li><strong>Forget gate</strong> decides what to erase.</li>
+<li><strong>Input gate</strong> decides what to add.</li>
+<li><strong>Output gate</strong> decides what to show.</li>
+</ul>
+<h1 id="4-experiments">4 Experiments<a hidden class="anchor" aria-hidden="true" href="#4-experiments">#</a></h1>
+<p><img alt="image.png" loading="lazy" src="/notes/xlstm_extended_long_short-term_memory/image_3.png"></p>
+<p>LSTM and xLSTM models <strong>far outperform Transformers and State Space Models</strong> on tasks that need <strong>long-term memory and state tracking; xLSTM</strong>, especially when combining sLSTM + mLSTM, achieves the <strong>best all-around performance</strong>, showing that <strong>recurrent memory architectures</strong> still beat attention models for logical and structured reasoning.</p>
+<hr>
+<p><img alt="image.png" loading="lazy" src="/notes/xlstm_extended_long_short-term_memory/image_4.png"></p>
+<aside>
+<p>The paper uses <strong>perplexity (ppl)</strong> as the main evaluation metric for language modeling. It measures <strong>how well the model predicts the next token</strong> in a text sequence.</p>
+<ul>
+<li>The model is confident and accurate → the model gives <strong>high probability</strong> to the correct next word → it’s confident → <strong>low perplexity</strong>.</li>
+<li>The model is confused and often wrong → the model gives <strong>low probability</strong> → it’s uncertain or wrong → <strong>high perplexity</strong>.</li>
+</ul>
+</aside>
+<h2 id="scaling-laws">Scaling Laws<a hidden class="anchor" aria-hidden="true" href="#scaling-laws">#</a></h2>
+<p><img alt="image.png" loading="lazy" src="/notes/xlstm_extended_long_short-term_memory/image_5.png"></p>
+<p>Next token prediction perplexity of xLSTM, RWKV-4, Llama, and Mamba on the SlimPajama validation set when trained on 300B tokens from SlimPajama. Model sizes are 125M, 350M, 760M, and 1.3B. The scaling laws indicate that for larger models xLSTM will perform well too.</p>
+<h1 id="5-limitations">5 Limitations<a hidden class="anchor" aria-hidden="true" href="#5-limitations">#</a></h1>
+<ol>
+<li>
+<p><strong>sLSTM not parallelizable:</strong></p>
+<ul>
+<li>Its memory mixing prevents full parallel execution.</li>
+<li>Custom CUDA version is faster, but still ~2× slower than mLSTM.</li>
+</ul>
+</li>
+<li>
+<p><strong>mLSTM kernels not optimized:</strong></p>
+<ul>
+<li>Current CUDA implementation is ~4× slower than FlashAttention.</li>
+<li>Could be improved with better GPU kernels.</li>
+</ul>
+</li>
+<li>
+<p><strong>High computation cost:</strong></p>
+<ul>
+<li>
+<p>mLSTM processes (d \times d) matrices, which increases compute load,</p>
+<p>though it can still be parallelized using standard matrix ops.</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Gate initialization sensitivity:</strong></p>
+<ul>
+<li>Forget-gate parameters must be tuned carefully for stability.</li>
+</ul>
+</li>
+<li>
+<p><strong>Memory limits at long contexts:</strong></p>
+<ul>
+<li>
+<p>Large matrix memory may overload at very long sequence lengths,</p>
+<p>but works fine up to ~16k tokens.</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Not fully optimized yet:</strong></p>
+<ul>
+<li>Architecture and hyperparameters weren’t exhaustively tuned due to cost.</li>
+<li>More optimization could further boost performance.</li>
+</ul>
+</li>
+</ol>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

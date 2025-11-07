@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>From Local to Global A GraphRAG Approach to Query- | Home</title>
+<meta name="keywords" content="">
+<meta name="description" content="Paper-reading notes: From Local to Global A GraphRAG Approach to Query-">
+<meta name="author" content="">
+<link rel="canonical" href="http://localhost:1313/notes/from_local_to_global_a_graphrag_approach_to_query-/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.9bb7abd44394c0e0d2cecd8ad4322626054cd3f5709a6d890d5a408efaf1fa90.css" integrity="sha256-m7er1EOUwODSzs2K1DImJgVM0/Vwmm2JDVpAjvrx&#43;pA=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/selfile.png">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/selfile.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/selfile.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/selfile.png">
+<link rel="mask-icon" href="http://localhost:1313/selfile.png">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/notes/from_local_to_global_a_graphrag_approach_to_query-/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css" integrity="" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js" integrity="" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" integrity="" crossorigin="anonymous"></script>
+<script defer>
+  document.addEventListener("DOMContentLoaded", function() {
+    if (typeof renderMathInElement === 'function') {
+      renderMathInElement(document.body, {
+        
+        delimiters: [
+          {left: "$$", right: "$$", display: true},
+          {left: "\\[", right: "\\]", display: true},
+          {left: "$", right: "$", display: false},
+          {left: "\\(", right: "\\)", display: false}
+        ],
+        
+        throwOnError: false,
+        
+        ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      });
+    }
+  });
+</script>
+
+  
+  <style>
+     
+    ul#menu .tag-button {
+      background: none;
+      border: none;
+      padding: 0;
+      margin: 0;
+      font-weight: 500;
+      color: inherit;
+      cursor: pointer;
+      text-decoration: none;
+      opacity: 0.95;
+      display: inline-block;
+    }
+    ul#menu .tag-button:hover { text-decoration: underline; }
+    ul#menu .tag-button.active { text-decoration: underline; font-weight: 600; }
+
+     
+    body.is-home .post-entry { display: none; }
+    body.is-home .page-footer .pagination { display: none; }
+  </style>
+
+  
+  <script>
+    (function(){
+      function isRootPath() {
+        const p = location.pathname.replace(/\/+/g, '/');
+        return p === '/' || p === '' || p === '/index.html';
+      }
+
+      if (isRootPath()) document.body.classList.add('is-home');
+
+      
+      document.addEventListener('DOMContentLoaded', function(){
+        const menu = document.getElementById('menu');
+        if (!menu) return;
+        
+        if (menu.querySelector('.tag-button')) return;
+        const tags = ['Notes','Thoughts','Projects'];
+        tags.forEach(t => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+          a.className = 'tag-button';
+          a.href = `/tags/${t.toLowerCase()}/`;
+          a.textContent = t;
+          
+          if (location.pathname.toLowerCase().startsWith(`/tags/${t.toLowerCase()}`)) a.classList.add('active');
+          li.appendChild(a);
+          menu.appendChild(li);
+        });
+      });
+    })();
+  </script>
+<meta property="og:url" content="http://localhost:1313/notes/from_local_to_global_a_graphrag_approach_to_query-/">
+  <meta property="og:site_name" content="Home">
+  <meta property="og:title" content="From Local to Global A GraphRAG Approach to Query-">
+  <meta property="og:description" content="Paper-reading notes: From Local to Global A GraphRAG Approach to Query-">
+  <meta property="og:locale" content="en-us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="notes">
+    <meta property="article:published_time" content="2025-10-16T19:42:01+00:00">
+    <meta property="article:modified_time" content="2025-10-16T19:42:01+00:00">
+      <meta property="og:image" content="http://localhost:1313/notes/from_local_to_global_a_graphrag_approach_to_query-/image.png">
+      <meta property="og:image" content="http://localhost:1313/notes/from_local_to_global_a_graphrag_approach_to_query-/image_1.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://localhost:1313/notes/from_local_to_global_a_graphrag_approach_to_query-/image.png">
+<meta name="twitter:title" content="From Local to Global A GraphRAG Approach to Query-">
+<meta name="twitter:description" content="Paper-reading notes: From Local to Global A GraphRAG Approach to Query-">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Notes",
+      "item": "http://localhost:1313/notes/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "From Local to Global A GraphRAG Approach to Query-",
+      "item": "http://localhost:1313/notes/from_local_to_global_a_graphrag_approach_to_query-/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "From Local to Global A GraphRAG Approach to Query-",
+  "name": "From Local to Global A GraphRAG Approach to Query-",
+  "description": "Paper-reading notes: From Local to Global A GraphRAG Approach to Query-",
+  "keywords": [
+    
+  ],
+  "articleBody": "1. Abstract Background:\nsummarization → Traditional RAG works well for specific questions (“When was Company X founded?”), but it struggles with broad, global ones (“What are the main ideas in all these documents?”). scalability → (Such questions need summarization of the whole dataset, not just retrieving a few passages — that’s called query-focused summarization (QFS).) Prior QFS methods, meanwhile, do not scale to the quantities of text indexed by typical RAG systems. we need to combine scalability and summarization: combines knowledge graph generation and query-focused summarization GraphRAG,\na graph-based approach to question answering over private text corpora that scales with both the generality of user questions and the quantity of source text.\nBuild a graph index in two stages:\nderive an entity knowledge graph from the source documents. a knowledge graph (nodes = entities, edges = relationships) pre-generate community summaries for all groups of closely related entities. Given a question, each community summary is used to generate a partial response, before all partial responses are again summarized in a final response to the user.\n1. Introduction GraphRAG,\nuses an LLM to construct a knowledge graph a knowledge graph, nodes correspond to key entities in the corpus and edges represent relationships between those entities. it partitions the graph into a hierarchy of communities of closely related entities, before using an LLM to generate community-level summaries. GraphRAG answers queries through map-reduce processing of community summaries. In the map step → the summaries are used to provide partial answers to the query independently and in parallel, In the reduce step → the partial answers are combined and used to generate a final global answer. GraphRAG contrasts with vector RAG (text embeddings) in its ability to answer queries that require global sensemaking over the entire data corpus.\n2. Background Adaptive Benchmarking → the process of dynamically generating evaluation benchmarks tailored to specific domains or use cases.\nGenerating test questions based on the current knowledge base. Measuring how well the model adapts when the corpus changes. Evaluating both retrieval and generation quality together. 3. Methods The high-level data flow of the GraphRAG approach and pipeline:\nCommunity detection is used to partition the graph index into groups of elements (nodes, edges, covariates) that the LLM can summarize in parallel at both indexing time and query time.\nnum of duplicates → edge weights claims → similarity Entities \u0026 Relationships → Knowledge Graph\nComponent Purpose Typical Technique (as described or implied) LLM extraction Identify entities/relations/claims Prompt-based, few-shot examples Entity matching Merge identical names Exact string match (default), fuzzy possible Graph construction Store nodes/edges Simple adjacency list or NetworkX graph Edge weighting Track frequency of relationships Count duplicates Aggregation \u0026 summarization Produce node/edge descriptions LLM summarization Community detection Find clusters Leiden algorithm (modularity optimization) For a given community level, the global answer to any user query is generated as follows:\nPrepare community summaries. Community summaries are randomly shuffled and divided into chunks of pre-specified token size. This ensures relevant information is distributed across chunks, rather than concentrated (and potentially lost) in a single context window. Map community answers. Intermediate answers are generated in parallel. The LLM is also asked to generate a score between 0-100 indicating how helpful the generated answer is in answering the target question. Answers with score 0 are filtered out. Reduce to global answer. Intermediate community answers are sorted in descending order of helpfulness score and iteratively added into a new context window until the token limit is reached. This final context is used to generate the global answer returned to the user. ",
+  "wordCount" : "588",
+  "inLanguage": "en",
+  "image": "http://localhost:1313/notes/from_local_to_global_a_graphrag_approach_to_query-/image.png","datePublished": "2025-10-16T19:42:01Z",
+  "dateModified": "2025-10-16T19:42:01Z",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "http://localhost:1313/notes/from_local_to_global_a_graphrag_approach_to_query-/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Home",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "http://localhost:1313/selfile.png"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="Home (Alt + H)">Home</a>
+            <div class="logo-switches">
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a class="tag-button" href="http://localhost:1313/tags/notes/">
+                    <span>Notes</span>
+                </a>
+            </li>
+            <li>
+                <a class="tag-button" href="http://localhost:1313/tags/thoughts/">
+                    <span>Thoughts</span>
+                </a>
+            </li>
+            <li>
+                <a class="tag-button" href="http://localhost:1313/tags/projects/">
+                    <span>Projects</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="http://localhost:1313/">Home</a>&nbsp;»&nbsp;<a href="/notes/">Notes</a></div>
+    <h1 class="post-title entry-hint-parent">
+      From Local to Global A GraphRAG Approach to Query-
+    </h1>
+    <div class="post-description">
+      Paper-reading notes: From Local to Global A GraphRAG Approach to Query-
+    </div>
+    <div class="post-meta"><span title='2025-10-16 19:42:01 +0000 +0000'>October 16, 2025</span>&nbsp;·&nbsp;<span>588 words</span>
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#1-abstract" aria-label="1. Abstract">1. Abstract</a></li>
+                <li>
+                    <a href="#1-introduction" aria-label="1. Introduction">1. Introduction</a></li>
+                <li>
+                    <a href="#2-background" aria-label="2. Background">2. Background</a></li>
+                <li>
+                    <a href="#3-methods" aria-label="3. Methods">3. Methods</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><h1 id="1-abstract">1. Abstract<a hidden class="anchor" aria-hidden="true" href="#1-abstract">#</a></h1>
+<p>Background:</p>
+<ol>
+<li><strong>summarization →</strong> Traditional RAG works well for <em>specific</em> questions (“When was Company X founded?”), but it struggles with <em>broad</em>, <em>global</em> ones (“What are the main ideas in all these documents?”).</li>
+<li><strong>scalability →</strong> (Such questions need <strong>summarization of the whole dataset</strong>, not just retrieving a few passages — that’s called <strong>query-focused summarization</strong> (QFS).) Prior QFS methods, meanwhile, do not scale to the quantities of text indexed by typical RAG systems.</li>
+<li>we need to combine <strong>scalability</strong> and <strong>summarization:</strong> combines knowledge graph generation and query-focused summarization</li>
+</ol>
+<aside>
+<p><strong>GraphRAG</strong>,</p>
+<p>a graph-based approach to question answering over private text corpora that scales with both the generality of user questions and the quantity of source text.</p>
+<p>Build a graph index in two stages:</p>
+<ol>
+<li>derive <strong>an entity knowledge graph</strong> from the source documents.
+<ul>
+<li><strong>a knowledge graph</strong> (nodes = entities, edges = relationships)</li>
+</ul>
+</li>
+<li>pre-generate <strong>community summaries</strong> for all groups of closely related entities.</li>
+</ol>
+</aside>
+<p>Given a question, each <strong>community summary</strong> is used to generate a partial response, before
+all partial responses are again summarized in a final response to the user.</p>
+<h1 id="1-introduction">1. Introduction<a hidden class="anchor" aria-hidden="true" href="#1-introduction">#</a></h1>
+<aside>
+<p><strong>GraphRAG,</strong></p>
+<ol>
+<li>uses an LLM to construct a knowledge graph
+<ul>
+<li><strong>a knowledge graph,</strong> nodes correspond to key entities in the corpus and edges represent relationships between those entities.</li>
+</ul>
+</li>
+<li>it partitions the graph into a hierarchy of communities of closely related entities, before using an LLM to generate community-level summaries.</li>
+<li>GraphRAG answers queries through <strong>map-reduce</strong> processing of community summaries.
+<ol>
+<li>In the map step →  the summaries are used to provide partial answers to the query independently and in parallel,</li>
+<li>In the reduce step → the partial answers are combined and used to generate a final global answer.</li>
+</ol>
+</li>
+</ol>
+</aside>
+<p><strong>GraphRAG</strong> contrasts with <strong>vector RAG</strong> (text embeddings) in its ability to answer queries that require global sensemaking over the entire data corpus.</p>
+<h1 id="2-background">2. Background<a hidden class="anchor" aria-hidden="true" href="#2-background">#</a></h1>
+<aside>
+<p><strong>Adaptive Benchmarking</strong> → the process of dynamically generating evaluation benchmarks tailored to specific domains or use cases.</p>
+<ul>
+<li>Generating test questions <em>based on the current knowledge base.</em></li>
+<li>Measuring how well the model adapts when the corpus changes.</li>
+<li>Evaluating both <strong>retrieval</strong> and <strong>generation</strong> quality together.</li>
+</ul>
+</aside>
+<h1 id="3-methods">3. Methods<a hidden class="anchor" aria-hidden="true" href="#3-methods">#</a></h1>
+<p><strong>The high-level data flow of the GraphRAG approach and pipeline:</strong></p>
+<p><img alt="<strong>Community detection</strong> is used to partition the graph index into groups of elements (nodes, edges, covariates) that the LLM can summarize in parallel at both indexing time and query time." loading="lazy" src="/notes/from_local_to_global_a_graphrag_approach_to_query-/image.png"></p>
+<p><strong>Community detection</strong> is used to partition the graph index into groups of elements (nodes, edges, covariates) that the LLM can summarize in parallel at both indexing time and query time.</p>
+<aside>
+<ul>
+<li>num of duplicates → edge weights</li>
+<li>claims → similarity</li>
+</ul>
+</aside>
+<p><strong>Entities &amp; Relationships → Knowledge Graph</strong></p>
+<table>
+  <thead>
+      <tr>
+          <th>Component</th>
+          <th>Purpose</th>
+          <th>Typical Technique (as described or implied)</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>LLM extraction</strong></td>
+          <td>Identify entities/relations/claims</td>
+          <td>Prompt-based, few-shot examples</td>
+      </tr>
+      <tr>
+          <td><strong>Entity matching</strong></td>
+          <td>Merge identical names</td>
+          <td>Exact string match (default), fuzzy possible</td>
+      </tr>
+      <tr>
+          <td><strong>Graph construction</strong></td>
+          <td>Store nodes/edges</td>
+          <td>Simple adjacency list or NetworkX graph</td>
+      </tr>
+      <tr>
+          <td><strong>Edge weighting</strong></td>
+          <td>Track frequency of relationships</td>
+          <td>Count duplicates</td>
+      </tr>
+      <tr>
+          <td><strong>Aggregation &amp; summarization</strong></td>
+          <td>Produce node/edge descriptions</td>
+          <td>LLM summarization</td>
+      </tr>
+      <tr>
+          <td><strong>Community detection</strong></td>
+          <td>Find clusters</td>
+          <td>Leiden algorithm (modularity optimization)</td>
+      </tr>
+  </tbody>
+</table>
+<p><img alt="image.png" loading="lazy" src="/notes/from_local_to_global_a_graphrag_approach_to_query-/image_1.png"></p>
+<aside>
+<p>For a given community level, the global answer to any user query is generated as follows:</p>
+<ul>
+<li>Prepare community summaries. Community summaries are randomly shuffled and divided into chunks of pre-specified token size. This ensures relevant information is distributed across chunks, rather than concentrated (and potentially lost) in a single context window.</li>
+<li>Map community answers. Intermediate answers are generated in parallel. The LLM is also asked to generate a score between 0-100 indicating how helpful the generated answer is in answering the target question. Answers with score 0 are filtered out.</li>
+<li>Reduce to global answer. Intermediate community answers are sorted in descending order of helpfulness score and iteratively added into a new context window until the token limit is reached. This final context is used to generate the global answer returned to the user.</li>
+</ul>
+</aside>
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

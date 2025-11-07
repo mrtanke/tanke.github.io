@@ -21,3 +21,59 @@
     }
   });
 </script>
+
+  <!-- Tag navigation (PaperMod-style) -->
+  <style>
+    /* PaperMod-like tag links placed in the header menu */
+    ul#menu .tag-button {
+      background: none;
+      border: none;
+      padding: 0;
+      margin: 0;
+      font-weight: 500;
+      color: inherit;
+      cursor: pointer;
+      text-decoration: none;
+      opacity: 0.95;
+      display: inline-block;
+    }
+    ul#menu .tag-button:hover { text-decoration: underline; }
+    ul#menu .tag-button.active { text-decoration: underline; font-weight: 600; }
+
+    /* Keep homepage minimal: hide post list and pagination only on the root page */
+    body.is-home .post-entry { display: none; }
+    body.is-home .page-footer .pagination { display: none; }
+  </style>
+
+  <!-- Inject tag links into the existing header menu and mark homepage -->
+  <script>
+    (function(){
+      function isRootPath() {
+        const p = location.pathname.replace(/\/+/g, '/');
+        return p === '/' || p === '' || p === '/index.html';
+      }
+
+      if (isRootPath()) document.body.classList.add('is-home');
+
+      // Inject links into the #menu UL so they align with PaperMod nav styling
+      document.addEventListener('DOMContentLoaded', function(){
+        const menu = document.getElementById('menu');
+        if (!menu) return;
+        // avoid double injection
+        if (menu.querySelector('.tag-button')) return;
+        const tags = ['Notes','Thoughts','Projects'];
+        const map = { Notes: '/notes/', Thoughts: '/thoughts/', Projects: '/projects/' };
+        tags.forEach(t => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+          a.className = 'tag-button';
+          a.href = map[t];
+          a.textContent = t;
+          // mark active when on a tag page
+          if (location.pathname.toLowerCase().startsWith(map[t])) a.classList.add('active');
+          li.appendChild(a);
+          menu.appendChild(li);
+        });
+      });
+    })();
+  </script>

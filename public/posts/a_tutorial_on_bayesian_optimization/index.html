@@ -1,58 +1,1028 @@
-<!doctype html><html lang=en dir=auto><head><meta charset=utf-8><meta http-equiv=X-UA-Compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no"><meta name=robots content="index, follow"><title>A Tutorial on Bayesian Optimization | Home</title><meta name=keywords content><meta name=description content="Paper-reading notes: A Tutorial on Bayesian Optimization"><meta name=author content><link rel=canonical href=https://my-blog-alpha-vert.vercel.app/posts/a_tutorial_on_bayesian_optimization/><link crossorigin=anonymous href=/assets/css/stylesheet.9bb7abd44394c0e0d2cecd8ad4322626054cd3f5709a6d890d5a408efaf1fa90.css integrity="sha256-m7er1EOUwODSzs2K1DImJgVM0/Vwmm2JDVpAjvrx+pA=" rel="preload stylesheet" as=style><link rel=icon href=https://my-blog-alpha-vert.vercel.app/selfile.png><link rel=icon type=image/png sizes=16x16 href=https://my-blog-alpha-vert.vercel.app/selfile.png><link rel=icon type=image/png sizes=32x32 href=https://my-blog-alpha-vert.vercel.app/selfile.png><link rel=apple-touch-icon href=https://my-blog-alpha-vert.vercel.app/selfile.png><link rel=mask-icon href=https://my-blog-alpha-vert.vercel.app/selfile.png><meta name=theme-color content="#2e2e33"><meta name=msapplication-TileColor content="#2e2e33"><link rel=alternate hreflang=en href=https://my-blog-alpha-vert.vercel.app/posts/a_tutorial_on_bayesian_optimization/><noscript><style>#theme-toggle,.top-link{display:none}</style><style>@media(prefers-color-scheme:dark){:root{--theme:rgb(29, 30, 32);--entry:rgb(46, 46, 51);--primary:rgb(218, 218, 219);--secondary:rgb(155, 156, 157);--tertiary:rgb(65, 66, 68);--content:rgb(196, 196, 197);--code-block-bg:rgb(46, 46, 51);--code-bg:rgb(55, 56, 62);--border:rgb(51, 51, 51)}.list{background:var(--theme)}.list:not(.dark)::-webkit-scrollbar-track{background:0 0}.list:not(.dark)::-webkit-scrollbar-thumb{border-color:var(--theme)}}</style></noscript><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css integrity crossorigin=anonymous><script defer src=https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js integrity crossorigin=anonymous></script><script defer src=https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js integrity crossorigin=anonymous></script><script defer>document.addEventListener("DOMContentLoaded",function(){typeof renderMathInElement=="function"&&renderMathInElement(document.body,{delimiters:[{left:"$$",right:"$$",display:!0},{left:"\\[",right:"\\]",display:!0},{left:"$",right:"$",display:!1},{left:"\\(",right:"\\)",display:!1}],throwOnError:!1,ignoredTags:["script","noscript","style","textarea","pre","code"]})})</script><meta property="og:url" content="https://my-blog-alpha-vert.vercel.app/posts/a_tutorial_on_bayesian_optimization/"><meta property="og:site_name" content="Home"><meta property="og:title" content="A Tutorial on Bayesian Optimization"><meta property="og:description" content="Paper-reading notes: A Tutorial on Bayesian Optimization"><meta property="og:locale" content="en-us"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2025-11-01T23:05:46+00:00"><meta property="article:modified_time" content="2025-11-01T23:05:46+00:00"><meta property="og:image" content="https://my-blog-alpha-vert.vercel.app/posts/a_tutorial_on_bayesian_optimization/image.png"><meta property="og:image" content="https://my-blog-alpha-vert.vercel.app/posts/a_tutorial_on_bayesian_optimization/image_1.png"><meta property="og:image" content="https://my-blog-alpha-vert.vercel.app/posts/a_tutorial_on_bayesian_optimization/image_2.png"><meta property="og:image" content="https://my-blog-alpha-vert.vercel.app/posts/a_tutorial_on_bayesian_optimization/image_3.png"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://my-blog-alpha-vert.vercel.app/posts/a_tutorial_on_bayesian_optimization/image.png"><meta name=twitter:title content="A Tutorial on Bayesian Optimization"><meta name=twitter:description content="Paper-reading notes: A Tutorial on Bayesian Optimization"><script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Posts","item":"https://my-blog-alpha-vert.vercel.app/posts/"},{"@type":"ListItem","position":2,"name":"A Tutorial on Bayesian Optimization","item":"https://my-blog-alpha-vert.vercel.app/posts/a_tutorial_on_bayesian_optimization/"}]}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"A Tutorial on Bayesian Optimization","name":"A Tutorial on Bayesian Optimization","description":"Paper-reading notes: A Tutorial on Bayesian Optimization","keywords":[],"articleBody":"Abstraction Bayesian Optimization is a method for finding the best solution when evaluating the objective function is slow or expensive (taking minutes or hours).\nIt is mainly used for problems with fewer than 20 variables and where evaluations may contain noise.\nThe method works by:\nBuilding a surrogate model of the unknown function using a Bayesian machine learning method called Gaussian Process regression, which predicts both the function value and its uncertainty. Using an acquisition function (expected improvement, knowledge gradient or entropy search) to decide where to sample next — balancing exploration and exploitation. The tutorial also extends expected improvement to handle noisy evaluations, supported by a formal decision-theoretic argument, rather than ad hoc fixes.\n1 Introduction Bayesian Optimization (BayesOpt) is a machine learning–based method for optimizing expensive, black-box functions, it’s designed for black-box derivative-free global optimization. It aims to solve\n$$ \\max_{x \\in A} f(x) $$\nwhere $f(x)$ is expensive to evaluate, derivative-free, and continuous.\nTypical Problem Setting\nThe input x lies in a continuous space R^d with small dimensionality (usually d ≤ 20). → search space The feasible set A is simple, such as a box constraint or simplex. → search area The objective function f is: Continuous (needed for Gaussian Process modeling). Expensive — each evaluation might take hours or cost resources. Black-box — no known analytic structure like linearity or convexity. Derivative-free — we can only observe f(x), not gradients. Possibly noisy — measurements may include Gaussian noise. At first, we pretend every time we evaluate f(x), we get the exact same result. Later in the paper, the author adds stochastic noise — meaning repeated evaluations of the same xxx might give slightly different results (like random fluctuations). Concept Meaning Intuition Search space The entire region of possible inputs x, its dimensionality tells us how complex the problem is. it’s the multi-dimensional space that defines where you can look. Feasible set / search area The subset of that space that you actually allow x to take, i.e., with all constraints applied. this is the region inside the search space that satisfies all limits (bounds, rules). BayesOpt is for global optimization of black-box functions. It builds a surrogate model of f(x) using a Bayesian machine learning technique, typically Gaussian Process (GP) regression. It then chooses where to sample next using an acquisition function (e.g., Expected Improvement, Knowledge Gradient, or Entropy Search). This balances exploration (trying uncertain areas) and exploitation (sampling promising areas).\nThe ability to optimize expensive black-box derivative-free functions makes BayesOpt extremely versatile. Recently it has become extremely popular for tuning hyperparameters in machine learning algorithms. And it’s also suitable for engineering design, scientific experiments and reinforcement Learning.\nWhat makes Bayesian Optimization unique compared to general surrogate-based optimization approaches are using surrogates developed using bayesian statistics and choosing new points using a probabilistic acquisition rule instead of heuristics. (reasoning probabilistically about what it already knows and what it’s uncertain about)\n2 Overview of BayesOpt BayesOpt consists of two main components: a Bayesian statistical model for modeling the objective function, and an acquisition function for deciding where to sample next.\nBayesian Statistical Model Models the unknown objective function $f(x)$.\nTypically a Gaussian Process (GP).\nProduces a posterior distribution:\n$$ f(x) \\sim \\mathcal{N}(\\mu_n(x), \\sigma_n^2(x)) $$\nwhere:\n$\\mu_n(x)$: predicted mean (best guess) $\\sigma_n(x)$: predicted uncertainty Updated each time new data (evaluations of f) are observed.\nAcquisition Function Decides where to sample next based on the GP’s posterior. Measures the “value” of sampling a new point x: High $\\mu_n(x)$: promising area. High $\\sigma_n(x)$: uncertain area. Common types: Expected Improvement (EI), Knowledge Gradient (KG), Entropy Search (ES), and Predictive Entropy Search (PES). After evaluating the objective according to an initial space-filling experimental design, often consisting of points chosen uniformly at random, they are used iteratively to allocate the remainder of a budget of N function evaluations.\nAlgorithm 1: Basic Bayesian Optimization Loop\nStart with a Gaussian Process (GP) model that guesses how f might behave. Test f at a few random starting points spread across the space. Repeat until you run out of trials: Update the GP using all results collected so far. Use the acquisition rule to pick the next best point to try. Test the real function at that point to get a new result ( y_n = f(x_n) ). Add this new point to your data. Give the final answer: The point with the best actual value, or The point the GP predicts to be the best. 3 Gaussian Process (GP) Regression Gaussian Process (GP) Regression is a Bayesian way to model an unknown function $f(x)$.\nIt assumes that any collection of function values $[f(x_1), f(x_2), …, f(x_k)]$ follows a multivariate normal distribution with a specific mean vector and covariance matrix.\nSo instead of guessing one possible curve for $f(x)$, we assume a probability distribution over all possible smooth curves.\n3.1 Initialization Steps Step 1: Define the Prior Before we see any data, we describe our belief about $f(x)$ using:\nA mean function $\\mu_0(x)$ → gives the average expected value, often set to 0 (no bias). A covariance (kernel) function $\\Sigma_0(x_i, x_j)$ → shows how similar two points are. Close points = high correlation (similar f values) Far points = low correlation (independent values) Together, they form the prior:\n$$ f(x_{1:k}) \\sim \\text{Normal}(\\mu_0(x_{1:k}), \\Sigma_0(x_{1:k}, x_{1:k})) $$\nStep 2: Update with Observed Data (Bayes’ Rule) Once we have some known data $(x_1, f(x_1)), …, (x_n, f(x_n))$, we update our belief to get the posterior distribution, what we now believe about the function after seeing real values.\nFor a new point x:\n$$ f(x)|f(x_{1:n}) \\sim \\text{Normal}(\\mu_n(x), \\sigma_n^2(x)) $$\nwhere:\n$\\mu_n(x)$: the posterior mean — our best prediction at $x$ $\\sigma_n^2(x)$: the posterior variance — how uncertain we are at $x$ The GP uses the kernel to decide how much nearby points influence the prediction:\nIf $x$ is near known points → high confidence, low uncertainty. If $x$ is far from all known points → low confidence, high uncertainty. Step 3: Posterior Formula $$ \\mu_n(x) = \\Sigma_0(x, x_{1:n})\\Sigma_0(x_{1:n}, x_{1:n})^{-1}(f(x_{1:n}) - \\mu_0(x_{1:n})) + \\mu_0(x) $$\n$$ \\sigma_n^2(x) = \\Sigma_0(x, x) - \\Sigma_0(x, x_{1:n})\\Sigma_0(x_{1:n}, x_{1:n})^{-1}\\Sigma_0(x_{1:n}, x) $$\nMeaning:\nThe new prediction $\\mu_n(x)$ = weighted average of nearby known values (old belief + weighted correction from known data) The uncertainty $\\sigma_n^2(x)$ = initial uncertainty minus what we’ve learned (reduce uncertainty) Step 4: Practical Notes Instead of directly inverting large matrices, use Cholesky decomposition for stability and speed. Add a tiny number (e.g., $10^{-6}$) to the diagonal of the covariance matrix to prevent numerical errors. The same formulas work for: Many new points at once (matrices) Continuous domains (theoretically infinite points) 3.2 Choosing a Mean Function and Kernel Kernel choice The kernel (covariance function) defines how much two inputs (x) and (x’) are correlated. Points that are close in the input space are more strongly correlated, the kernel must be positive semi-definite (it cannot give negative variances):\n$$ if (||x - x’|| \u003c ||x - x’’||), then (Σ_0(x, x’) \u003e Σ_0(x, x’’)). $$\nIf you combine things in any way, the total uncertainty you calculate will never be negative.\nPower Exponential (Gaussian) Kernel $$ Σ_0(x, x’) = α_0 \\exp(-||x - x’||^2) $$\nThe is the most common kernel and produces very smooth functions.\n$α_0$ controls overall variance (how much $f(x)$ can vary). $α_i$ inside $||x - x’||^2 = \\sum_i α_i (x_i - x’_i)^2$ control how quickly correlation decreases as inputs differ. Matérn Kernel $$ Σ_0(x, x’) = α_0 \\frac{2^{1-ν}}{Γ(ν)} (\\sqrt{2ν}||x - x’||)^{ν} K_ν(\\sqrt{2ν}||x - x’||) $$\nAdds a parameter $ν$ that controls smoothness. Smaller $ν$ produces rougher functions, larger $ν$ gives smoother ones. $K_ν$ is the modified Bessel function. Mean function The mean function expresses the expected trend of $f(x)$ before seeing data. The most common choice is a constant mean: $μ_0(x) = μ$. And If $f(x)$ is believed to have a trend, a parametric mean can be used:\n$$ μ_0(x) = μ + \\sum_{i=1}^{P} β_i Ψ_i(x) $$\nwhere $Ψ_i(x)$ are basis functions, often low-order polynomials.\nFor example, $Ψ(x) = x$ gives a linear trend, $Ψ(x) = [1, x, x^2]$ gives a quadratic trend.\n3.3 Choosing Hyperparameters The mean and kernel functions contain parameters (like $\\alpha_0, \\nu, \\mu$) called hyperparameters, grouped in a vector $\\eta$. These control how the Gaussian Process behaves (for example, how smooth it is or what its average level is).\nMaximum Likelihood Estimation (MLE) $$ \\hat{\\eta} = \\arg\\max_{\\eta} P(f(x_{1:n}) | \\eta) $$\nChoose hyperparameters that make the observed data most likely under the GP model. It’s simple and widely used. But it can give unreasonable results if the model overfits (e.g., too smooth or too wiggly).\nMaximum a Posteriori (MAP) $$ \\hat{\\eta} = \\arg\\max_{\\eta} P(\\eta | f(x_{1:n})) = \\arg\\max_{\\eta} P(f(x_{1:n}) | \\eta) P(\\eta) $$\nSimilar to MLE, but adds a prior $P(\\eta)$ on the hyperparameters. This prior prevents extreme or unrealistic parameter values. The MLE is a special case of MAP when $P(\\eta)$ is constant (flat). Common priors include uniform, normal, or log-normal distributions.\nFully Bayesian Approach $$ P(f(x) = y| f(x_{1:n})) = \\int P(f(x) = y| f(x_{1:n}), \\eta) P(\\eta | f(x_{1:n})) d\\eta $$\nInstead of choosing a single best $\\eta$, it integrates over all possible values of the hyperparameters. It produces more robust uncertainty estimates but is computationally expensive. In practice, it’s approximated using sampling methods (e.g., MCMC). MAP can be viewed as an approximation to this full Bayesian inference.\nDon’t fix η; instead, consider all possible η, weighted by how likely each one is.\nBut this high-dimensional and usually cannot be computed exactly, so in practice, we approximate it by sampling:\n$$ P(f(x) = y |f(x_{1:n})) \\approx \\frac{1}{J} \\sum_{j=1}^{J} P(f(x) = y |f(x_{1:n}), \\eta = \\eta_{j}) $$\nwhere the samples $\\eta_j$ are drawn from $P(\\eta | f(x_{1:n}))$. This is typically done using MCMC (Markov Chain Monte Carlo).\n3. Summary table Method In short Pros Cons MLE Fit the data best Finds hyperparams that best fit data Simple MAP Fit the data but stay reasonable Adds prior to control extremes More stable Fully Bayesian Consider all possible fits, weighted by probability computationally expensive Integrates over all possible scenarios 4 Acquisition Functions Expected Imrpvement(EI), Knowledge Gradient(KG), Entropy Search(ES)\n4.1 Expeced Improvement Goal: Decide where to sample next so that we are likely to improve our current best result.\nSuppose we have already tested n points. The best value so far is\n$$ f_n^* = \\max_{m \\le n} f(x_m) $$\nParameters:\nn is the number of points we have already evaluated so far. m is just an index variable If we evaluate a new point x, its value f(x) is uncertain. The improvement is how much better it is than the current best:\n$$ I(x) = [f(x) - f_n^*]^+ = \\max(f(x) - f_n^*, 0) $$\nSince f(x) is a random variable under the Gaussian Process model, we take the expected value of this improvement:\n$$ EI_n(x) = E_n[[f(x) - f_n^*]^+] $$\nBecause $f(x) \\sim \\mathcal{N}(\\mu_n(x), \\sigma_n^2(x))$, EI can be computed in closed form:\n$$ EI_n(x) = (\\mu_n(x) - f_n^*)\\Phi(z) + \\sigma_n(x)\\phi(z), \\quad z = \\frac{\\mu_n(x) - f_n^*}{\\sigma_n(x)} $$\nwhere $\\Phi$ is the normal CDF and $\\phi$ is the normal PDF.\n$Φ(z)$ = the cumulative distribution function (CDF) of the standard normal.\n→ It gives the probability that a standard normal variable is ≤ z.\n$ϕ(z)$ = the probability density function (PDF) of the standard normal.\n→ It gives the height of the bell curve at z.\nGoal → How much do I expect to improve the best result I’ve found so far if I test at this new point x?\n$EI_n(x)$ = predicted gain × chance it’s true + uncertainty × possible surprise\nEI =（平均能提升多少 × 提升的可能性） + （不确定性 × 由不确定性带来的潜在收益）\nFirst term: expected improvement if you trust the mean. Second term: extra improvement that might happen because the model is uncertain. The next sampling point is chosen by maximizing EI:\n$$ x_{n+1} = \\arg\\max_x EI_n(x) $$\nInterpretation:\nEI balances two goals:\nExploitation: sampling where the predicted mean $\\mu_n(x)$ is high. Exploration: sampling where uncertainty $\\sigma_n(x)$ is high. This trade-off helps the algorithm explore new areas and improve known good ones efficiently.\n4.2 Knowledge Gradient The Knowledge Gradient (KG) acquisition function measures the expected value of information gained from sampling a new point.\nUnlike Expected Improvement (EI), which focuses on immediate improvement at the sampled point, KG evaluates how much better our overall knowledge about the objective becomes after sampling.\nEI assumes the final solution must be one of the evaluated points. KG relaxes this: after we take one more sample, we can still choose any point (evaluated or not) as our final decision. Therefore, the value of sampling comes not just from finding a better local result, but from improving the entire model’s understanding of the objective surface. Mathematical Form:\n$$ KG_n(x) = E_n[\\mu_{n+1}^* - \\mu_n^*] $$\nwhere\n$\\mu_n^* = \\max_{x’} \\mu_n(x’)$: current predicted maximum, $\\mu_{n+1}^* = \\max_{x’} \\mu_{n+1}(x’)$: predicted maximum after taking a new sample at (x), The expectation $\\mathbb{E}_n[\\cdot]$ averages over possible outcomes of the new observation. Interpretation:\nKG measures the expected increase in the best achievable posterior mean after taking one new sample.\nAlgorithm 2 Simulation-based computation Purpost: estimate how much the best mean prediction might improve if we sample at x.\nSteps:\nFind the current best mean value\n$$ \\mu_n^* = \\max_{x’} \\mu_n(x’) $$\nThis is the best prediction under the current Gaussian Process (GP).\nSimulate what could happen if we sample at x\nRepeat J times (Monte Carlo simulation):\nDraw a random possible observation\n$$ y_{n+1} \\sim \\mathcal{N}(\\mu_n(x), \\sigma_n^2(x)) $$\n(equivalently, $y_{n+1} = \\mu_n(x) + \\sigma_n(x)Z ; Z\\sim\\mathcal{N}(0,1)$).\nUpdate the GP posterior using this “imagined” observation $(x, y_{n+1})$, obtaining a new mean function $\\mu_{n+1}(\\cdot)$.\nCompute the new best mean value\n$$ \\mu_{n+1}^* = \\max_{x’} \\mu_{n+1}(x’) $$\nCompute the gain for this scenario\n$$ \\Delta^{(j)} = \\mu_{n+1}^* - \\mu_n^* $$\nAverage over all J simulations\nThe Knowledge Gradient estimate is\n$$ KG_n(x) = \\frac{1}{J}\\sum_{j=1}^J \\Delta^{(j)} $$\nAlgorithm 3: Multi-start Stochastic Gradient Ascent Goal: Find the best next sampling point $x$ that maximizes $KG_n(x)$.\nProcess:\nStart from multiple random initial points $x_0^{(r)}$ (r = 1,…,R).\nFor each start, perform T stochastic gradient ascent steps:\nCompute stochastic gradient $G$ (estimated using Algorithm 4).\nUpdate $x_t^{(r)} = x_{t-1}^{(r)} + \\alpha_t G$,\nwhere $\\alpha_t = a / (a + t)$ is a decreasing step size.\nAfter T steps, estimate $KG_n(x_T^{(r)})$ using simulation (Algorithm 2).\nReturn the point with the largest estimated KG value.\nNotes:\nUsing multiple random starts helps avoid local optima. This method converges to a local maximum of the KG function. Algorithm 4 — Simulation of Stochastic Gradients Purpose: Compute an unbiased estimate of the gradient $\\nabla KG_n(x)$.\nSteps:\nFor each of J simulations: Sample a random variable $Z \\sim \\mathcal{N}(0,1)$. Generate a possible observation $y_{n+1} = \\mu_n(x) + \\sigma_n(x)Z$. Update the GP posterior using $(x, y_{n+1})$ to obtain new mean $\\mu_{n+1}$. Compute the new best posterior mean value $\\mu^*{n+1} = \\max{x’} \\mu{n+1}(x’)$. Evaluate its gradient w.r.t. the sampled point x. Average over all J samples to estimate $\\nabla KG_n(x)$. 4.3 Entropy Search and Predictive Entropy Search Entropy Search (ES) and Predictive Entropy Search (PES) are acquisition functions in Bayesian optimization that try to reduce uncertainty about the position of the global optimum $x^*$.\nInstead of asking “which point will improve the function value most,” they ask “which point will tell me the most about where the best value is.”\nEntropy measures uncertainty. If the posterior over the location of the global optimum x has high entropy, we are unsure where the best point is. A good new observation is one that most reduces this entropy.\nEntropy Search (ES) Purpose: Measures how much uncertainty (entropy) about the true optimum $x^*$ will go down if we sample at point x.\n$P_n(x^*)$: the current posterior belief over where the global optimum lies. $H(P_n(x^*))$: its entropy, representing uncertainty. After sampling at a candidate point x, the posterior changes to $P_n(x^*|f(x))$. The expected reduction in entropy is $$ ES_n(x) = H(P_n(x^*)) - E_{f(x)}[H(P_n(x^*|f(x)))] $$\nThis means we prefer points x where observing $f(x)$ is expected to most reduce our uncertainty about $x^*$. Computing ES directly is difficult, because it requires calculating entropy over many possible function outcomes.\nPredictive Entropy Search (PES) Purpose: Measures how much uncertainty (entropy) about the true optimum $x^*$ will go down if we sample at point x.\nPES reformulates the same idea in a simpler way. Instead of measuring the entropy of the optimum location directly, it measures the mutual information between $f(x)$ and $x^*$:\n$$ PES_n(x) = H(P_n(f(x))) - \\mathbb{E}_{x^*}[H(P_n(f(x)|x^*))] $$\nThis is mathematically equivalent to ES but easier to approximate in practice. PES estimates how much knowing the value of $f(x)$ would reduce uncertainty about where the optimum is.\nIntuitive difference from EI and KG\nExpected Improvement (EI) focuses on increasing the best function value so far. Knowledge Gradient (KG) focuses on improving the overall model prediction. ES and PES focus on learning information that narrows down the true location of the optimum. Entropy Search and Predictive Entropy Search choose sampling points that give the most information about the global optimum.\nThey are more global and information-driven than EI or KG but are computationally more complex.\n4.4 Multi-Step Optimal Acquisition Functions Bayesian optimization can be viewed as a sequential decision process: each sample depends on past results. Standard methods like EI, KG, ES, and PES are one-step optimal, choosing the next point assuming only one evaluation remains.\nA multi-step optimal strategy would plan several future evaluations ahead, maximizing total expected reward. However, computing it is extremely hard due to the dimensionality.\nRecent studies have tried approximate multi-step methods using reinforcement learning and dynamic programming, but they are not yet practical. Experiments show that one-step methods already perform nearly as well, so they remain the preferred approach in practice.\n5 Exotic Bayesian Optimization Noisy Evaluations Gaussian Process (GP) regression can handle noisy observations by adding noise variance to the covariance matrix. In practice, the noise variance is often unknown and treated as a hyperparameter. If noise varies across the domain, it can be modeled with another GP.\nAcquisition functions like EI, KG, ES, and PES naturally extend to noisy settings, but EI becomes less straightforward since the “improvement” is not directly observable. The KG approach is more robust under noise.\nParallel Evaluations Parallel Bayesian optimization allows evaluating several points simultaneously using multiple computing resources. Expected Improvement (EI) is extended to parallel EI, where several points $(x^{(1)}, \\dots, x^{(q)})$ are selected jointly to maximize expected improvement.\nVariants like multipoint EI and Constant Liar approximations simplify optimization. Similar extensions exist for KG, ES, and PES. Parallel versions are computationally harder but useful for speeding up optimization on modern systems.\nConstraints In real problems, sampling may be limited by constraints $g_i(x) \\ge 0$ (g is the constraint). These constraints can be as expensive to evaluate as $f(x)$. EI can be extended to check improvement only among feasible points, i.e., points that satisfy all $g_i(x) \\ge 0$.\nRecent work also studied constrained Bayesian optimization under noisy or uncertain feasibility.\nMulti-Fidelity and Multi-Information Source Evaluations Sometimes there are multiple ways to estimate the objective, each with different accuracy and cost (called fidelities). For example, $f(x, s)$ may represent evaluating $x$ with fidelity level $s$:\nlow fidelity is cheap but inaccurate high fidelity is expensive but precise The goal is to allocate a limited total budget among fidelities to maximize information gain. Methods like KG, ES, and PES can handle this setting, but EI does not generalize well because evaluating $f(x, s)$ for $s ≠ 0$ never provides an improvement in the best objective function value seen.\nRandom Environmental Conditions and Multi-Task Bayesian Optimization Here, the objective $f(x, w)$ depends on both design variables x and random environmental variables w (e.g., weather, test fold, etc.). The aim is to optimize either the expected value $\\int f(x,w)p(w)dw$ or the sum over tasks $\\sum f(x,w)p(w)$.\nBy observing performance under different w, we can infer information about nearby conditions, reducing the need for full evaluations. This setup is widely used in engineering, machine learning (cross-validation folds), and reinforcement learning. Modified EI, KG, and PES methods apply here.\nDerivative Observations Sometimes gradient (derivative) information is available along with function values. Gradients can be incorporated into GP models to improve predictions and optimization speed. While EI does not directly benefit from derivatives, KG can use them effectively.\nGradient-based updates improve convergence and numerical stability, especially in regions where function evaluations are expensive.\n6 Software 7 Conclusion and Research Directions 7.1 Conclusion The paper reviews Bayesian Optimization (BO) including Gaussian Process (GP) regression, and key acquisition functions such as expected improvement (EI), knowledge gradient (KG), entropy search (ES), and predictive entropy search (PES). And paper extends discussion to more complex cases (noise, constraints, multi-fidelity, multi-task, etc.).\n7.2 Future Research Directions Theory and Convergence: There is a need for a deeper theoretical understanding of BO. Multi-step optimal algorithms are known to exist but are hard to compute. We lack finite-time performance guarantees and full understanding of convergence rates. Beyond Gaussian Processes: Most BO methods use GPs, but new statistical models may better capture some types of problems. Research should aim to develop alternative models suited for specific applications. High-Dimensional Optimization: Current BO struggles when the number of parameters is large. New methods should leverage structure in high-dimensional problems. Exotic Problem Structures: BO should handle more complex, real-world conditions (multi-fidelity data, environmental randomness, derivative information). Combining method development with practical applications can reveal new challenges and innovations. Real-World Impact: BO has strong potential in chemistry, materials science, and drug discovery, where experiments are expensive and slow. However, few researchers in these fields currently use BO — so expanding awareness and applications is important. ","wordCount":"3591","inLanguage":"en","image":"https://my-blog-alpha-vert.vercel.app/posts/a_tutorial_on_bayesian_optimization/image.png","datePublished":"2025-11-01T23:05:46Z","dateModified":"2025-11-01T23:05:46Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://my-blog-alpha-vert.vercel.app/posts/a_tutorial_on_bayesian_optimization/"},"publisher":{"@type":"Organization","name":"Home","logo":{"@type":"ImageObject","url":"https://my-blog-alpha-vert.vercel.app/selfile.png"}}}</script></head><body id=top><script>localStorage.getItem("pref-theme")==="dark"?document.body.classList.add("dark"):localStorage.getItem("pref-theme")==="light"?document.body.classList.remove("dark"):window.matchMedia("(prefers-color-scheme: dark)").matches&&document.body.classList.add("dark")</script><header class=header><nav class=nav><div class=logo><a href=https://my-blog-alpha-vert.vercel.app/ accesskey=h title="Home (Alt + H)">Home</a><div class=logo-switches><button id=theme-toggle accesskey=t title="(Alt + T)" aria-label="Toggle theme">
-<svg id="moon" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
-<svg id="sun" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button></div></div><ul id=menu></ul></nav></header><main class=main><article class=post-single><header class=post-header><div class=breadcrumbs><a href=https://my-blog-alpha-vert.vercel.app/>Home</a>&nbsp;»&nbsp;<a href=/posts/>Posts</a></div><h1 class="post-title entry-hint-parent">A Tutorial on Bayesian Optimization</h1><div class=post-description>Paper-reading notes: A Tutorial on Bayesian Optimization</div><div class=post-meta><span title='2025-11-01 23:05:46 +0000 +0000'>November 1, 2025</span>&nbsp;·&nbsp;<span>3591 words</span></div></header><div class=toc><details><summary accesskey=c title="(Alt + C)"><span class=details>Table of Contents</span></summary><div class=inner><ul><li><a href=#abstraction aria-label=Abstraction>Abstraction</a></li><li><a href=#1-introduction aria-label="1 Introduction">1 Introduction</a></li><li><a href=#2-overview-of-bayesopt aria-label="2 Overview of BayesOpt">2 Overview of BayesOpt</a></li><li><a href=#3-gaussian-process-gp-regression aria-label="3 Gaussian Process (GP) Regression">3 Gaussian Process (GP) Regression</a><ul><li><a href=#31-initialization-steps aria-label="3.1 Initialization Steps">3.1 Initialization Steps</a><ul><li><a href=#step-1-define-the-prior aria-label="Step 1: Define the Prior">Step 1: Define the Prior</a></li><li><a href=#step-2-update-with-observed-data-bayes-rule aria-label="Step 2: Update with Observed Data (Bayes’ Rule)">Step 2: Update with Observed Data (Bayes’ Rule)</a></li><li><a href=#step-3-posterior-formula aria-label="Step 3: Posterior Formula">Step 3: Posterior Formula</a></li><li><a href=#step-4-practical-notes aria-label="Step 4: Practical Notes">Step 4: Practical Notes</a></li></ul></li><li><a href=#32-choosing-a-mean-function-and-kernel aria-label="3.2 Choosing a Mean Function and Kernel">3.2 Choosing a Mean Function and Kernel</a><ul><li><a href=#kernel-choice aria-label="Kernel choice">Kernel choice</a></li><li><a href=#power-exponential-gaussian-kernel aria-label="Power Exponential (Gaussian) Kernel">Power Exponential (Gaussian) Kernel</a></li><li><a href=#mat%c3%a9rn-kernel aria-label="Matérn Kernel">Matérn Kernel</a></li><li><a href=#mean-function aria-label="Mean function">Mean function</a></li></ul></li><li><a href=#33-choosing-hyperparameters aria-label="3.3 Choosing Hyperparameters">3.3 Choosing Hyperparameters</a><ul><li><a href=#maximum-likelihood-estimation-mle aria-label="Maximum Likelihood Estimation (MLE)">Maximum Likelihood Estimation (MLE)</a></li><li><a href=#maximum-a-posteriori-map aria-label="Maximum a Posteriori (MAP)">Maximum a Posteriori (MAP)</a></li><li><a href=#fully-bayesian-approach aria-label="Fully Bayesian Approach">Fully Bayesian Approach</a></li><li><a href=#3-summary-table aria-label="3. Summary table">3. Summary table</a></li></ul></li></ul></li><li><a href=#4-acquisition-functions aria-label="4 Acquisition Functions">4 Acquisition Functions</a><ul><li><a href=#41-expeced-improvement aria-label="4.1 Expeced Improvement">4.1 Expeced Improvement</a></li><li><a href=#42-knowledge-gradient aria-label="4.2 Knowledge Gradient">4.2 Knowledge Gradient</a><ul><li><a href=#algorithm-2-simulation-based-computation aria-label="Algorithm 2 Simulation-based computation">Algorithm 2 Simulation-based computation</a></li><li><a href=#algorithm-3-multi-start-stochastic-gradient-ascent aria-label="Algorithm 3: Multi-start Stochastic Gradient Ascent">Algorithm 3: Multi-start Stochastic Gradient Ascent</a></li><li><a href=#algorithm-4--simulation-of-stochastic-gradients aria-label="Algorithm 4 — Simulation of Stochastic Gradients">Algorithm 4 — Simulation of Stochastic Gradients</a></li></ul></li><li><a href=#43-entropy-search-and-predictive-entropy-search aria-label="4.3 Entropy Search and Predictive Entropy Search">4.3 Entropy Search and Predictive Entropy Search</a><ul><li><a href=#entropy-search-es aria-label="Entropy Search (ES)">Entropy Search (ES)</a></li><li><a href=#predictive-entropy-search-pes aria-label="Predictive Entropy Search (PES)">Predictive Entropy Search (PES)</a></li></ul></li><li><a href=#44-multi-step-optimal-acquisition-functions aria-label="4.4 Multi-Step Optimal Acquisition Functions">4.4 Multi-Step Optimal Acquisition Functions</a></li></ul></li><li><a href=#5-exotic-bayesian-optimization aria-label="5 Exotic Bayesian Optimization">5 Exotic Bayesian Optimization</a><ul><ul><li><a href=#noisy-evaluations aria-label="Noisy Evaluations">Noisy Evaluations</a></li><li><a href=#parallel-evaluations aria-label="Parallel Evaluations">Parallel Evaluations</a></li><li><a href=#constraints aria-label=Constraints>Constraints</a></li><li><a href=#multi-fidelity-and-multi-information-source-evaluations aria-label="Multi-Fidelity and Multi-Information Source Evaluations">Multi-Fidelity and Multi-Information Source Evaluations</a></li><li><a href=#random-environmental-conditions-and-multi-task-bayesian-optimization aria-label="Random Environmental Conditions and Multi-Task Bayesian Optimization">Random Environmental Conditions and Multi-Task Bayesian Optimization</a></li><li><a href=#derivative-observations aria-label="Derivative Observations">Derivative Observations</a></li></ul></ul></li><li><a href=#6-software aria-label="6 Software">6 Software</a></li><li><a href=#7-conclusion-and-research-directions aria-label="7 Conclusion and Research Directions">7 Conclusion and Research Directions</a><ul><li><a href=#71-conclusion aria-label="7.1 Conclusion">7.1 Conclusion</a></li><li><a href=#72-future-research-directions aria-label="7.2 Future Research Directions">7.2 Future Research Directions</a></li></ul></li></ul></div></details></div><div class=post-content><h1 id=abstraction>Abstraction<a hidden class=anchor aria-hidden=true href=#abstraction>#</a></h1><p><strong>Bayesian Optimization</strong> is a method for finding the best solution when evaluating the objective function is <strong>slow or expensive</strong> (taking minutes or hours).</p><p>It is mainly used for problems with <strong>fewer than 20 variables</strong> and where evaluations may contain <strong>noise</strong>.</p><p>The method works by:</p><ol><li>Building a <strong>surrogate model</strong> of the unknown function using a <strong>Bayesian machine learning method called Gaussian Process regression</strong>, which predicts both the function <strong>value</strong> and its <strong>uncertainty</strong>.</li><li>Using an <strong>acquisition function</strong> (expected improvement, knowledge gradient or entropy search) to decide <strong>where to sample next</strong> — balancing exploration and exploitation.</li></ol><p>The tutorial also extends expected improvement to handle <strong>noisy evaluations</strong>, supported by a <strong>formal decision-theoretic argument</strong>, rather than ad hoc fixes.</p><h1 id=1-introduction>1 Introduction<a hidden class=anchor aria-hidden=true href=#1-introduction>#</a></h1><p><strong>Bayesian Optimization (BayesOpt)</strong> is a <strong>machine learning–based method</strong> for optimizing expensive, black-box functions, it’s designed for black-box derivative-free global optimization. It aims to solve</p><p>$$
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>A Tutorial on Bayesian Optimization | Home</title>
+<meta name="keywords" content="">
+<meta name="description" content="Paper-reading notes: A Tutorial on Bayesian Optimization">
+<meta name="author" content="">
+<link rel="canonical" href="http://localhost:1313/posts/a_tutorial_on_bayesian_optimization/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.9bb7abd44394c0e0d2cecd8ad4322626054cd3f5709a6d890d5a408efaf1fa90.css" integrity="sha256-m7er1EOUwODSzs2K1DImJgVM0/Vwmm2JDVpAjvrx&#43;pA=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/selfile.png">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/selfile.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/selfile.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/selfile.png">
+<link rel="mask-icon" href="http://localhost:1313/selfile.png">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/posts/a_tutorial_on_bayesian_optimization/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css" integrity="" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js" integrity="" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" integrity="" crossorigin="anonymous"></script>
+<script defer>
+  document.addEventListener("DOMContentLoaded", function() {
+    if (typeof renderMathInElement === 'function') {
+      renderMathInElement(document.body, {
+        
+        delimiters: [
+          {left: "$$", right: "$$", display: true},
+          {left: "\\[", right: "\\]", display: true},
+          {left: "$", right: "$", display: false},
+          {left: "\\(", right: "\\)", display: false}
+        ],
+        
+        throwOnError: false,
+        
+        ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      });
+    }
+  });
+</script>
+
+  
+  <style>
+     
+    ul#menu .tag-button {
+      background: none;
+      border: none;
+      padding: 0;
+      margin: 0;
+      font-weight: 500;
+      color: inherit;
+      cursor: pointer;
+      text-decoration: none;
+      opacity: 0.95;
+      display: inline-block;
+    }
+    ul#menu .tag-button:hover { text-decoration: underline; }
+    ul#menu .tag-button.active { text-decoration: underline; font-weight: 600; }
+
+     
+    body.is-home .post-entry { display: none; }
+    body.is-home .page-footer .pagination { display: none; }
+  </style>
+
+  
+  <script>
+    (function(){
+      function isRootPath() {
+        const p = location.pathname.replace(/\/+/g, '/');
+        return p === '/' || p === '' || p === '/index.html';
+      }
+
+      if (isRootPath()) document.body.classList.add('is-home');
+
+      
+      document.addEventListener('DOMContentLoaded', function(){
+        const menu = document.getElementById('menu');
+        if (!menu) return;
+        
+        if (menu.querySelector('.tag-button')) return;
+        const tags = ['Notes','Thoughts','Projects'];
+        tags.forEach(t => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+          a.className = 'tag-button';
+          a.href = `/tags/${t.toLowerCase()}/`;
+          a.textContent = t;
+          
+          if (location.pathname.toLowerCase().startsWith(`/tags/${t.toLowerCase()}`)) a.classList.add('active');
+          li.appendChild(a);
+          menu.appendChild(li);
+        });
+      });
+    })();
+  </script>
+<meta property="og:url" content="http://localhost:1313/posts/a_tutorial_on_bayesian_optimization/">
+  <meta property="og:site_name" content="Home">
+  <meta property="og:title" content="A Tutorial on Bayesian Optimization">
+  <meta property="og:description" content="Paper-reading notes: A Tutorial on Bayesian Optimization">
+  <meta property="og:locale" content="en-us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2025-11-01T23:05:46+00:00">
+    <meta property="article:modified_time" content="2025-11-01T23:05:46+00:00">
+      <meta property="og:image" content="http://localhost:1313/posts/a_tutorial_on_bayesian_optimization/image.png">
+      <meta property="og:image" content="http://localhost:1313/posts/a_tutorial_on_bayesian_optimization/image_1.png">
+      <meta property="og:image" content="http://localhost:1313/posts/a_tutorial_on_bayesian_optimization/image_2.png">
+      <meta property="og:image" content="http://localhost:1313/posts/a_tutorial_on_bayesian_optimization/image_3.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://localhost:1313/posts/a_tutorial_on_bayesian_optimization/image.png">
+<meta name="twitter:title" content="A Tutorial on Bayesian Optimization">
+<meta name="twitter:description" content="Paper-reading notes: A Tutorial on Bayesian Optimization">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "http://localhost:1313/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "A Tutorial on Bayesian Optimization",
+      "item": "http://localhost:1313/posts/a_tutorial_on_bayesian_optimization/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "A Tutorial on Bayesian Optimization",
+  "name": "A Tutorial on Bayesian Optimization",
+  "description": "Paper-reading notes: A Tutorial on Bayesian Optimization",
+  "keywords": [
+    
+  ],
+  "articleBody": "Abstraction Bayesian Optimization is a method for finding the best solution when evaluating the objective function is slow or expensive (taking minutes or hours).\nIt is mainly used for problems with fewer than 20 variables and where evaluations may contain noise.\nThe method works by:\nBuilding a surrogate model of the unknown function using a Bayesian machine learning method called Gaussian Process regression, which predicts both the function value and its uncertainty. Using an acquisition function (expected improvement, knowledge gradient or entropy search) to decide where to sample next — balancing exploration and exploitation. The tutorial also extends expected improvement to handle noisy evaluations, supported by a formal decision-theoretic argument, rather than ad hoc fixes.\n1 Introduction Bayesian Optimization (BayesOpt) is a machine learning–based method for optimizing expensive, black-box functions, it’s designed for black-box derivative-free global optimization. It aims to solve\n$$ \\max_{x \\in A} f(x) $$\nwhere $f(x)$ is expensive to evaluate, derivative-free, and continuous.\nTypical Problem Setting\nThe input x lies in a continuous space R^d with small dimensionality (usually d ≤ 20). → search space The feasible set A is simple, such as a box constraint or simplex. → search area The objective function f is: Continuous (needed for Gaussian Process modeling). Expensive — each evaluation might take hours or cost resources. Black-box — no known analytic structure like linearity or convexity. Derivative-free — we can only observe f(x), not gradients. Possibly noisy — measurements may include Gaussian noise. At first, we pretend every time we evaluate f(x), we get the exact same result. Later in the paper, the author adds stochastic noise — meaning repeated evaluations of the same xxx might give slightly different results (like random fluctuations). Concept Meaning Intuition Search space The entire region of possible inputs x, its dimensionality tells us how complex the problem is. it’s the multi-dimensional space that defines where you can look. Feasible set / search area The subset of that space that you actually allow x to take, i.e., with all constraints applied. this is the region inside the search space that satisfies all limits (bounds, rules). BayesOpt is for global optimization of black-box functions. It builds a surrogate model of f(x) using a Bayesian machine learning technique, typically Gaussian Process (GP) regression. It then chooses where to sample next using an acquisition function (e.g., Expected Improvement, Knowledge Gradient, or Entropy Search). This balances exploration (trying uncertain areas) and exploitation (sampling promising areas).\nThe ability to optimize expensive black-box derivative-free functions makes BayesOpt extremely versatile. Recently it has become extremely popular for tuning hyperparameters in machine learning algorithms. And it’s also suitable for engineering design, scientific experiments and reinforcement Learning.\nWhat makes Bayesian Optimization unique compared to general surrogate-based optimization approaches are using surrogates developed using bayesian statistics and choosing new points using a probabilistic acquisition rule instead of heuristics. (reasoning probabilistically about what it already knows and what it’s uncertain about)\n2 Overview of BayesOpt BayesOpt consists of two main components: a Bayesian statistical model for modeling the objective function, and an acquisition function for deciding where to sample next.\nBayesian Statistical Model Models the unknown objective function $f(x)$.\nTypically a Gaussian Process (GP).\nProduces a posterior distribution:\n$$ f(x) \\sim \\mathcal{N}(\\mu_n(x), \\sigma_n^2(x)) $$\nwhere:\n$\\mu_n(x)$: predicted mean (best guess) $\\sigma_n(x)$: predicted uncertainty Updated each time new data (evaluations of f) are observed.\nAcquisition Function Decides where to sample next based on the GP’s posterior. Measures the “value” of sampling a new point x: High $\\mu_n(x)$: promising area. High $\\sigma_n(x)$: uncertain area. Common types: Expected Improvement (EI), Knowledge Gradient (KG), Entropy Search (ES), and Predictive Entropy Search (PES). After evaluating the objective according to an initial space-filling experimental design, often consisting of points chosen uniformly at random, they are used iteratively to allocate the remainder of a budget of N function evaluations.\nAlgorithm 1: Basic Bayesian Optimization Loop\nStart with a Gaussian Process (GP) model that guesses how f might behave. Test f at a few random starting points spread across the space. Repeat until you run out of trials: Update the GP using all results collected so far. Use the acquisition rule to pick the next best point to try. Test the real function at that point to get a new result ( y_n = f(x_n) ). Add this new point to your data. Give the final answer: The point with the best actual value, or The point the GP predicts to be the best. 3 Gaussian Process (GP) Regression Gaussian Process (GP) Regression is a Bayesian way to model an unknown function $f(x)$.\nIt assumes that any collection of function values $[f(x_1), f(x_2), …, f(x_k)]$ follows a multivariate normal distribution with a specific mean vector and covariance matrix.\nSo instead of guessing one possible curve for $f(x)$, we assume a probability distribution over all possible smooth curves.\n3.1 Initialization Steps Step 1: Define the Prior Before we see any data, we describe our belief about $f(x)$ using:\nA mean function $\\mu_0(x)$ → gives the average expected value, often set to 0 (no bias). A covariance (kernel) function $\\Sigma_0(x_i, x_j)$ → shows how similar two points are. Close points = high correlation (similar f values) Far points = low correlation (independent values) Together, they form the prior:\n$$ f(x_{1:k}) \\sim \\text{Normal}(\\mu_0(x_{1:k}), \\Sigma_0(x_{1:k}, x_{1:k})) $$\nStep 2: Update with Observed Data (Bayes’ Rule) Once we have some known data $(x_1, f(x_1)), …, (x_n, f(x_n))$, we update our belief to get the posterior distribution, what we now believe about the function after seeing real values.\nFor a new point x:\n$$ f(x)|f(x_{1:n}) \\sim \\text{Normal}(\\mu_n(x), \\sigma_n^2(x)) $$\nwhere:\n$\\mu_n(x)$: the posterior mean — our best prediction at $x$ $\\sigma_n^2(x)$: the posterior variance — how uncertain we are at $x$ The GP uses the kernel to decide how much nearby points influence the prediction:\nIf $x$ is near known points → high confidence, low uncertainty. If $x$ is far from all known points → low confidence, high uncertainty. Step 3: Posterior Formula $$ \\mu_n(x) = \\Sigma_0(x, x_{1:n})\\Sigma_0(x_{1:n}, x_{1:n})^{-1}(f(x_{1:n}) - \\mu_0(x_{1:n})) + \\mu_0(x) $$\n$$ \\sigma_n^2(x) = \\Sigma_0(x, x) - \\Sigma_0(x, x_{1:n})\\Sigma_0(x_{1:n}, x_{1:n})^{-1}\\Sigma_0(x_{1:n}, x) $$\nMeaning:\nThe new prediction $\\mu_n(x)$ = weighted average of nearby known values (old belief + weighted correction from known data) The uncertainty $\\sigma_n^2(x)$ = initial uncertainty minus what we’ve learned (reduce uncertainty) Step 4: Practical Notes Instead of directly inverting large matrices, use Cholesky decomposition for stability and speed. Add a tiny number (e.g., $10^{-6}$) to the diagonal of the covariance matrix to prevent numerical errors. The same formulas work for: Many new points at once (matrices) Continuous domains (theoretically infinite points) 3.2 Choosing a Mean Function and Kernel Kernel choice The kernel (covariance function) defines how much two inputs (x) and (x’) are correlated. Points that are close in the input space are more strongly correlated, the kernel must be positive semi-definite (it cannot give negative variances):\n$$ if (||x - x’|| \u003c ||x - x’’||), then (Σ_0(x, x’) \u003e Σ_0(x, x’’)). $$\nIf you combine things in any way, the total uncertainty you calculate will never be negative.\nPower Exponential (Gaussian) Kernel $$ Σ_0(x, x’) = α_0 \\exp(-||x - x’||^2) $$\nThe is the most common kernel and produces very smooth functions.\n$α_0$ controls overall variance (how much $f(x)$ can vary). $α_i$ inside $||x - x’||^2 = \\sum_i α_i (x_i - x’_i)^2$ control how quickly correlation decreases as inputs differ. Matérn Kernel $$ Σ_0(x, x’) = α_0 \\frac{2^{1-ν}}{Γ(ν)} (\\sqrt{2ν}||x - x’||)^{ν} K_ν(\\sqrt{2ν}||x - x’||) $$\nAdds a parameter $ν$ that controls smoothness. Smaller $ν$ produces rougher functions, larger $ν$ gives smoother ones. $K_ν$ is the modified Bessel function. Mean function The mean function expresses the expected trend of $f(x)$ before seeing data. The most common choice is a constant mean: $μ_0(x) = μ$. And If $f(x)$ is believed to have a trend, a parametric mean can be used:\n$$ μ_0(x) = μ + \\sum_{i=1}^{P} β_i Ψ_i(x) $$\nwhere $Ψ_i(x)$ are basis functions, often low-order polynomials.\nFor example, $Ψ(x) = x$ gives a linear trend, $Ψ(x) = [1, x, x^2]$ gives a quadratic trend.\n3.3 Choosing Hyperparameters The mean and kernel functions contain parameters (like $\\alpha_0, \\nu, \\mu$) called hyperparameters, grouped in a vector $\\eta$. These control how the Gaussian Process behaves (for example, how smooth it is or what its average level is).\nMaximum Likelihood Estimation (MLE) $$ \\hat{\\eta} = \\arg\\max_{\\eta} P(f(x_{1:n}) | \\eta) $$\nChoose hyperparameters that make the observed data most likely under the GP model. It’s simple and widely used. But it can give unreasonable results if the model overfits (e.g., too smooth or too wiggly).\nMaximum a Posteriori (MAP) $$ \\hat{\\eta} = \\arg\\max_{\\eta} P(\\eta | f(x_{1:n})) = \\arg\\max_{\\eta} P(f(x_{1:n}) | \\eta) P(\\eta) $$\nSimilar to MLE, but adds a prior $P(\\eta)$ on the hyperparameters. This prior prevents extreme or unrealistic parameter values. The MLE is a special case of MAP when $P(\\eta)$ is constant (flat). Common priors include uniform, normal, or log-normal distributions.\nFully Bayesian Approach $$ P(f(x) = y| f(x_{1:n})) = \\int P(f(x) = y| f(x_{1:n}), \\eta) P(\\eta | f(x_{1:n})) d\\eta $$\nInstead of choosing a single best $\\eta$, it integrates over all possible values of the hyperparameters. It produces more robust uncertainty estimates but is computationally expensive. In practice, it’s approximated using sampling methods (e.g., MCMC). MAP can be viewed as an approximation to this full Bayesian inference.\nDon’t fix η; instead, consider all possible η, weighted by how likely each one is.\nBut this high-dimensional and usually cannot be computed exactly, so in practice, we approximate it by sampling:\n$$ P(f(x) = y |f(x_{1:n})) \\approx \\frac{1}{J} \\sum_{j=1}^{J} P(f(x) = y |f(x_{1:n}), \\eta = \\eta_{j}) $$\nwhere the samples $\\eta_j$ are drawn from $P(\\eta | f(x_{1:n}))$. This is typically done using MCMC (Markov Chain Monte Carlo).\n3. Summary table Method In short Pros Cons MLE Fit the data best Finds hyperparams that best fit data Simple MAP Fit the data but stay reasonable Adds prior to control extremes More stable Fully Bayesian Consider all possible fits, weighted by probability computationally expensive Integrates over all possible scenarios 4 Acquisition Functions Expected Imrpvement(EI), Knowledge Gradient(KG), Entropy Search(ES)\n4.1 Expeced Improvement Goal: Decide where to sample next so that we are likely to improve our current best result.\nSuppose we have already tested n points. The best value so far is\n$$ f_n^* = \\max_{m \\le n} f(x_m) $$\nParameters:\nn is the number of points we have already evaluated so far. m is just an index variable If we evaluate a new point x, its value f(x) is uncertain. The improvement is how much better it is than the current best:\n$$ I(x) = [f(x) - f_n^*]^+ = \\max(f(x) - f_n^*, 0) $$\nSince f(x) is a random variable under the Gaussian Process model, we take the expected value of this improvement:\n$$ EI_n(x) = E_n[[f(x) - f_n^*]^+] $$\nBecause $f(x) \\sim \\mathcal{N}(\\mu_n(x), \\sigma_n^2(x))$, EI can be computed in closed form:\n$$ EI_n(x) = (\\mu_n(x) - f_n^*)\\Phi(z) + \\sigma_n(x)\\phi(z), \\quad z = \\frac{\\mu_n(x) - f_n^*}{\\sigma_n(x)} $$\nwhere $\\Phi$ is the normal CDF and $\\phi$ is the normal PDF.\n$Φ(z)$ = the cumulative distribution function (CDF) of the standard normal.\n→ It gives the probability that a standard normal variable is ≤ z.\n$ϕ(z)$ = the probability density function (PDF) of the standard normal.\n→ It gives the height of the bell curve at z.\nGoal → How much do I expect to improve the best result I’ve found so far if I test at this new point x?\n$EI_n(x)$ = predicted gain × chance it’s true + uncertainty × possible surprise\nEI =（平均能提升多少 × 提升的可能性） + （不确定性 × 由不确定性带来的潜在收益）\nFirst term: expected improvement if you trust the mean. Second term: extra improvement that might happen because the model is uncertain. The next sampling point is chosen by maximizing EI:\n$$ x_{n+1} = \\arg\\max_x EI_n(x) $$\nInterpretation:\nEI balances two goals:\nExploitation: sampling where the predicted mean $\\mu_n(x)$ is high. Exploration: sampling where uncertainty $\\sigma_n(x)$ is high. This trade-off helps the algorithm explore new areas and improve known good ones efficiently.\n4.2 Knowledge Gradient The Knowledge Gradient (KG) acquisition function measures the expected value of information gained from sampling a new point.\nUnlike Expected Improvement (EI), which focuses on immediate improvement at the sampled point, KG evaluates how much better our overall knowledge about the objective becomes after sampling.\nEI assumes the final solution must be one of the evaluated points. KG relaxes this: after we take one more sample, we can still choose any point (evaluated or not) as our final decision. Therefore, the value of sampling comes not just from finding a better local result, but from improving the entire model’s understanding of the objective surface. Mathematical Form:\n$$ KG_n(x) = E_n[\\mu_{n+1}^* - \\mu_n^*] $$\nwhere\n$\\mu_n^* = \\max_{x’} \\mu_n(x’)$: current predicted maximum, $\\mu_{n+1}^* = \\max_{x’} \\mu_{n+1}(x’)$: predicted maximum after taking a new sample at (x), The expectation $\\mathbb{E}_n[\\cdot]$ averages over possible outcomes of the new observation. Interpretation:\nKG measures the expected increase in the best achievable posterior mean after taking one new sample.\nAlgorithm 2 Simulation-based computation Purpost: estimate how much the best mean prediction might improve if we sample at x.\nSteps:\nFind the current best mean value\n$$ \\mu_n^* = \\max_{x’} \\mu_n(x’) $$\nThis is the best prediction under the current Gaussian Process (GP).\nSimulate what could happen if we sample at x\nRepeat J times (Monte Carlo simulation):\nDraw a random possible observation\n$$ y_{n+1} \\sim \\mathcal{N}(\\mu_n(x), \\sigma_n^2(x)) $$\n(equivalently, $y_{n+1} = \\mu_n(x) + \\sigma_n(x)Z ; Z\\sim\\mathcal{N}(0,1)$).\nUpdate the GP posterior using this “imagined” observation $(x, y_{n+1})$, obtaining a new mean function $\\mu_{n+1}(\\cdot)$.\nCompute the new best mean value\n$$ \\mu_{n+1}^* = \\max_{x’} \\mu_{n+1}(x’) $$\nCompute the gain for this scenario\n$$ \\Delta^{(j)} = \\mu_{n+1}^* - \\mu_n^* $$\nAverage over all J simulations\nThe Knowledge Gradient estimate is\n$$ KG_n(x) = \\frac{1}{J}\\sum_{j=1}^J \\Delta^{(j)} $$\nAlgorithm 3: Multi-start Stochastic Gradient Ascent Goal: Find the best next sampling point $x$ that maximizes $KG_n(x)$.\nProcess:\nStart from multiple random initial points $x_0^{(r)}$ (r = 1,…,R).\nFor each start, perform T stochastic gradient ascent steps:\nCompute stochastic gradient $G$ (estimated using Algorithm 4).\nUpdate $x_t^{(r)} = x_{t-1}^{(r)} + \\alpha_t G$,\nwhere $\\alpha_t = a / (a + t)$ is a decreasing step size.\nAfter T steps, estimate $KG_n(x_T^{(r)})$ using simulation (Algorithm 2).\nReturn the point with the largest estimated KG value.\nNotes:\nUsing multiple random starts helps avoid local optima. This method converges to a local maximum of the KG function. Algorithm 4 — Simulation of Stochastic Gradients Purpose: Compute an unbiased estimate of the gradient $\\nabla KG_n(x)$.\nSteps:\nFor each of J simulations: Sample a random variable $Z \\sim \\mathcal{N}(0,1)$. Generate a possible observation $y_{n+1} = \\mu_n(x) + \\sigma_n(x)Z$. Update the GP posterior using $(x, y_{n+1})$ to obtain new mean $\\mu_{n+1}$. Compute the new best posterior mean value $\\mu^*{n+1} = \\max{x’} \\mu{n+1}(x’)$. Evaluate its gradient w.r.t. the sampled point x. Average over all J samples to estimate $\\nabla KG_n(x)$. 4.3 Entropy Search and Predictive Entropy Search Entropy Search (ES) and Predictive Entropy Search (PES) are acquisition functions in Bayesian optimization that try to reduce uncertainty about the position of the global optimum $x^*$.\nInstead of asking “which point will improve the function value most,” they ask “which point will tell me the most about where the best value is.”\nEntropy measures uncertainty. If the posterior over the location of the global optimum x has high entropy, we are unsure where the best point is. A good new observation is one that most reduces this entropy.\nEntropy Search (ES) Purpose: Measures how much uncertainty (entropy) about the true optimum $x^*$ will go down if we sample at point x.\n$P_n(x^*)$: the current posterior belief over where the global optimum lies. $H(P_n(x^*))$: its entropy, representing uncertainty. After sampling at a candidate point x, the posterior changes to $P_n(x^*|f(x))$. The expected reduction in entropy is $$ ES_n(x) = H(P_n(x^*)) - E_{f(x)}[H(P_n(x^*|f(x)))] $$\nThis means we prefer points x where observing $f(x)$ is expected to most reduce our uncertainty about $x^*$. Computing ES directly is difficult, because it requires calculating entropy over many possible function outcomes.\nPredictive Entropy Search (PES) Purpose: Measures how much uncertainty (entropy) about the true optimum $x^*$ will go down if we sample at point x.\nPES reformulates the same idea in a simpler way. Instead of measuring the entropy of the optimum location directly, it measures the mutual information between $f(x)$ and $x^*$:\n$$ PES_n(x) = H(P_n(f(x))) - \\mathbb{E}_{x^*}[H(P_n(f(x)|x^*))] $$\nThis is mathematically equivalent to ES but easier to approximate in practice. PES estimates how much knowing the value of $f(x)$ would reduce uncertainty about where the optimum is.\nIntuitive difference from EI and KG\nExpected Improvement (EI) focuses on increasing the best function value so far. Knowledge Gradient (KG) focuses on improving the overall model prediction. ES and PES focus on learning information that narrows down the true location of the optimum. Entropy Search and Predictive Entropy Search choose sampling points that give the most information about the global optimum.\nThey are more global and information-driven than EI or KG but are computationally more complex.\n4.4 Multi-Step Optimal Acquisition Functions Bayesian optimization can be viewed as a sequential decision process: each sample depends on past results. Standard methods like EI, KG, ES, and PES are one-step optimal, choosing the next point assuming only one evaluation remains.\nA multi-step optimal strategy would plan several future evaluations ahead, maximizing total expected reward. However, computing it is extremely hard due to the dimensionality.\nRecent studies have tried approximate multi-step methods using reinforcement learning and dynamic programming, but they are not yet practical. Experiments show that one-step methods already perform nearly as well, so they remain the preferred approach in practice.\n5 Exotic Bayesian Optimization Noisy Evaluations Gaussian Process (GP) regression can handle noisy observations by adding noise variance to the covariance matrix. In practice, the noise variance is often unknown and treated as a hyperparameter. If noise varies across the domain, it can be modeled with another GP.\nAcquisition functions like EI, KG, ES, and PES naturally extend to noisy settings, but EI becomes less straightforward since the “improvement” is not directly observable. The KG approach is more robust under noise.\nParallel Evaluations Parallel Bayesian optimization allows evaluating several points simultaneously using multiple computing resources. Expected Improvement (EI) is extended to parallel EI, where several points $(x^{(1)}, \\dots, x^{(q)})$ are selected jointly to maximize expected improvement.\nVariants like multipoint EI and Constant Liar approximations simplify optimization. Similar extensions exist for KG, ES, and PES. Parallel versions are computationally harder but useful for speeding up optimization on modern systems.\nConstraints In real problems, sampling may be limited by constraints $g_i(x) \\ge 0$ (g is the constraint). These constraints can be as expensive to evaluate as $f(x)$. EI can be extended to check improvement only among feasible points, i.e., points that satisfy all $g_i(x) \\ge 0$.\nRecent work also studied constrained Bayesian optimization under noisy or uncertain feasibility.\nMulti-Fidelity and Multi-Information Source Evaluations Sometimes there are multiple ways to estimate the objective, each with different accuracy and cost (called fidelities). For example, $f(x, s)$ may represent evaluating $x$ with fidelity level $s$:\nlow fidelity is cheap but inaccurate high fidelity is expensive but precise The goal is to allocate a limited total budget among fidelities to maximize information gain. Methods like KG, ES, and PES can handle this setting, but EI does not generalize well because evaluating $f(x, s)$ for $s ≠ 0$ never provides an improvement in the best objective function value seen.\nRandom Environmental Conditions and Multi-Task Bayesian Optimization Here, the objective $f(x, w)$ depends on both design variables x and random environmental variables w (e.g., weather, test fold, etc.). The aim is to optimize either the expected value $\\int f(x,w)p(w)dw$ or the sum over tasks $\\sum f(x,w)p(w)$.\nBy observing performance under different w, we can infer information about nearby conditions, reducing the need for full evaluations. This setup is widely used in engineering, machine learning (cross-validation folds), and reinforcement learning. Modified EI, KG, and PES methods apply here.\nDerivative Observations Sometimes gradient (derivative) information is available along with function values. Gradients can be incorporated into GP models to improve predictions and optimization speed. While EI does not directly benefit from derivatives, KG can use them effectively.\nGradient-based updates improve convergence and numerical stability, especially in regions where function evaluations are expensive.\n6 Software 7 Conclusion and Research Directions 7.1 Conclusion The paper reviews Bayesian Optimization (BO) including Gaussian Process (GP) regression, and key acquisition functions such as expected improvement (EI), knowledge gradient (KG), entropy search (ES), and predictive entropy search (PES). And paper extends discussion to more complex cases (noise, constraints, multi-fidelity, multi-task, etc.).\n7.2 Future Research Directions Theory and Convergence: There is a need for a deeper theoretical understanding of BO. Multi-step optimal algorithms are known to exist but are hard to compute. We lack finite-time performance guarantees and full understanding of convergence rates. Beyond Gaussian Processes: Most BO methods use GPs, but new statistical models may better capture some types of problems. Research should aim to develop alternative models suited for specific applications. High-Dimensional Optimization: Current BO struggles when the number of parameters is large. New methods should leverage structure in high-dimensional problems. Exotic Problem Structures: BO should handle more complex, real-world conditions (multi-fidelity data, environmental randomness, derivative information). Combining method development with practical applications can reveal new challenges and innovations. Real-World Impact: BO has strong potential in chemistry, materials science, and drug discovery, where experiments are expensive and slow. However, few researchers in these fields currently use BO — so expanding awareness and applications is important. ",
+  "wordCount" : "3591",
+  "inLanguage": "en",
+  "image": "http://localhost:1313/posts/a_tutorial_on_bayesian_optimization/image.png","datePublished": "2025-11-01T23:05:46Z",
+  "dateModified": "2025-11-01T23:05:46Z",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "http://localhost:1313/posts/a_tutorial_on_bayesian_optimization/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Home",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "http://localhost:1313/selfile.png"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="Home (Alt + H)">Home</a>
+            <div class="logo-switches">
+            </div>
+        </div>
+        <ul id="menu">
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="http://localhost:1313/">Home</a>&nbsp;»&nbsp;<a href="/posts/">Posts</a></div>
+    <h1 class="post-title entry-hint-parent">
+      A Tutorial on Bayesian Optimization
+    </h1>
+    <div class="post-description">
+      Paper-reading notes: A Tutorial on Bayesian Optimization
+    </div>
+    <div class="post-meta"><span title='2025-11-01 23:05:46 +0000 +0000'>November 1, 2025</span>&nbsp;·&nbsp;<span>3591 words</span>
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#abstraction" aria-label="Abstraction">Abstraction</a></li>
+                <li>
+                    <a href="#1-introduction" aria-label="1 Introduction">1 Introduction</a></li>
+                <li>
+                    <a href="#2-overview-of-bayesopt" aria-label="2 Overview of BayesOpt">2 Overview of BayesOpt</a></li>
+                <li>
+                    <a href="#3-gaussian-process-gp-regression" aria-label="3 Gaussian Process (GP) Regression">3 Gaussian Process (GP) Regression</a><ul>
+                        
+                <li>
+                    <a href="#31-initialization-steps" aria-label="3.1 Initialization Steps">3.1 Initialization Steps</a><ul>
+                        
+                <li>
+                    <a href="#step-1-define-the-prior" aria-label="Step 1: Define the Prior">Step 1: Define the Prior</a></li>
+                <li>
+                    <a href="#step-2-update-with-observed-data-bayes-rule" aria-label="Step 2: Update with Observed Data (Bayes’ Rule)">Step 2: Update with Observed Data (Bayes’ Rule)</a></li>
+                <li>
+                    <a href="#step-3-posterior-formula" aria-label="Step 3: Posterior Formula">Step 3: Posterior Formula</a></li>
+                <li>
+                    <a href="#step-4-practical-notes" aria-label="Step 4: Practical Notes">Step 4: Practical Notes</a></li></ul>
+                </li>
+                <li>
+                    <a href="#32-choosing-a-mean-function-and-kernel" aria-label="3.2 Choosing a Mean Function and Kernel">3.2 Choosing a Mean Function and Kernel</a><ul>
+                        
+                <li>
+                    <a href="#kernel-choice" aria-label="Kernel choice">Kernel choice</a></li>
+                <li>
+                    <a href="#power-exponential-gaussian-kernel" aria-label="Power Exponential (Gaussian) Kernel">Power Exponential (Gaussian) Kernel</a></li>
+                <li>
+                    <a href="#mat%c3%a9rn-kernel" aria-label="Matérn Kernel">Matérn Kernel</a></li>
+                <li>
+                    <a href="#mean-function" aria-label="Mean function">Mean function</a></li></ul>
+                </li>
+                <li>
+                    <a href="#33-choosing-hyperparameters" aria-label="3.3 Choosing Hyperparameters">3.3 Choosing Hyperparameters</a><ul>
+                        
+                <li>
+                    <a href="#maximum-likelihood-estimation-mle" aria-label="Maximum Likelihood Estimation (MLE)">Maximum Likelihood Estimation (MLE)</a></li>
+                <li>
+                    <a href="#maximum-a-posteriori-map" aria-label="Maximum a Posteriori (MAP)">Maximum a Posteriori (MAP)</a></li>
+                <li>
+                    <a href="#fully-bayesian-approach" aria-label="Fully Bayesian Approach">Fully Bayesian Approach</a></li>
+                <li>
+                    <a href="#3-summary-table" aria-label="3. Summary table">3. Summary table</a></li></ul>
+                </li></ul>
+                </li>
+                <li>
+                    <a href="#4-acquisition-functions" aria-label="4 Acquisition Functions">4 Acquisition Functions</a><ul>
+                        
+                <li>
+                    <a href="#41-expeced-improvement" aria-label="4.1 Expeced Improvement">4.1 Expeced Improvement</a></li>
+                <li>
+                    <a href="#42-knowledge-gradient" aria-label="4.2 Knowledge Gradient">4.2 Knowledge Gradient</a><ul>
+                        
+                <li>
+                    <a href="#algorithm-2-simulation-based-computation" aria-label="Algorithm 2 Simulation-based computation">Algorithm 2 Simulation-based computation</a></li>
+                <li>
+                    <a href="#algorithm-3-multi-start-stochastic-gradient-ascent" aria-label="Algorithm 3: Multi-start Stochastic Gradient Ascent">Algorithm 3: Multi-start Stochastic Gradient Ascent</a></li>
+                <li>
+                    <a href="#algorithm-4--simulation-of-stochastic-gradients" aria-label="Algorithm 4 — Simulation of Stochastic Gradients">Algorithm 4 — Simulation of Stochastic Gradients</a></li></ul>
+                </li>
+                <li>
+                    <a href="#43-entropy-search-and-predictive-entropy-search" aria-label="4.3 Entropy Search and Predictive Entropy Search">4.3 Entropy Search and Predictive Entropy Search</a><ul>
+                        
+                <li>
+                    <a href="#entropy-search-es" aria-label="Entropy Search (ES)">Entropy Search (ES)</a></li>
+                <li>
+                    <a href="#predictive-entropy-search-pes" aria-label="Predictive Entropy Search (PES)">Predictive Entropy Search (PES)</a></li></ul>
+                </li>
+                <li>
+                    <a href="#44-multi-step-optimal-acquisition-functions" aria-label="4.4 Multi-Step Optimal Acquisition Functions">4.4 Multi-Step Optimal Acquisition Functions</a></li></ul>
+                </li>
+                <li>
+                    <a href="#5-exotic-bayesian-optimization" aria-label="5 Exotic Bayesian Optimization">5 Exotic Bayesian Optimization</a><ul>
+                        <ul>
+                        
+                <li>
+                    <a href="#noisy-evaluations" aria-label="Noisy Evaluations">Noisy Evaluations</a></li>
+                <li>
+                    <a href="#parallel-evaluations" aria-label="Parallel Evaluations">Parallel Evaluations</a></li>
+                <li>
+                    <a href="#constraints" aria-label="Constraints">Constraints</a></li>
+                <li>
+                    <a href="#multi-fidelity-and-multi-information-source-evaluations" aria-label="Multi-Fidelity and Multi-Information Source Evaluations">Multi-Fidelity and Multi-Information Source Evaluations</a></li>
+                <li>
+                    <a href="#random-environmental-conditions-and-multi-task-bayesian-optimization" aria-label="Random Environmental Conditions and Multi-Task Bayesian Optimization">Random Environmental Conditions and Multi-Task Bayesian Optimization</a></li>
+                <li>
+                    <a href="#derivative-observations" aria-label="Derivative Observations">Derivative Observations</a></li></ul>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#6-software" aria-label="6 Software">6 Software</a></li>
+                <li>
+                    <a href="#7-conclusion-and-research-directions" aria-label="7 Conclusion and Research Directions">7 Conclusion and Research Directions</a><ul>
+                        
+                <li>
+                    <a href="#71-conclusion" aria-label="7.1 Conclusion">7.1 Conclusion</a></li>
+                <li>
+                    <a href="#72-future-research-directions" aria-label="7.2 Future Research Directions">7.2 Future Research Directions</a>
+                </li>
+            </ul>
+            </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><h1 id="abstraction">Abstraction<a hidden class="anchor" aria-hidden="true" href="#abstraction">#</a></h1>
+<p><strong>Bayesian Optimization</strong> is a method for finding the best solution when evaluating the objective function is <strong>slow or expensive</strong> (taking minutes or hours).</p>
+<p>It is mainly used for problems with <strong>fewer than 20 variables</strong> and where evaluations may contain <strong>noise</strong>.</p>
+<p>The method works by:</p>
+<ol>
+<li>Building a <strong>surrogate model</strong> of the unknown function using a <strong>Bayesian machine learning method called Gaussian Process regression</strong>, which predicts both the function <strong>value</strong> and its <strong>uncertainty</strong>.</li>
+<li>Using an <strong>acquisition function</strong> (expected improvement, knowledge gradient or entropy search) to decide <strong>where to sample next</strong> — balancing exploration and exploitation.</li>
+</ol>
+<p>The tutorial also extends expected improvement to handle <strong>noisy evaluations</strong>, supported by a <strong>formal decision-theoretic argument</strong>, rather than ad hoc fixes.</p>
+<h1 id="1-introduction">1 Introduction<a hidden class="anchor" aria-hidden="true" href="#1-introduction">#</a></h1>
+<p><strong>Bayesian Optimization (BayesOpt)</strong> is a <strong>machine learning–based method</strong> for optimizing expensive, black-box functions, it’s designed for black-box derivative-free global optimization. It aims to solve</p>
+<p>$$
 \max_{x \in A} f(x)
-$$</p><p>where $f(x)$ is <strong>expensive to evaluate</strong>, <strong>derivative-free</strong>, and <strong>continuous</strong>.</p><aside><p><strong>Typical Problem Setting</strong></p><ul><li>The <strong>input x</strong> lies in a continuous space R^d with small dimensionality (usually d ≤ 20). → search space</li><li>The <strong>feasible set A</strong> is simple, such as a <strong>box constraint</strong> or <strong>simplex</strong>. → search area</li><li>The <strong>objective function f</strong> is:<ul><li>Continuous (needed for Gaussian Process modeling).</li><li><strong>Expensive</strong> — each evaluation might take hours or cost resources.</li><li><strong>Black-box</strong> — no known analytic structure like linearity or convexity.</li><li><strong>Derivative-free</strong> — we can only observe f(x), not gradients.</li><li>Possibly <strong>noisy</strong> — measurements may include Gaussian noise.<ul><li>At first, we pretend every time we evaluate f(x), we get the <strong>exact same result</strong>.</li><li>Later in the paper, the author adds <strong>stochastic noise</strong> — meaning repeated evaluations of the same xxx might give slightly different results (like random fluctuations).</li></ul></li></ul></li></ul></aside><table><thead><tr><th>Concept</th><th>Meaning</th><th>Intuition</th></tr></thead><tbody><tr><td><strong>Search space</strong></td><td>The <strong>entire region of possible inputs x,</strong> its dimensionality tells us how complex the problem is.</td><td>it’s the multi-dimensional space that defines where you can look.</td></tr><tr><td><strong>Feasible set / search area</strong></td><td>The <strong>subset of that space</strong> that you actually allow x to take, i.e., with all constraints applied.</td><td>this is the region inside the search space that satisfies all limits (bounds, rules).</td></tr></tbody></table><p>BayesOpt is for <strong>global optimization</strong> of black-box functions. It builds a <strong>surrogate model</strong> of f(x) using a <strong>Bayesian machine learning technique</strong>, typically <strong>Gaussian Process (GP) regression</strong>. It then chooses where to sample next using an <strong>acquisition function</strong> (e.g., Expected Improvement, Knowledge Gradient, or Entropy Search). This balances <strong>exploration</strong> (trying uncertain areas) and <strong>exploitation</strong> (sampling promising areas).</p><p>The ability to optimize <strong>expensive black-box derivative-free</strong> functions makes BayesOpt extremely <strong>versatile</strong>. Recently it has become extremely popular for <strong>tuning hyperparameters</strong> in machine learning algorithms. And it’s also suitable for engineering design, scientific experiments and reinforcement Learning.</p><p>What makes <strong>Bayesian Optimization</strong> unique compared to general <strong>surrogate-based optimization</strong> approaches are using surrogates developed using <strong>bayesian statistics</strong> and choosing new points using a <strong>probabilistic acquisition rule</strong> instead of heuristics. (<strong>reasoning probabilistically</strong> about what it already knows and what it’s uncertain about)</p><h1 id=2-overview-of-bayesopt>2 Overview of BayesOpt<a hidden class=anchor aria-hidden=true href=#2-overview-of-bayesopt>#</a></h1><p>BayesOpt consists of two main components: a <strong>Bayesian statistical model</strong> for modeling the objective function, and an <strong>acquisition function</strong> for deciding where to sample next.</p><ol><li><strong>Bayesian Statistical Model</strong><ul><li><p>Models the unknown objective function $f(x)$.</p></li><li><p>Typically a <strong>Gaussian Process (GP)</strong>.</p></li><li><p>Produces a <strong>posterior distribution</strong>:</p><p>$$
+$$</p>
+<p>where $f(x)$ is <strong>expensive to evaluate</strong>, <strong>derivative-free</strong>, and <strong>continuous</strong>.</p>
+<aside>
+<p><strong>Typical Problem Setting</strong></p>
+<ul>
+<li>The <strong>input x</strong>  lies in a continuous space R^d with small dimensionality (usually d ≤ 20). → search space</li>
+<li>The <strong>feasible set A</strong> is simple, such as a <strong>box constraint</strong> or <strong>simplex</strong>. → search area</li>
+<li>The <strong>objective function f</strong> is:
+<ul>
+<li>Continuous (needed for Gaussian Process modeling).</li>
+<li><strong>Expensive</strong> — each evaluation might take hours or cost resources.</li>
+<li><strong>Black-box</strong> — no known analytic structure like linearity or convexity.</li>
+<li><strong>Derivative-free</strong> — we can only observe f(x), not gradients.</li>
+<li>Possibly <strong>noisy</strong> — measurements may include Gaussian noise.
+<ul>
+<li>At first, we pretend every time we evaluate f(x), we get the <strong>exact same result</strong>.</li>
+<li>Later in the paper, the author adds <strong>stochastic noise</strong> — meaning repeated evaluations of the same xxx might give slightly different results (like random fluctuations).</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</aside>
+<table>
+  <thead>
+      <tr>
+          <th>Concept</th>
+          <th>Meaning</th>
+          <th>Intuition</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>Search space</strong></td>
+          <td>The <strong>entire region of possible inputs x,</strong> its dimensionality tells us how complex the problem is.</td>
+          <td>it’s the multi-dimensional space that defines where you can look.</td>
+      </tr>
+      <tr>
+          <td><strong>Feasible set / search area</strong></td>
+          <td>The <strong>subset of that space</strong> that you actually allow x to take, i.e., with all constraints applied.</td>
+          <td>this is the region inside the search space that satisfies all limits (bounds, rules).</td>
+      </tr>
+  </tbody>
+</table>
+<p>BayesOpt is for <strong>global optimization</strong> of black-box functions. It builds a <strong>surrogate model</strong> of f(x) using a <strong>Bayesian machine learning technique</strong>, typically <strong>Gaussian Process (GP) regression</strong>. It then chooses where to sample next using an <strong>acquisition function</strong> (e.g., Expected Improvement, Knowledge Gradient, or Entropy Search). This balances <strong>exploration</strong> (trying uncertain areas) and <strong>exploitation</strong> (sampling promising areas).</p>
+<p>The ability to optimize <strong>expensive black-box derivative-free</strong> functions makes BayesOpt extremely <strong>versatile</strong>. Recently it has become extremely popular for <strong>tuning hyperparameters</strong> in machine learning algorithms. And it’s also suitable for engineering design, scientific experiments and reinforcement Learning.</p>
+<p>What makes <strong>Bayesian Optimization</strong> unique compared to general <strong>surrogate-based optimization</strong> approaches are using surrogates developed using <strong>bayesian statistics</strong> and choosing new points using a <strong>probabilistic acquisition rule</strong> instead of heuristics. (<strong>reasoning probabilistically</strong> about what it already knows and what it’s uncertain about)</p>
+<h1 id="2-overview-of-bayesopt">2 Overview of BayesOpt<a hidden class="anchor" aria-hidden="true" href="#2-overview-of-bayesopt">#</a></h1>
+<p>BayesOpt consists of two main components: a <strong>Bayesian statistical model</strong> for modeling the objective function, and an <strong>acquisition function</strong> for deciding where to sample next.</p>
+<ol>
+<li><strong>Bayesian Statistical Model</strong>
+<ul>
+<li>
+<p>Models the unknown objective function $f(x)$.</p>
+</li>
+<li>
+<p>Typically a <strong>Gaussian Process (GP)</strong>.</p>
+</li>
+<li>
+<p>Produces a <strong>posterior distribution</strong>:</p>
+<p>$$
 f(x) \sim \mathcal{N}(\mu_n(x), \sigma_n^2(x))
-$$</p><p>where:</p><ul><li>$\mu_n(x)$: predicted mean (best guess)</li><li>$\sigma_n(x)$: predicted uncertainty</li></ul></li><li><p>Updated each time new data (evaluations of f) are observed.</p></li></ul></li><li><strong>Acquisition Function</strong><ul><li>Decides <strong>where to sample next</strong> based on the GP’s posterior.</li><li>Measures the “value” of sampling a new point x:<ul><li>High $\mu_n(x)$: promising area.</li><li>High $\sigma_n(x)$: uncertain area.</li></ul></li><li>Common types: <strong>Expected Improvement (EI)</strong>, <strong>Knowledge Gradient (KG)</strong>, <strong>Entropy Search (ES)</strong>, and <strong>Predictive Entropy Search (PES)</strong>.</li></ul></li></ol><p>After evaluating the objective according to an <strong>initial space-filling experimental design</strong>, often consisting of points chosen uniformly at random, they are used iteratively to allocate the remainder of a budget of N function evaluations.</p><hr><p><img alt=image.png loading=lazy src=/posts/a_tutorial_on_bayesian_optimization/image.png></p><aside><p><strong>Algorithm 1: Basic Bayesian Optimization Loop</strong></p><ol><li>Start with a <strong>Gaussian Process (GP)</strong> model that guesses how <strong>f</strong> might behave.</li><li>Test <strong>f</strong> at a few <strong>random starting points</strong> spread across the space.</li><li><strong>Repeat until you run out of trials:</strong><ul><li>Update the GP using <strong>all results collected so far</strong>.</li><li>Use the <strong>acquisition rule</strong> to pick the <strong>next best point</strong> to try.</li><li>Test the real function at that point to get a new result ( y_n = f(x_n) ).</li><li>Add this new point to your data.</li></ul></li><li><strong>Give the final answer:</strong><ul><li>The point with the <strong>best actual value</strong>, or</li><li>The point the <strong>GP predicts</strong> to be the best.</li></ul></li></ol></aside><h1 id=3-gaussian-process-gp-regression>3 Gaussian Process (GP) Regression<a hidden class=anchor aria-hidden=true href=#3-gaussian-process-gp-regression>#</a></h1><p><strong>Gaussian Process (GP) Regression</strong> is a <strong>Bayesian way</strong> to model an unknown function $f(x)$.</p><p>It assumes that any collection of function values $[f(x_1), f(x_2), &mldr;, f(x_k)]$ follows a <strong>multivariate normal distribution</strong> with a specific <strong>mean vector</strong> and <strong>covariance matrix</strong>.</p><p>So instead of guessing one possible curve for $f(x)$, we assume a probability distribution over all possible smooth curves.</p><h2 id=31-initialization-steps>3.1 Initialization Steps<a hidden class=anchor aria-hidden=true href=#31-initialization-steps>#</a></h2><h3 id=step-1-define-the-prior>Step 1: Define the Prior<a hidden class=anchor aria-hidden=true href=#step-1-define-the-prior>#</a></h3><p>Before we see any data, we describe our belief about $f(x)$ using:</p><ul><li>A <strong>mean function</strong> $\mu_0(x)$ → gives the average expected value, often set to 0 (no bias).</li><li>A <strong>covariance (kernel) function</strong> $\Sigma_0(x_i, x_j)$ → shows how similar two points are.<ul><li>Close points = high correlation (similar f values)</li><li>Far points = low correlation (independent values)</li></ul></li></ul><p>Together, they form the <strong>prior</strong>:</p><p>$$
+$$</p>
+<p>where:</p>
+<ul>
+<li>$\mu_n(x)$: predicted mean (best guess)</li>
+<li>$\sigma_n(x)$: predicted uncertainty</li>
+</ul>
+</li>
+<li>
+<p>Updated each time new data (evaluations of f) are observed.</p>
+</li>
+</ul>
+</li>
+<li><strong>Acquisition Function</strong>
+<ul>
+<li>Decides <strong>where to sample next</strong> based on the GP’s posterior.</li>
+<li>Measures the “value” of sampling a new point x:
+<ul>
+<li>High $\mu_n(x)$: promising area.</li>
+<li>High $\sigma_n(x)$: uncertain area.</li>
+</ul>
+</li>
+<li>Common types: <strong>Expected Improvement (EI)</strong>, <strong>Knowledge Gradient (KG)</strong>, <strong>Entropy Search (ES)</strong>, and <strong>Predictive Entropy Search (PES)</strong>.</li>
+</ul>
+</li>
+</ol>
+<p>After evaluating the objective according to an <strong>initial space-filling experimental design</strong>, often consisting of points chosen uniformly at random, they are used iteratively to allocate the remainder of a budget of N function evaluations.</p>
+<hr>
+<p><img alt="image.png" loading="lazy" src="/posts/a_tutorial_on_bayesian_optimization/image.png"></p>
+<aside>
+<p><strong>Algorithm 1: Basic Bayesian Optimization Loop</strong></p>
+<ol>
+<li>Start with a <strong>Gaussian Process (GP)</strong> model that guesses how <strong>f</strong> might behave.</li>
+<li>Test <strong>f</strong> at a few <strong>random starting points</strong> spread across the space.</li>
+<li><strong>Repeat until you run out of trials:</strong>
+<ul>
+<li>Update the GP using <strong>all results collected so far</strong>.</li>
+<li>Use the <strong>acquisition rule</strong> to pick the <strong>next best point</strong> to try.</li>
+<li>Test the real function at that point to get a new result ( y_n = f(x_n) ).</li>
+<li>Add this new point to your data.</li>
+</ul>
+</li>
+<li><strong>Give the final answer:</strong>
+<ul>
+<li>The point with the <strong>best actual value</strong>, or</li>
+<li>The point the <strong>GP predicts</strong> to be the best.</li>
+</ul>
+</li>
+</ol>
+</aside>
+<h1 id="3-gaussian-process-gp-regression">3 Gaussian Process (GP) Regression<a hidden class="anchor" aria-hidden="true" href="#3-gaussian-process-gp-regression">#</a></h1>
+<p><strong>Gaussian Process (GP) Regression</strong> is a <strong>Bayesian way</strong> to model an unknown function $f(x)$.</p>
+<p>It assumes that any collection of function values $[f(x_1), f(x_2), &hellip;, f(x_k)]$ follows a <strong>multivariate normal distribution</strong> with a specific <strong>mean vector</strong> and <strong>covariance matrix</strong>.</p>
+<p>So instead of guessing one possible curve for $f(x)$, we assume a probability distribution over all possible smooth curves.</p>
+<h2 id="31-initialization-steps">3.1 Initialization Steps<a hidden class="anchor" aria-hidden="true" href="#31-initialization-steps">#</a></h2>
+<h3 id="step-1-define-the-prior">Step 1: Define the Prior<a hidden class="anchor" aria-hidden="true" href="#step-1-define-the-prior">#</a></h3>
+<p>Before we see any data, we describe our belief about $f(x)$ using:</p>
+<ul>
+<li>A <strong>mean function</strong> $\mu_0(x)$ → gives the average expected value, often set to 0 (no bias).</li>
+<li>A <strong>covariance (kernel) function</strong> $\Sigma_0(x_i, x_j)$ → shows how similar two points are.
+<ul>
+<li>Close points = high correlation (similar f values)</li>
+<li>Far points = low correlation (independent values)</li>
+</ul>
+</li>
+</ul>
+<p>Together, they form the <strong>prior</strong>:</p>
+<p>$$
 f(x_{1:k}) \sim \text{Normal}(\mu_0(x_{1:k}), \Sigma_0(x_{1:k}, x_{1:k}))
-$$</p><hr><h3 id=step-2-update-with-observed-data-bayes-rule>Step 2: Update with Observed Data (Bayes’ Rule)<a hidden class=anchor aria-hidden=true href=#step-2-update-with-observed-data-bayes-rule>#</a></h3><p>Once we have some known data $(x_1, f(x_1)), &mldr;, (x_n, f(x_n))$, we update our belief to get the <strong>posterior</strong> distribution, what we now believe about the function after seeing real values.</p><p>For a new point x:</p><p>$$
+$$</p>
+<hr>
+<h3 id="step-2-update-with-observed-data-bayes-rule">Step 2: Update with Observed Data (Bayes’ Rule)<a hidden class="anchor" aria-hidden="true" href="#step-2-update-with-observed-data-bayes-rule">#</a></h3>
+<p>Once we have some known data $(x_1, f(x_1)), &hellip;, (x_n, f(x_n))$, we update our belief to get the <strong>posterior</strong> distribution, what we now believe about the function after seeing real values.</p>
+<p>For a new point x:</p>
+<p>$$
 f(x)|f(x_{1:n}) \sim \text{Normal}(\mu_n(x), \sigma_n^2(x))
-$$</p><p>where:</p><ul><li>$\mu_n(x)$: the <strong>posterior mean</strong> — our best prediction at $x$</li><li>$\sigma_n^2(x)$: the <strong>posterior variance</strong> — how uncertain we are at $x$</li></ul><p>The GP uses the <strong>kernel</strong> to decide how much nearby points influence the prediction:</p><ul><li>If $x$ is near known points → high confidence, low uncertainty.</li><li>If $x$ is far from all known points → low confidence, high uncertainty.</li></ul><hr><h3 id=step-3-posterior-formula>Step 3: Posterior Formula<a hidden class=anchor aria-hidden=true href=#step-3-posterior-formula>#</a></h3><p>$$
+$$</p>
+<p>where:</p>
+<ul>
+<li>$\mu_n(x)$: the <strong>posterior mean</strong> — our best prediction at $x$</li>
+<li>$\sigma_n^2(x)$: the <strong>posterior variance</strong> — how uncertain we are at $x$</li>
+</ul>
+<p>The GP uses the <strong>kernel</strong> to decide how much nearby points influence the prediction:</p>
+<ul>
+<li>If $x$ is near known points → high confidence, low uncertainty.</li>
+<li>If $x$ is far from all known points → low confidence, high uncertainty.</li>
+</ul>
+<hr>
+<h3 id="step-3-posterior-formula">Step 3: Posterior Formula<a hidden class="anchor" aria-hidden="true" href="#step-3-posterior-formula">#</a></h3>
+<p>$$
 \mu_n(x) = \Sigma_0(x, x_{1:n})\Sigma_0(x_{1:n}, x_{1:n})^{-1}(f(x_{1:n}) - \mu_0(x_{1:n})) + \mu_0(x)
-$$</p><p>$$
+$$</p>
+<p>$$
 \sigma_n^2(x) = \Sigma_0(x, x) - \Sigma_0(x, x_{1:n})\Sigma_0(x_{1:n}, x_{1:n})^{-1}\Sigma_0(x_{1:n}, x)
-$$</p><p>Meaning:</p><ul><li>The new prediction $\mu_n(x)$ = weighted average of nearby known values (<strong>old belief + weighted correction from known data</strong>)</li><li>The uncertainty $\sigma_n^2(x)$ = initial uncertainty minus what we’ve learned (<strong>reduce uncertainty</strong>)</li></ul><hr><h3 id=step-4-practical-notes>Step 4: Practical Notes<a hidden class=anchor aria-hidden=true href=#step-4-practical-notes>#</a></h3><ul><li>Instead of directly inverting large matrices, use <strong>Cholesky decomposition</strong> for stability and speed.</li><li>Add a <strong>tiny number</strong> (e.g., $10^{-6}$) to the diagonal of the covariance matrix to prevent numerical errors.</li><li>The same formulas work for:<ul><li>Many new points at once (matrices)</li><li>Continuous domains (theoretically infinite points)</li></ul></li></ul><h2 id=32-choosing-a-mean-function-and-kernel>3.2 Choosing a Mean Function and Kernel<a hidden class=anchor aria-hidden=true href=#32-choosing-a-mean-function-and-kernel>#</a></h2><h3 id=kernel-choice><strong>Kernel choice</strong><a hidden class=anchor aria-hidden=true href=#kernel-choice>#</a></h3><p>The kernel (covariance function) defines how much two inputs (x) and (x&rsquo;) are correlated. Points that are close in the input space are more strongly correlated, the kernel must be <strong>positive semi-definite</strong> (it cannot give negative variances):</p><p>$$
-if (||x - x&rsquo;|| &lt; ||x - x&rsquo;&rsquo;||), then (Σ_0(x, x&rsquo;) > Σ_0(x, x&rsquo;&rsquo;)).
-$$</p><aside><p>If you combine things in any way, the total <strong>uncertainty</strong> you calculate will <strong>never be negative</strong>.</p></aside><h3 id=power-exponential-gaussian-kernel><strong>Power Exponential (Gaussian) Kernel</strong><a hidden class=anchor aria-hidden=true href=#power-exponential-gaussian-kernel>#</a></h3><p>$$
+$$</p>
+<p>Meaning:</p>
+<ul>
+<li>The new prediction $\mu_n(x)$ = weighted average of nearby known values (<strong>old belief + weighted correction from known data</strong>)</li>
+<li>The uncertainty $\sigma_n^2(x)$ = initial uncertainty minus what we’ve learned (<strong>reduce uncertainty</strong>)</li>
+</ul>
+<hr>
+<h3 id="step-4-practical-notes">Step 4: Practical Notes<a hidden class="anchor" aria-hidden="true" href="#step-4-practical-notes">#</a></h3>
+<ul>
+<li>Instead of directly inverting large matrices, use <strong>Cholesky decomposition</strong> for stability and speed.</li>
+<li>Add a <strong>tiny number</strong> (e.g., $10^{-6}$) to the diagonal of the covariance matrix to prevent numerical errors.</li>
+<li>The same formulas work for:
+<ul>
+<li>Many new points at once (matrices)</li>
+<li>Continuous domains (theoretically infinite points)</li>
+</ul>
+</li>
+</ul>
+<h2 id="32-choosing-a-mean-function-and-kernel">3.2 Choosing a Mean Function and Kernel<a hidden class="anchor" aria-hidden="true" href="#32-choosing-a-mean-function-and-kernel">#</a></h2>
+<h3 id="kernel-choice"><strong>Kernel choice</strong><a hidden class="anchor" aria-hidden="true" href="#kernel-choice">#</a></h3>
+<p>The kernel (covariance function) defines how much two inputs (x) and (x&rsquo;) are correlated. Points that are close in the input space are more strongly correlated, the kernel must be <strong>positive semi-definite</strong> (it cannot give negative variances):</p>
+<p>$$
+if (||x - x&rsquo;|| &lt; ||x - x&rsquo;&rsquo;||), then (Σ_0(x, x&rsquo;) &gt; Σ_0(x, x&rsquo;&rsquo;)).
+$$</p>
+<aside>
+<p>If you combine things in any way, the total <strong>uncertainty</strong> you calculate will <strong>never be negative</strong>.</p>
+</aside>
+<h3 id="power-exponential-gaussian-kernel"><strong>Power Exponential (Gaussian) Kernel</strong><a hidden class="anchor" aria-hidden="true" href="#power-exponential-gaussian-kernel">#</a></h3>
+<p>$$
 Σ_0(x, x&rsquo;) = α_0 \exp(-||x - x&rsquo;||^2)
-$$</p><p>The is the most common kernel and produces very smooth functions.</p><ul><li>$α_0$ controls overall variance (how much $f(x)$ can vary).</li><li>$α_i$ inside $||x - x&rsquo;||^2 = \sum_i α_i (x_i - x&rsquo;_i)^2$ control how quickly correlation decreases as inputs differ.</li></ul><h3 id=matérn-kernel><strong>Matérn Kernel</strong><a hidden class=anchor aria-hidden=true href=#matérn-kernel>#</a></h3><p>$$
+$$</p>
+<p>The is the most common kernel and produces very smooth functions.</p>
+<ul>
+<li>$α_0$ controls overall variance (how much $f(x)$ can vary).</li>
+<li>$α_i$ inside $||x - x&rsquo;||^2 = \sum_i α_i (x_i - x&rsquo;_i)^2$ control how quickly correlation decreases as inputs differ.</li>
+</ul>
+<h3 id="matérn-kernel"><strong>Matérn Kernel</strong><a hidden class="anchor" aria-hidden="true" href="#matérn-kernel">#</a></h3>
+<p>$$
 Σ_0(x, x&rsquo;) = α_0 \frac{2^{1-ν}}{Γ(ν)} (\sqrt{2ν}||x - x&rsquo;||)^{ν} K_ν(\sqrt{2ν}||x - x&rsquo;||)
-$$</p><ul><li>Adds a parameter $ν$ that controls smoothness.</li><li>Smaller $ν$ produces rougher functions, larger $ν$ gives smoother ones.</li><li>$K_ν$ is the modified <strong>Bessel function</strong>.</li></ul><h3 id=mean-function><strong>Mean function</strong><a hidden class=anchor aria-hidden=true href=#mean-function>#</a></h3><p>The mean function expresses the expected trend of $f(x)$ before seeing data. The most common choice is a constant mean: $μ_0(x) = μ$. And If $f(x)$ is believed to have a trend, a parametric mean can be used:</p><p>$$
+$$</p>
+<ul>
+<li>Adds a parameter $ν$ that controls smoothness.</li>
+<li>Smaller $ν$ produces rougher functions, larger $ν$ gives smoother ones.</li>
+<li>$K_ν$ is the modified <strong>Bessel function</strong>.</li>
+</ul>
+<h3 id="mean-function"><strong>Mean function</strong><a hidden class="anchor" aria-hidden="true" href="#mean-function">#</a></h3>
+<p>The mean function expresses the expected trend of $f(x)$ before seeing data. The most common choice is a constant mean: $μ_0(x) = μ$. And If $f(x)$ is believed to have a trend, a parametric mean can be used:</p>
+<p>$$
 μ_0(x) = μ + \sum_{i=1}^{P} β_i Ψ_i(x)
-$$</p><p>where $Ψ_i(x)$ are basis functions, often low-order polynomials.</p><p>For example, $Ψ(x) = x$ gives a linear trend, $Ψ(x) = [1, x, x^2]$ gives a quadratic trend.</p><h2 id=33-choosing-hyperparameters>3.3 Choosing Hyperparameters<a hidden class=anchor aria-hidden=true href=#33-choosing-hyperparameters>#</a></h2><p>The <strong>mean</strong> and <strong>kernel</strong> functions contain parameters (like  $\alpha_0, \nu, \mu$) called <strong>hyperparameters</strong>, grouped in <strong>a vector</strong> $\eta$. These control how the Gaussian Process behaves (for example, how smooth it is or what its average level is).</p><h3 id=maximum-likelihood-estimation-mle><strong>Maximum Likelihood Estimation (MLE)</strong><a hidden class=anchor aria-hidden=true href=#maximum-likelihood-estimation-mle>#</a></h3><p>$$
+$$</p>
+<p>where $Ψ_i(x)$ are basis functions, often low-order polynomials.</p>
+<p>For example, $Ψ(x) = x$ gives a linear trend, $Ψ(x) = [1, x, x^2]$ gives a quadratic trend.</p>
+<h2 id="33-choosing-hyperparameters">3.3 Choosing Hyperparameters<a hidden class="anchor" aria-hidden="true" href="#33-choosing-hyperparameters">#</a></h2>
+<p>The <strong>mean</strong> and <strong>kernel</strong> functions contain parameters (like  $\alpha_0, \nu, \mu$) called <strong>hyperparameters</strong>, grouped in <strong>a vector</strong> $\eta$. These control how the Gaussian Process behaves (for example, how smooth it is or what its average level is).</p>
+<h3 id="maximum-likelihood-estimation-mle"><strong>Maximum Likelihood Estimation (MLE)</strong><a hidden class="anchor" aria-hidden="true" href="#maximum-likelihood-estimation-mle">#</a></h3>
+<p>$$
 \hat{\eta} = \arg\max_{\eta} P(f(x_{1:n}) | \eta)
-$$</p><p>Choose hyperparameters that make the observed data most likely under the GP model. It’s simple and widely used. But it can give unreasonable results if the model overfits (e.g., too smooth or too wiggly).</p><h3 id=maximum-a-posteriori-map><strong>Maximum a Posteriori (MAP)</strong><a hidden class=anchor aria-hidden=true href=#maximum-a-posteriori-map>#</a></h3><p>$$
+$$</p>
+<p>Choose hyperparameters that make the observed data most likely under the GP model. It’s simple and widely used. But it can give unreasonable results if the model overfits (e.g., too smooth or too wiggly).</p>
+<h3 id="maximum-a-posteriori-map"><strong>Maximum a Posteriori (MAP)</strong><a hidden class="anchor" aria-hidden="true" href="#maximum-a-posteriori-map">#</a></h3>
+<p>$$
 \hat{\eta} = \arg\max_{\eta} P(\eta | f(x_{1:n})) = \arg\max_{\eta} P(f(x_{1:n}) | \eta) P(\eta)
-$$</p><p>Similar to MLE, but adds a <strong>prior</strong> $P(\eta)$ on the hyperparameters. This prior prevents extreme or unrealistic parameter values. The MLE is a special case of MAP when $P(\eta)$ is constant (flat). Common priors include uniform, normal, or log-normal distributions.</p><h3 id=fully-bayesian-approach><strong>Fully Bayesian Approach</strong><a hidden class=anchor aria-hidden=true href=#fully-bayesian-approach>#</a></h3><p>$$
+$$</p>
+<p>Similar to MLE, but adds a <strong>prior</strong> $P(\eta)$ on the hyperparameters. This prior prevents extreme or unrealistic parameter values. The MLE is a special case of MAP when $P(\eta)$ is constant (flat). Common priors include uniform, normal, or log-normal distributions.</p>
+<h3 id="fully-bayesian-approach"><strong>Fully Bayesian Approach</strong><a hidden class="anchor" aria-hidden="true" href="#fully-bayesian-approach">#</a></h3>
+<p>$$
 P(f(x) = y| f(x_{1:n})) = \int P(f(x) = y| f(x_{1:n}), \eta) P(\eta | f(x_{1:n})) d\eta
-$$</p><p>Instead of choosing a single best $\eta$, it <strong>integrates over all possible values</strong> of the hyperparameters. It produces more robust uncertainty estimates but is computationally expensive. In practice, it’s approximated using <strong>sampling methods</strong> (e.g., MCMC). MAP can be viewed as an approximation to this full Bayesian inference.</p><p><strong>Don’t fix η; instead, consider all possible η, weighted by how likely each one is.</strong></p><p>But this high-dimensional and usually cannot be computed exactly, so in practice, we <strong>approximate</strong> it by <strong>sampling</strong>:</p><p>$$
+$$</p>
+<p>Instead of choosing a single best $\eta$, it <strong>integrates over all possible values</strong> of the hyperparameters. It produces more robust uncertainty estimates but is computationally expensive. In practice, it’s approximated using <strong>sampling methods</strong> (e.g., MCMC). MAP can be viewed as an approximation to this full Bayesian inference.</p>
+<p><strong>Don’t fix η; instead, consider all possible η, weighted by how likely each one is.</strong></p>
+<p>But this high-dimensional and usually cannot be computed exactly, so in practice, we <strong>approximate</strong> it by <strong>sampling</strong>:</p>
+<p>$$
 P(f(x) = y |f(x_{1:n})) \approx \frac{1}{J} \sum_{j=1}^{J} P(f(x) = y |f(x_{1:n}), \eta = \eta_{j})
-$$</p><p>where the samples $\eta_j$ are drawn from $P(\eta | f(x_{1:n}))$. This is typically done using <strong>MCMC (Markov Chain Monte Carlo)</strong>.</p><h3 id=3-summary-table>3. Summary table<a hidden class=anchor aria-hidden=true href=#3-summary-table>#</a></h3><table><thead><tr><th>Method</th><th>In short</th><th>Pros</th><th>Cons</th></tr></thead><tbody><tr><td><strong>MLE</strong></td><td>Fit the data best</td><td>Finds hyperparams that best fit data</td><td>Simple</td></tr><tr><td><strong>MAP</strong></td><td>Fit the data but stay reasonable</td><td>Adds prior to control extremes</td><td>More stable</td></tr><tr><td><strong>Fully Bayesian</strong></td><td>Consider all possible fits, weighted by probability</td><td>computationally expensive</td><td>Integrates over all possible scenarios</td></tr></tbody></table><h1 id=4-acquisition-functions>4 Acquisition Functions<a hidden class=anchor aria-hidden=true href=#4-acquisition-functions>#</a></h1><p><strong>Expected Imrpvement(EI)</strong>, Knowledge Gradient(KG), Entropy Search(ES)</p><h2 id=41-expeced-improvement>4.1 Expeced Improvement<a hidden class=anchor aria-hidden=true href=#41-expeced-improvement>#</a></h2><p><strong>Goal:</strong> Decide where to sample next so that we are likely to improve our current best result.</p><ol><li><p>Suppose we have already tested n points. The best value so far is</p><p>$$
+$$</p>
+<p>where the samples $\eta_j$ are drawn from $P(\eta | f(x_{1:n}))$. This is typically done using <strong>MCMC (Markov Chain Monte Carlo)</strong>.</p>
+<h3 id="3-summary-table">3. Summary table<a hidden class="anchor" aria-hidden="true" href="#3-summary-table">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>Method</th>
+          <th>In short</th>
+          <th>Pros</th>
+          <th>Cons</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>MLE</strong></td>
+          <td>Fit the data best</td>
+          <td>Finds hyperparams that best fit data</td>
+          <td>Simple</td>
+      </tr>
+      <tr>
+          <td><strong>MAP</strong></td>
+          <td>Fit the data but stay reasonable</td>
+          <td>Adds prior to control extremes</td>
+          <td>More stable</td>
+      </tr>
+      <tr>
+          <td><strong>Fully Bayesian</strong></td>
+          <td>Consider all possible fits, weighted by probability</td>
+          <td>computationally expensive</td>
+          <td>Integrates over all possible scenarios</td>
+      </tr>
+  </tbody>
+</table>
+<h1 id="4-acquisition-functions">4 Acquisition Functions<a hidden class="anchor" aria-hidden="true" href="#4-acquisition-functions">#</a></h1>
+<p><strong>Expected Imrpvement(EI)</strong>, Knowledge Gradient(KG), Entropy Search(ES)</p>
+<h2 id="41-expeced-improvement">4.1 Expeced Improvement<a hidden class="anchor" aria-hidden="true" href="#41-expeced-improvement">#</a></h2>
+<p><strong>Goal:</strong> Decide where to sample next so that we are likely to improve our current best result.</p>
+<ol>
+<li>
+<p>Suppose we have already tested n points. The best value so far is</p>
+<p>$$
 f_n^* = \max_{m \le n} f(x_m)
-$$</p></li></ol><aside><p>Parameters:</p><ul><li>n is the <strong>number of points</strong> we have <strong>already evaluated</strong> so far.</li><li>m is just an <strong>index variable</strong></li></ul></aside><ol><li><p>If we evaluate a new point x, its value f(x) is uncertain. The <strong>improvement</strong> is how much better it is than the current best:</p><p>$$
+$$</p>
+</li>
+</ol>
+<aside>
+<p>Parameters:</p>
+<ul>
+<li>n is the <strong>number of points</strong> we have <strong>already evaluated</strong> so far.</li>
+<li>m is just an <strong>index variable</strong></li>
+</ul>
+</aside>
+<ol>
+<li>
+<p>If we evaluate a new point x, its value f(x) is uncertain. The <strong>improvement</strong> is how much better it is than the current best:</p>
+<p>$$
 I(x) = [f(x) - f_n^*]^+ = \max(f(x) - f_n^*, 0)
-$$</p></li><li><p>Since f(x) is a random variable under the Gaussian Process model, we take the <strong>expected value</strong> of this improvement:</p><p>$$
+$$</p>
+</li>
+<li>
+<p>Since f(x) is a random variable under the Gaussian Process model, we take the <strong>expected value</strong> of this improvement:</p>
+<p>$$
 EI_n(x) = E_n[[f(x) - f_n^*]^+]
-$$</p></li><li><p>Because $f(x) \sim \mathcal{N}(\mu_n(x), \sigma_n^2(x))$, EI can be computed in closed form:</p><p>$$
+$$</p>
+</li>
+<li>
+<p>Because $f(x) \sim \mathcal{N}(\mu_n(x), \sigma_n^2(x))$, EI can be computed in closed form:</p>
+<p>$$
 EI_n(x) = (\mu_n(x) - f_n^*)\Phi(z) + \sigma_n(x)\phi(z), \quad z = \frac{\mu_n(x) - f_n^*}{\sigma_n(x)}
-$$</p><p>where $\Phi$ is the normal CDF and $\phi$ is the normal PDF.</p><ul><li><p>$Φ(z)$ = the <strong>cumulative distribution function (CDF)</strong> of the standard normal.</p><p>→ It gives the probability that a standard normal variable is ≤ z.</p></li><li><p>$ϕ(z)$ = the <strong>probability density function (PDF)</strong> of the standard normal.</p><p>→ It gives the height of the bell curve at z.</p></li></ul></li></ol><aside><p>Goal → How much do I expect to improve the best result I’ve found so far if I test at this new point x?</p><p>$EI_n(x)$ = predicted gain × chance it’s true + uncertainty × possible surprise</p><p>EI =（平均能提升多少 × 提升的可能性） + （不确定性 × 由不确定性带来的潜在收益）</p><ul><li>First term: expected improvement if you trust the mean.</li><li>Second term: extra improvement that might happen because the model is uncertain.</li></ul></aside><ol><li><p>The next sampling point is chosen by maximizing EI:</p><p>$$
+$$</p>
+<p>where $\Phi$ is the normal CDF and $\phi$ is the normal PDF.</p>
+<ul>
+<li>
+<p>$Φ(z)$ = the <strong>cumulative distribution function (CDF)</strong> of the standard normal.</p>
+<p>→ It gives the probability that a standard normal variable is ≤ z.</p>
+</li>
+<li>
+<p>$ϕ(z)$ = the <strong>probability density function (PDF)</strong> of the standard normal.</p>
+<p>→ It gives the height of the bell curve at z.</p>
+</li>
+</ul>
+</li>
+</ol>
+<aside>
+<p>Goal → How much do I expect to improve the best result I’ve found so far if I test at this new point x?</p>
+<p>$EI_n(x)$ = predicted gain × chance it’s true + uncertainty × possible surprise</p>
+<p>EI =（平均能提升多少 × 提升的可能性） + （不确定性 × 由不确定性带来的潜在收益）</p>
+<ul>
+<li>First term: expected improvement if you trust the mean.</li>
+<li>Second term: extra improvement that might happen because the model is uncertain.</li>
+</ul>
+</aside>
+<ol>
+<li>
+<p>The next sampling point is chosen by maximizing EI:</p>
+<p>$$
 x_{n+1} = \arg\max_x EI_n(x)
-$$</p></li></ol><p><strong>Interpretation:</strong></p><p>EI balances two goals:</p><ul><li><strong>Exploitation:</strong> sampling where the predicted mean $\mu_n(x)$ is high.</li><li><strong>Exploration:</strong> sampling where uncertainty $\sigma_n(x)$ is high.</li></ul><p>This trade-off helps the algorithm explore new areas and improve known good ones efficiently.</p><h2 id=42-knowledge-gradient>4.2 Knowledge Gradient<a hidden class=anchor aria-hidden=true href=#42-knowledge-gradient>#</a></h2><p>The Knowledge Gradient (KG) acquisition function measures the expected value of information gained from sampling a new point.</p><p>Unlike Expected Improvement (EI), which focuses on immediate improvement at the sampled point, KG evaluates how much <strong>better our overall knowledge</strong> about the objective becomes after sampling.</p><ul><li>EI assumes the final solution must be one of the evaluated points.</li><li>KG relaxes this: after we take one more sample, we can still choose any point (evaluated or not) as our final decision.</li><li>Therefore, the value of sampling comes not just from finding a better local result, but from <strong>improving the entire model’s understanding</strong> of the objective surface.</li></ul><p><strong>Mathematical Form:</strong></p><p>$$
+$$</p>
+</li>
+</ol>
+<p><strong>Interpretation:</strong></p>
+<p>EI balances two goals:</p>
+<ul>
+<li><strong>Exploitation:</strong> sampling where the predicted mean $\mu_n(x)$ is high.</li>
+<li><strong>Exploration:</strong> sampling where uncertainty $\sigma_n(x)$ is high.</li>
+</ul>
+<p>This trade-off helps the algorithm explore new areas and improve known good ones efficiently.</p>
+<h2 id="42-knowledge-gradient">4.2 Knowledge Gradient<a hidden class="anchor" aria-hidden="true" href="#42-knowledge-gradient">#</a></h2>
+<p>The Knowledge Gradient (KG) acquisition function measures the expected value of information gained from sampling a new point.</p>
+<p>Unlike Expected Improvement (EI), which focuses on immediate improvement at the sampled point, KG evaluates how much <strong>better our overall knowledge</strong> about the objective becomes after sampling.</p>
+<ul>
+<li>EI assumes the final solution must be one of the evaluated points.</li>
+<li>KG relaxes this: after we take one more sample, we can still choose any point (evaluated or not) as our final decision.</li>
+<li>Therefore, the value of sampling comes not just from finding a better local result, but from <strong>improving the entire model’s understanding</strong> of the objective surface.</li>
+</ul>
+<p><strong>Mathematical Form:</strong></p>
+<p>$$
 KG_n(x) = E_n[\mu_{n+1}^* - \mu_n^*]
-$$</p><p>where</p><ul><li>$\mu_n^* = \max_{x&rsquo;} \mu_n(x&rsquo;)$: current predicted maximum,</li><li>$\mu_{n+1}^* = \max_{x&rsquo;} \mu_{n+1}(x&rsquo;)$: predicted maximum after taking a new sample at (x),</li><li>The expectation $\mathbb{E}_n[\cdot]$ averages over possible outcomes of the new observation.</li></ul><p><strong>Interpretation:</strong></p><blockquote><p>KG measures the expected increase in the best achievable posterior mean after taking one new sample.</p></blockquote><h3 id=algorithm-2-simulation-based-computation>Algorithm 2 Simulation-based computation<a hidden class=anchor aria-hidden=true href=#algorithm-2-simulation-based-computation>#</a></h3><p><img alt=image.png loading=lazy src=/posts/a_tutorial_on_bayesian_optimization/image_1.png></p><p><strong>Purpost:</strong> estimate how much the best mean prediction might improve if we sample at x.</p><p><strong>Steps:</strong></p><ol><li><p><strong>Find the current best mean value</strong></p><p>$$
+$$</p>
+<p>where</p>
+<ul>
+<li>$\mu_n^* = \max_{x&rsquo;} \mu_n(x&rsquo;)$: current predicted maximum,</li>
+<li>$\mu_{n+1}^* = \max_{x&rsquo;} \mu_{n+1}(x&rsquo;)$: predicted maximum after taking a new sample at (x),</li>
+<li>The expectation $\mathbb{E}_n[\cdot]$ averages over possible outcomes of the new observation.</li>
+</ul>
+<p><strong>Interpretation:</strong></p>
+<blockquote>
+<p>KG measures the expected increase in the best achievable posterior mean after taking one new sample.</p>
+</blockquote>
+<h3 id="algorithm-2-simulation-based-computation">Algorithm 2 Simulation-based computation<a hidden class="anchor" aria-hidden="true" href="#algorithm-2-simulation-based-computation">#</a></h3>
+<p><img alt="image.png" loading="lazy" src="/posts/a_tutorial_on_bayesian_optimization/image_1.png"></p>
+<p><strong>Purpost:</strong> estimate how much the best mean prediction might improve if we sample at x.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li>
+<p><strong>Find the current best mean value</strong></p>
+<p>$$
 \mu_n^* = \max_{x&rsquo;} \mu_n(x&rsquo;)
-$$</p><p>This is the best prediction under the current Gaussian Process (GP).</p></li><li><p><strong>Simulate what could happen if we sample at x</strong></p><p>Repeat J times (Monte Carlo simulation):</p><ul><li><p>Draw a random possible observation</p><p>$$
+$$</p>
+<p>This is the best prediction under the current Gaussian Process (GP).</p>
+</li>
+<li>
+<p><strong>Simulate what could happen if we sample at x</strong></p>
+<p>Repeat J times (Monte Carlo simulation):</p>
+<ul>
+<li>
+<p>Draw a random possible observation</p>
+<p>$$
 y_{n+1} \sim \mathcal{N}(\mu_n(x), \sigma_n^2(x))
-$$</p><p>(equivalently, $y_{n+1} = \mu_n(x) + \sigma_n(x)Z ; Z\sim\mathcal{N}(0,1)$).</p></li><li><p>Update the GP posterior using this “imagined” observation $(x, y_{n+1})$, obtaining a new mean function $\mu_{n+1}(\cdot)$.</p></li><li><p>Compute the <strong>new best mean value</strong></p><p>$$
+$$</p>
+<p>(equivalently, $y_{n+1} = \mu_n(x) + \sigma_n(x)Z ; Z\sim\mathcal{N}(0,1)$).</p>
+</li>
+<li>
+<p>Update the GP posterior using this “imagined” observation $(x, y_{n+1})$, obtaining a new mean function $\mu_{n+1}(\cdot)$.</p>
+</li>
+<li>
+<p>Compute the <strong>new best mean value</strong></p>
+<p>$$
 \mu_{n+1}^* = \max_{x&rsquo;} \mu_{n+1}(x&rsquo;)
-$$</p></li><li><p>Compute the <strong>gain</strong> for this scenario</p></li></ul><p>$$
+$$</p>
+</li>
+<li>
+<p>Compute the <strong>gain</strong> for this scenario</p>
+</li>
+</ul>
+<p>$$
 \Delta^{(j)} = \mu_{n+1}^* - \mu_n^*
-$$</p></li><li><p><strong>Average over all J simulations</strong></p><p>The Knowledge Gradient estimate is</p><p>$$
+$$</p>
+</li>
+<li>
+<p><strong>Average over all J simulations</strong></p>
+<p>The Knowledge Gradient estimate is</p>
+<p>$$
 KG_n(x) = \frac{1}{J}\sum_{j=1}^J \Delta^{(j)}
-$$</p></li></ol><hr><h3 id=algorithm-3-multi-start-stochastic-gradient-ascent><strong>Algorithm 3: Multi-start Stochastic Gradient Ascent</strong><a hidden class=anchor aria-hidden=true href=#algorithm-3-multi-start-stochastic-gradient-ascent>#</a></h3><p><img alt=image.png loading=lazy src=/posts/a_tutorial_on_bayesian_optimization/image_2.png></p><p><strong>Goal:</strong> Find the best next sampling point $x$ that maximizes $KG_n(x)$.</p><p><strong>Process:</strong></p><ol><li><p>Start from multiple random initial points $x_0^{(r)}$ (r = 1,…,R).</p></li><li><p>For each start, perform <strong>T</strong> stochastic gradient ascent steps:</p><ul><li><p>Compute stochastic gradient $G$ (estimated using Algorithm 4).</p></li><li><p>Update $x_t^{(r)} = x_{t-1}^{(r)} + \alpha_t G$,</p><p>where $\alpha_t = a / (a + t)$ is a decreasing step size.</p></li></ul></li><li><p>After T steps, estimate $KG_n(x_T^{(r)})$ using simulation (Algorithm 2).</p></li><li><p>Return the point with the largest estimated KG value.</p></li></ol><p><strong>Notes:</strong></p><ul><li>Using multiple random starts helps avoid local optima.</li><li>This method converges to a local maximum of the KG function.</li></ul><hr><h3 id=algorithm-4--simulation-of-stochastic-gradients><strong>Algorithm 4 — Simulation of Stochastic Gradients</strong><a hidden class=anchor aria-hidden=true href=#algorithm-4--simulation-of-stochastic-gradients>#</a></h3><p><img alt=image.png loading=lazy src=/posts/a_tutorial_on_bayesian_optimization/image_3.png></p><p><strong>Purpose:</strong> Compute an unbiased estimate of the gradient $\nabla KG_n(x)$.</p><p><strong>Steps:</strong></p><ol><li>For each of J simulations:<ul><li>Sample a random variable $Z \sim \mathcal{N}(0,1)$.</li><li>Generate a possible observation $y_{n+1} = \mu_n(x) + \sigma_n(x)Z$.</li><li>Update the GP posterior using $(x, y_{n+1})$ to obtain new mean $\mu_{n+1}$.</li><li>Compute the new best posterior mean value $\mu^*<em>{n+1} = \max{x&rsquo;} \mu</em>{n+1}(x&rsquo;)$.</li><li>Evaluate its gradient w.r.t. the sampled point x.</li></ul></li><li>Average over all J samples to estimate $\nabla KG_n(x)$.</li></ol><h2 id=43-entropy-search-and-predictive-entropy-search>4.3 Entropy Search and Predictive Entropy Search<a hidden class=anchor aria-hidden=true href=#43-entropy-search-and-predictive-entropy-search>#</a></h2><p>Entropy Search (ES) and Predictive Entropy Search (PES) are acquisition functions in Bayesian optimization that try to reduce uncertainty about the position of the <strong>global optimum</strong> $x^*$.</p><p>Instead of asking “which point will improve the function value most,” they ask “<strong>which point will tell me the most about where the best value is.</strong>”</p><aside><p>Entropy measures uncertainty. If the posterior over the location of the global optimum x has high entropy, we are unsure where the best point is. A good new observation is one that most reduces this entropy.</p></aside><h3 id=entropy-search-es><strong>Entropy Search (ES)</strong><a hidden class=anchor aria-hidden=true href=#entropy-search-es>#</a></h3><p><strong>Purpose:</strong> Measures <strong>how much uncertainty (entropy)</strong> about the <strong>true optimum</strong> $x^*$ will go down <strong>if we sample at point x.</strong></p><ul><li>$P_n(x^*)$: the current posterior belief over where the global optimum lies.</li><li>$H(P_n(x^*))$: its entropy, representing uncertainty.</li><li>After sampling at a candidate point x, the posterior changes to $P_n(x^*|f(x))$.</li><li>The expected reduction in entropy is</li></ul><p>$$
+$$</p>
+</li>
+</ol>
+<hr>
+<h3 id="algorithm-3-multi-start-stochastic-gradient-ascent"><strong>Algorithm 3: Multi-start Stochastic Gradient Ascent</strong><a hidden class="anchor" aria-hidden="true" href="#algorithm-3-multi-start-stochastic-gradient-ascent">#</a></h3>
+<p><img alt="image.png" loading="lazy" src="/posts/a_tutorial_on_bayesian_optimization/image_2.png"></p>
+<p><strong>Goal:</strong> Find the best next sampling point $x$ that maximizes $KG_n(x)$.</p>
+<p><strong>Process:</strong></p>
+<ol>
+<li>
+<p>Start from multiple random initial points $x_0^{(r)}$ (r = 1,…,R).</p>
+</li>
+<li>
+<p>For each start, perform <strong>T</strong> stochastic gradient ascent steps:</p>
+<ul>
+<li>
+<p>Compute stochastic gradient $G$ (estimated using Algorithm 4).</p>
+</li>
+<li>
+<p>Update $x_t^{(r)} = x_{t-1}^{(r)} + \alpha_t G$,</p>
+<p>where $\alpha_t = a / (a + t)$ is a decreasing step size.</p>
+</li>
+</ul>
+</li>
+<li>
+<p>After T steps, estimate $KG_n(x_T^{(r)})$ using simulation (Algorithm 2).</p>
+</li>
+<li>
+<p>Return the point with the largest estimated KG value.</p>
+</li>
+</ol>
+<p><strong>Notes:</strong></p>
+<ul>
+<li>Using multiple random starts helps avoid local optima.</li>
+<li>This method converges to a local maximum of the KG function.</li>
+</ul>
+<hr>
+<h3 id="algorithm-4--simulation-of-stochastic-gradients"><strong>Algorithm 4 — Simulation of Stochastic Gradients</strong><a hidden class="anchor" aria-hidden="true" href="#algorithm-4--simulation-of-stochastic-gradients">#</a></h3>
+<p><img alt="image.png" loading="lazy" src="/posts/a_tutorial_on_bayesian_optimization/image_3.png"></p>
+<p><strong>Purpose:</strong> Compute an unbiased estimate of the gradient $\nabla KG_n(x)$.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li>For each of J simulations:
+<ul>
+<li>Sample a random variable $Z \sim \mathcal{N}(0,1)$.</li>
+<li>Generate a possible observation $y_{n+1} = \mu_n(x) + \sigma_n(x)Z$.</li>
+<li>Update the GP posterior using $(x, y_{n+1})$ to obtain new mean $\mu_{n+1}$.</li>
+<li>Compute the new best posterior mean value $\mu^*<em>{n+1} = \max{x&rsquo;} \mu</em>{n+1}(x&rsquo;)$.</li>
+<li>Evaluate its gradient w.r.t. the sampled point x.</li>
+</ul>
+</li>
+<li>Average over all J samples to estimate $\nabla KG_n(x)$.</li>
+</ol>
+<h2 id="43-entropy-search-and-predictive-entropy-search">4.3 Entropy Search and Predictive Entropy Search<a hidden class="anchor" aria-hidden="true" href="#43-entropy-search-and-predictive-entropy-search">#</a></h2>
+<p>Entropy Search (ES) and Predictive Entropy Search (PES) are acquisition functions in Bayesian optimization that try to reduce uncertainty about the position of the <strong>global optimum</strong> $x^*$.</p>
+<p>Instead of asking “which point will improve the function value most,” they ask “<strong>which point will tell me the most about where the best value is.</strong>”</p>
+<aside>
+<p>Entropy measures uncertainty. If the posterior over the location of the global optimum x has high entropy, we are unsure where the best point is. A good new observation is one that most reduces this entropy.</p>
+</aside>
+<h3 id="entropy-search-es"><strong>Entropy Search (ES)</strong><a hidden class="anchor" aria-hidden="true" href="#entropy-search-es">#</a></h3>
+<p><strong>Purpose:</strong> Measures <strong>how much uncertainty (entropy)</strong> about the <strong>true optimum</strong> $x^*$ will go down <strong>if we sample at point x.</strong></p>
+<ul>
+<li>$P_n(x^*)$: the current posterior belief over where the global optimum lies.</li>
+<li>$H(P_n(x^*))$: its entropy, representing uncertainty.</li>
+<li>After sampling at a candidate point x, the posterior changes to $P_n(x^*|f(x))$.</li>
+<li>The expected reduction in entropy is</li>
+</ul>
+<p>$$
 ES_n(x) = H(P_n(x^*)) - E_{f(x)}[H(P_n(x^*|f(x)))]
-$$</p><p>This means we prefer points x where observing $f(x)$ is expected to most reduce our uncertainty about $x^*$. Computing ES directly is difficult, because it requires calculating entropy over many possible function outcomes.</p><h3 id=predictive-entropy-search-pes><strong>Predictive Entropy Search (PES)</strong><a hidden class=anchor aria-hidden=true href=#predictive-entropy-search-pes>#</a></h3><p><strong>Purpose:</strong> Measures <strong>how much uncertainty (entropy)</strong> about the true optimum $x^*$ will go down <strong>if we sample at point x.</strong></p><p>PES <strong>reformulates</strong> the same idea in a simpler way. Instead of measuring the entropy of the optimum location directly, it measures the mutual information between $f(x)$ and $x^*$:</p><p>$$
+$$</p>
+<p>This means we prefer points x where observing $f(x)$ is expected to most reduce our uncertainty about $x^*$. Computing ES directly is difficult, because it requires calculating entropy over many possible function outcomes.</p>
+<h3 id="predictive-entropy-search-pes"><strong>Predictive Entropy Search (PES)</strong><a hidden class="anchor" aria-hidden="true" href="#predictive-entropy-search-pes">#</a></h3>
+<p><strong>Purpose:</strong> Measures <strong>how much uncertainty (entropy)</strong> about the true optimum $x^*$ will go down <strong>if we sample at point x.</strong></p>
+<p>PES <strong>reformulates</strong> the same idea in a simpler way. Instead of measuring the entropy of the optimum location directly, it measures the mutual information between $f(x)$ and $x^*$:</p>
+<p>$$
 PES_n(x) = H(P_n(f(x))) - \mathbb{E}_{x^*}[H(P_n(f(x)|x^*))]
-$$</p><p>This is mathematically equivalent to ES but easier to approximate in practice. PES estimates how much knowing the value of $f(x)$ would reduce uncertainty about where the optimum is.</p><aside><p><strong>Intuitive difference from EI and KG</strong></p><ul><li><strong>Expected Improvement (EI)</strong> focuses on increasing the best function value so far.</li><li><strong>Knowledge Gradient (KG)</strong> focuses on improving the overall model prediction.</li><li><strong>ES</strong> and <strong>PES</strong> focus on learning information that narrows down the true location of the optimum.</li></ul></aside><p>Entropy Search and Predictive Entropy Search choose sampling points that give the most information about the global optimum.</p><p>They are more global and information-driven than EI or KG but are computationally more complex.</p><h2 id=44-multi-step-optimal-acquisition-functions>4.4 Multi-Step Optimal Acquisition Functions<a hidden class=anchor aria-hidden=true href=#44-multi-step-optimal-acquisition-functions>#</a></h2><p>Bayesian optimization can be viewed as a <strong>sequential decision process</strong>: each sample depends on past results. Standard methods like EI, KG, ES, and PES are <strong>one-step optimal</strong>, choosing the next point assuming only one evaluation remains.</p><p>A <strong>multi-step optimal</strong> strategy would plan several future evaluations ahead, maximizing total expected reward. However, computing it is extremely hard due to the <strong>dimensionality</strong>.</p><p>Recent studies have tried approximate multi-step methods using <strong>reinforcement learning</strong> and <strong>dynamic programming</strong>, but they are not yet practical. Experiments show that <strong>one-step methods already perform nearly as well</strong>, so they remain the preferred approach in practice.</p><h1 id=5-exotic-bayesian-optimization>5 Exotic Bayesian Optimization<a hidden class=anchor aria-hidden=true href=#5-exotic-bayesian-optimization>#</a></h1><h3 id=noisy-evaluations><strong>Noisy Evaluations</strong><a hidden class=anchor aria-hidden=true href=#noisy-evaluations>#</a></h3><p>Gaussian Process (GP) regression can handle noisy observations by adding <strong>noise variance</strong> to the <strong>covariance matrix</strong>. In practice, the noise variance is often unknown and treated as a hyperparameter. If noise varies across the domain, <strong>it can be modeled with another GP</strong>.</p><p>Acquisition functions like EI, KG, ES, and PES naturally extend to noisy settings, but EI becomes less straightforward since the “improvement” is not directly observable. The <strong>KG approach</strong> is more robust under noise.</p><h3 id=parallel-evaluations><strong>Parallel Evaluations</strong><a hidden class=anchor aria-hidden=true href=#parallel-evaluations>#</a></h3><p>Parallel Bayesian optimization allows evaluating several points simultaneously using multiple computing resources. Expected Improvement (EI) is extended to <strong>parallel EI</strong>, where several points $(x^{(1)}, \dots, x^{(q)})$ are selected jointly to maximize expected improvement.</p><p>Variants like <strong>multipoint EI</strong> and <strong>Constant Liar</strong> approximations simplify optimization. Similar extensions exist for KG, ES, and PES. Parallel versions are computationally harder but useful for speeding up optimization on modern systems.</p><h3 id=constraints><strong>Constraints</strong><a hidden class=anchor aria-hidden=true href=#constraints>#</a></h3><p>In real problems, sampling may be limited by constraints $g_i(x) \ge 0$ (g is the <strong>constraint</strong>). These constraints can be as expensive to evaluate as $f(x)$. EI can be extended to check improvement only among feasible points, i.e., points that satisfy all $g_i(x) \ge 0$.</p><p>Recent work also studied constrained Bayesian optimization under noisy or uncertain feasibility.</p><h3 id=multi-fidelity-and-multi-information-source-evaluations><strong>Multi-Fidelity and Multi-Information Source Evaluations</strong><a hidden class=anchor aria-hidden=true href=#multi-fidelity-and-multi-information-source-evaluations>#</a></h3><p>Sometimes there are multiple ways to estimate the objective, each with different accuracy and cost (called <strong>fidelities</strong>). For example, $f(x, s)$ may represent evaluating $x$ with fidelity level $s$:</p><ul><li>low fidelity is cheap but inaccurate</li><li>high fidelity is expensive but precise</li></ul><p>The goal is to allocate a <strong>limited</strong> total <strong>budget</strong> among fidelities to maximize <strong>information</strong> <strong>gain</strong>. Methods like KG, ES, and PES can handle this setting, but EI does not generalize well because evaluating $f(x, s)$ for $s ≠ 0$ never provides an improvement in the best objective function value seen.</p><h3 id=random-environmental-conditions-and-multi-task-bayesian-optimization><strong>Random Environmental Conditions and Multi-Task Bayesian Optimization</strong><a hidden class=anchor aria-hidden=true href=#random-environmental-conditions-and-multi-task-bayesian-optimization>#</a></h3><p>Here, the objective $f(x, w)$ depends on both design variables x and random environmental variables w (e.g., weather, test fold, etc.). The aim is to optimize either the <strong>expected value</strong> $\int f(x,w)p(w)dw$ or the <strong>sum over tasks</strong> $\sum f(x,w)p(w)$.</p><p>By observing performance under different w, we can infer information about nearby conditions, reducing the need for full evaluations. This setup is widely used in engineering, machine learning (cross-validation folds), and reinforcement learning. Modified EI, KG, and PES methods apply here.</p><h3 id=derivative-observations><strong>Derivative Observations</strong><a hidden class=anchor aria-hidden=true href=#derivative-observations>#</a></h3><p>Sometimes gradient (derivative) information is available along with function values. Gradients can be incorporated into GP models to improve predictions and optimization speed. While EI does not directly benefit from derivatives, <strong>KG</strong> can use them effectively.</p><p>Gradient-based updates improve convergence and numerical stability, especially in regions where function evaluations are expensive.</p><h1 id=6-software>6 Software<a hidden class=anchor aria-hidden=true href=#6-software>#</a></h1><h1 id=7-conclusion-and-research-directions>7 Conclusion and Research Directions<a hidden class=anchor aria-hidden=true href=#7-conclusion-and-research-directions>#</a></h1><h2 id=71-conclusion>7.1 Conclusion<a hidden class=anchor aria-hidden=true href=#71-conclusion>#</a></h2><p>The paper reviews <strong>Bayesian Optimization (BO)</strong> including <strong>Gaussian Process (GP) regression</strong>, and key <strong>acquisition functions</strong> such as expected improvement (EI), knowledge gradient (KG), entropy search (ES), and predictive entropy search (PES). And paper extends discussion to more complex cases (noise, constraints, multi-fidelity, multi-task, etc.).</p><h2 id=72-future-research-directions><strong>7.2 Future Research Directions</strong><a hidden class=anchor aria-hidden=true href=#72-future-research-directions>#</a></h2><ol><li><strong>Theory and Convergence:</strong><ul><li>There is a need for a <strong>deeper theoretical understanding</strong> of BO.</li><li>Multi-step optimal algorithms are known to exist but are <strong>hard to compute</strong>.</li><li>We lack <strong>finite-time performance guarantees</strong> and full understanding of <strong>convergence rates</strong>.</li></ul></li><li><strong>Beyond Gaussian Processes:</strong><ul><li>Most BO methods use GPs, but <strong>new statistical models</strong> may better capture some types of problems.</li><li>Research should aim to develop <strong>alternative models</strong> suited for specific applications.</li></ul></li><li><strong>High-Dimensional Optimization:</strong><ul><li>Current BO struggles when the number of parameters is large.</li><li>New methods should <strong>leverage structure</strong> in high-dimensional problems.</li></ul></li><li><strong>Exotic Problem Structures:</strong><ul><li>BO should handle <strong>more complex, real-world conditions</strong> (multi-fidelity data, environmental randomness, derivative information).</li><li>Combining <strong>method development</strong> with <strong>practical applications</strong> can reveal new challenges and innovations.</li></ul></li><li><strong>Real-World Impact:</strong><ul><li>BO has strong potential in <strong>chemistry, materials science, and drug discovery</strong>, where experiments are expensive and slow.</li><li>However, <strong>few researchers</strong> in these fields currently use BO — so expanding awareness and applications is important.</li></ul></li></ol></div><footer class=post-footer><ul class=post-tags></ul></footer></article></main><a href=#top aria-label="go to top" title="Go to Top (Alt + G)" class=top-link id=top-link accesskey=g><svg viewBox="0 0 12 6" fill="currentColor"><path d="M12 6H0l6-6z"/></svg>
-</a><script>let menu=document.getElementById("menu");menu&&(menu.scrollLeft=localStorage.getItem("menu-scroll-position"),menu.onscroll=function(){localStorage.setItem("menu-scroll-position",menu.scrollLeft)}),document.querySelectorAll('a[href^="#"]').forEach(e=>{e.addEventListener("click",function(e){e.preventDefault();var t=this.getAttribute("href").substr(1);window.matchMedia("(prefers-reduced-motion: reduce)").matches?document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView():document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView({behavior:"smooth"}),t==="top"?history.replaceState(null,null," "):history.pushState(null,null,`#${t}`)})})</script><script>var mybutton=document.getElementById("top-link");window.onscroll=function(){document.body.scrollTop>800||document.documentElement.scrollTop>800?(mybutton.style.visibility="visible",mybutton.style.opacity="1"):(mybutton.style.visibility="hidden",mybutton.style.opacity="0")}</script><script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove("dark"),localStorage.setItem("pref-theme","light")):(document.body.classList.add("dark"),localStorage.setItem("pref-theme","dark"))})</script><script>document.querySelectorAll("pre > code").forEach(e=>{const n=e.parentNode.parentNode,t=document.createElement("button");t.classList.add("copy-code"),t.innerHTML="copy";function s(){t.innerHTML="copied!",setTimeout(()=>{t.innerHTML="copy"},2e3)}t.addEventListener("click",t=>{if("clipboard"in navigator){navigator.clipboard.writeText(e.textContent),s();return}const n=document.createRange();n.selectNodeContents(e);const o=window.getSelection();o.removeAllRanges(),o.addRange(n);try{document.execCommand("copy"),s()}catch{}o.removeRange(n)}),n.classList.contains("highlight")?n.appendChild(t):n.parentNode.firstChild==n||(e.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName=="TABLE"?e.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(t):e.parentNode.appendChild(t))})</script></body></html>
+$$</p>
+<p>This is mathematically equivalent to ES but easier to approximate in practice. PES estimates how much knowing the value of $f(x)$ would reduce uncertainty about where the optimum is.</p>
+<aside>
+<p><strong>Intuitive difference from EI and KG</strong></p>
+<ul>
+<li><strong>Expected Improvement (EI)</strong> focuses on increasing the best function value so far.</li>
+<li><strong>Knowledge Gradient (KG)</strong> focuses on improving the overall model prediction.</li>
+<li><strong>ES</strong> and <strong>PES</strong> focus on learning information that narrows down the true location of the optimum.</li>
+</ul>
+</aside>
+<p>Entropy Search and Predictive Entropy Search choose sampling points that give the most information about the global optimum.</p>
+<p>They are more global and information-driven than EI or KG but are computationally more complex.</p>
+<h2 id="44-multi-step-optimal-acquisition-functions">4.4 Multi-Step Optimal Acquisition Functions<a hidden class="anchor" aria-hidden="true" href="#44-multi-step-optimal-acquisition-functions">#</a></h2>
+<p>Bayesian optimization can be viewed as a <strong>sequential decision process</strong>: each sample depends on past results. Standard methods like EI, KG, ES, and PES are <strong>one-step optimal</strong>, choosing the next point assuming only one evaluation remains.</p>
+<p>A <strong>multi-step optimal</strong> strategy would plan several future evaluations ahead, maximizing total expected reward. However, computing it is extremely hard due to the <strong>dimensionality</strong>.</p>
+<p>Recent studies have tried approximate multi-step methods using <strong>reinforcement learning</strong> and <strong>dynamic programming</strong>, but they are not yet practical. Experiments show that <strong>one-step methods already perform nearly as well</strong>, so they remain the preferred approach in practice.</p>
+<h1 id="5-exotic-bayesian-optimization">5 Exotic Bayesian Optimization<a hidden class="anchor" aria-hidden="true" href="#5-exotic-bayesian-optimization">#</a></h1>
+<h3 id="noisy-evaluations"><strong>Noisy Evaluations</strong><a hidden class="anchor" aria-hidden="true" href="#noisy-evaluations">#</a></h3>
+<p>Gaussian Process (GP) regression can handle noisy observations by adding <strong>noise variance</strong> to the <strong>covariance matrix</strong>. In practice, the noise variance is often unknown and treated as a hyperparameter. If noise varies across the domain, <strong>it can be modeled with another GP</strong>.</p>
+<p>Acquisition functions like EI, KG, ES, and PES naturally extend to noisy settings, but EI becomes less straightforward since the “improvement” is not directly observable. The <strong>KG approach</strong> is more robust under noise.</p>
+<h3 id="parallel-evaluations"><strong>Parallel Evaluations</strong><a hidden class="anchor" aria-hidden="true" href="#parallel-evaluations">#</a></h3>
+<p>Parallel Bayesian optimization allows evaluating several points simultaneously using multiple computing resources. Expected Improvement (EI) is extended to <strong>parallel EI</strong>, where several points $(x^{(1)}, \dots, x^{(q)})$ are selected jointly to maximize expected improvement.</p>
+<p>Variants like <strong>multipoint EI</strong> and <strong>Constant Liar</strong> approximations simplify optimization. Similar extensions exist for KG, ES, and PES. Parallel versions are computationally harder but useful for speeding up optimization on modern systems.</p>
+<h3 id="constraints"><strong>Constraints</strong><a hidden class="anchor" aria-hidden="true" href="#constraints">#</a></h3>
+<p>In real problems, sampling may be limited by constraints $g_i(x) \ge 0$ (g is the <strong>constraint</strong>). These constraints can be as expensive to evaluate as $f(x)$. EI can be extended to check improvement only among feasible points, i.e., points that satisfy all $g_i(x) \ge 0$.</p>
+<p>Recent work also studied constrained Bayesian optimization under noisy or uncertain feasibility.</p>
+<h3 id="multi-fidelity-and-multi-information-source-evaluations"><strong>Multi-Fidelity and Multi-Information Source Evaluations</strong><a hidden class="anchor" aria-hidden="true" href="#multi-fidelity-and-multi-information-source-evaluations">#</a></h3>
+<p>Sometimes there are multiple ways to estimate the objective, each with different accuracy and cost (called <strong>fidelities</strong>). For example, $f(x, s)$ may represent evaluating $x$ with fidelity level $s$:</p>
+<ul>
+<li>low fidelity is cheap but inaccurate</li>
+<li>high fidelity is expensive but precise</li>
+</ul>
+<p>The goal is to allocate a <strong>limited</strong> total <strong>budget</strong> among fidelities to maximize <strong>information</strong> <strong>gain</strong>. Methods like KG, ES, and PES can handle this setting, but EI does not generalize well because evaluating $f(x, s)$ for $s ≠ 0$ never provides an improvement in the best objective function value seen.</p>
+<h3 id="random-environmental-conditions-and-multi-task-bayesian-optimization"><strong>Random Environmental Conditions and Multi-Task Bayesian Optimization</strong><a hidden class="anchor" aria-hidden="true" href="#random-environmental-conditions-and-multi-task-bayesian-optimization">#</a></h3>
+<p>Here, the objective $f(x, w)$ depends on both design variables x and random environmental variables w (e.g., weather, test fold, etc.). The aim is to optimize either the <strong>expected value</strong> $\int f(x,w)p(w)dw$ or the <strong>sum over tasks</strong> $\sum f(x,w)p(w)$.</p>
+<p>By observing performance under different w, we can infer information about nearby conditions, reducing the need for full evaluations. This setup is widely used in engineering, machine learning (cross-validation folds), and reinforcement learning. Modified EI, KG, and PES methods apply here.</p>
+<h3 id="derivative-observations"><strong>Derivative Observations</strong><a hidden class="anchor" aria-hidden="true" href="#derivative-observations">#</a></h3>
+<p>Sometimes gradient (derivative) information is available along with function values. Gradients can be incorporated into GP models to improve predictions and optimization speed. While EI does not directly benefit from derivatives, <strong>KG</strong> can use them effectively.</p>
+<p>Gradient-based updates improve convergence and numerical stability, especially in regions where function evaluations are expensive.</p>
+<h1 id="6-software">6 Software<a hidden class="anchor" aria-hidden="true" href="#6-software">#</a></h1>
+<h1 id="7-conclusion-and-research-directions">7 Conclusion and Research Directions<a hidden class="anchor" aria-hidden="true" href="#7-conclusion-and-research-directions">#</a></h1>
+<h2 id="71-conclusion">7.1 Conclusion<a hidden class="anchor" aria-hidden="true" href="#71-conclusion">#</a></h2>
+<p>The paper reviews <strong>Bayesian Optimization (BO)</strong> including <strong>Gaussian Process (GP) regression</strong>, and key <strong>acquisition functions</strong> such as expected improvement (EI), knowledge gradient (KG), entropy search (ES), and predictive entropy search (PES). And paper extends discussion to more complex cases (noise, constraints, multi-fidelity, multi-task, etc.).</p>
+<h2 id="72-future-research-directions"><strong>7.2 Future Research Directions</strong><a hidden class="anchor" aria-hidden="true" href="#72-future-research-directions">#</a></h2>
+<ol>
+<li><strong>Theory and Convergence:</strong>
+<ul>
+<li>There is a need for a <strong>deeper theoretical understanding</strong> of BO.</li>
+<li>Multi-step optimal algorithms are known to exist but are <strong>hard to compute</strong>.</li>
+<li>We lack <strong>finite-time performance guarantees</strong> and full understanding of <strong>convergence rates</strong>.</li>
+</ul>
+</li>
+<li><strong>Beyond Gaussian Processes:</strong>
+<ul>
+<li>Most BO methods use GPs, but <strong>new statistical models</strong> may better capture some types of problems.</li>
+<li>Research should aim to develop <strong>alternative models</strong> suited for specific applications.</li>
+</ul>
+</li>
+<li><strong>High-Dimensional Optimization:</strong>
+<ul>
+<li>Current BO struggles when the number of parameters is large.</li>
+<li>New methods should <strong>leverage structure</strong> in high-dimensional problems.</li>
+</ul>
+</li>
+<li><strong>Exotic Problem Structures:</strong>
+<ul>
+<li>BO should handle <strong>more complex, real-world conditions</strong> (multi-fidelity data, environmental randomness, derivative information).</li>
+<li>Combining <strong>method development</strong> with <strong>practical applications</strong> can reveal new challenges and innovations.</li>
+</ul>
+</li>
+<li><strong>Real-World Impact:</strong>
+<ul>
+<li>BO has strong potential in <strong>chemistry, materials science, and drug discovery</strong>, where experiments are expensive and slow.</li>
+<li>However, <strong>few researchers</strong> in these fields currently use BO — so expanding awareness and applications is important.</li>
+</ul>
+</li>
+</ol>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

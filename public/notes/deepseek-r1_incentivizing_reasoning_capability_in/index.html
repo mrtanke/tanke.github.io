@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning | Home</title>
+<meta name="keywords" content="">
+<meta name="description" content="Paper-reading notes: DeepSeek-R1 - Incentivizing Reasoning Capability in LLMs via Reinforcement Learning">
+<meta name="author" content="">
+<link rel="canonical" href="http://localhost:1313/notes/deepseek-r1_incentivizing_reasoning_capability_in/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.9bb7abd44394c0e0d2cecd8ad4322626054cd3f5709a6d890d5a408efaf1fa90.css" integrity="sha256-m7er1EOUwODSzs2K1DImJgVM0/Vwmm2JDVpAjvrx&#43;pA=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/selfile.png">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/selfile.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/selfile.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/selfile.png">
+<link rel="mask-icon" href="http://localhost:1313/selfile.png">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/notes/deepseek-r1_incentivizing_reasoning_capability_in/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css" integrity="" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js" integrity="" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" integrity="" crossorigin="anonymous"></script>
+<script defer>
+  document.addEventListener("DOMContentLoaded", function() {
+    if (typeof renderMathInElement === 'function') {
+      renderMathInElement(document.body, {
+        
+        delimiters: [
+          {left: "$$", right: "$$", display: true},
+          {left: "\\[", right: "\\]", display: true},
+          {left: "$", right: "$", display: false},
+          {left: "\\(", right: "\\)", display: false}
+        ],
+        
+        throwOnError: false,
+        
+        ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      });
+    }
+  });
+</script>
+
+  
+  <style>
+     
+    ul#menu .tag-button {
+      background: none;
+      border: none;
+      padding: 0;
+      margin: 0;
+      font-weight: 500;
+      color: inherit;
+      cursor: pointer;
+      text-decoration: none;
+      opacity: 0.95;
+      display: inline-block;
+    }
+    ul#menu .tag-button:hover { text-decoration: underline; }
+    ul#menu .tag-button.active { text-decoration: underline; font-weight: 600; }
+
+     
+    body.is-home .post-entry { display: none; }
+    body.is-home .page-footer .pagination { display: none; }
+  </style>
+
+  
+  <script>
+    (function(){
+      function isRootPath() {
+        const p = location.pathname.replace(/\/+/g, '/');
+        return p === '/' || p === '' || p === '/index.html';
+      }
+
+      if (isRootPath()) document.body.classList.add('is-home');
+
+      
+      document.addEventListener('DOMContentLoaded', function(){
+        const menu = document.getElementById('menu');
+        if (!menu) return;
+        
+        if (menu.querySelector('.tag-button')) return;
+        const tags = ['Notes','Thoughts','Projects'];
+        tags.forEach(t => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+          a.className = 'tag-button';
+          a.href = `/tags/${t.toLowerCase()}/`;
+          a.textContent = t;
+          
+          if (location.pathname.toLowerCase().startsWith(`/tags/${t.toLowerCase()}`)) a.classList.add('active');
+          li.appendChild(a);
+          menu.appendChild(li);
+        });
+      });
+    })();
+  </script>
+<meta property="og:url" content="http://localhost:1313/notes/deepseek-r1_incentivizing_reasoning_capability_in/">
+  <meta property="og:site_name" content="Home">
+  <meta property="og:title" content="DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning">
+  <meta property="og:description" content="Paper-reading notes: DeepSeek-R1 - Incentivizing Reasoning Capability in LLMs via Reinforcement Learning">
+  <meta property="og:locale" content="en-us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="notes">
+    <meta property="article:published_time" content="2025-11-04T12:06:46+00:00">
+    <meta property="article:modified_time" content="2025-11-04T12:06:46+00:00">
+      <meta property="og:image" content="http://localhost:1313/notes/deepseek-r1_incentivizing_reasoning_capability_in/43d9d8bb-ab88-4db1-98e7-84f74c71f242.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://localhost:1313/notes/deepseek-r1_incentivizing_reasoning_capability_in/43d9d8bb-ab88-4db1-98e7-84f74c71f242.png">
+<meta name="twitter:title" content="DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning">
+<meta name="twitter:description" content="Paper-reading notes: DeepSeek-R1 - Incentivizing Reasoning Capability in LLMs via Reinforcement Learning">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Notes",
+      "item": "http://localhost:1313/notes/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning",
+      "item": "http://localhost:1313/notes/deepseek-r1_incentivizing_reasoning_capability_in/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning",
+  "name": "DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning",
+  "description": "Paper-reading notes: DeepSeek-R1 - Incentivizing Reasoning Capability in LLMs via Reinforcement Learning",
+  "keywords": [
+    
+  ],
+  "articleBody": "Reinforcement Learning\nIntroduction Recent LLMs are rapidly advancing toward AGI. Post-training has emerged as an important component of the full training pipeline, which enhances accuracy on reasoning tasks, align with social values, and adapt to user preferences, all while requiring relatively minimal computational resources against pre-training. In the context of reasoning capabilities, OpenAI’s o1 series models were the first to introduce inference-time scaling by increasing the length of the CoT reasoning process. This approach has achieved significant improvements in various reasoning tasks, such as mathematics, coding, and scientific reasoning.\nHowever, the challenge of effective test-time scaling (efficient reasoning at inference) remains an open question for the research community. Several prior works have explored various approaches, including process-based reward models, RL, and search algorithms such as MCTS and Beam Search. However, none of these methods has achieved general reasoning performance comparable to OpenAI’s o1 series models.\nThis paper proposes a RL-only-based approach DeepSeek-R1-Zero which directly applied RL to the base model without relying on supervised fine-tuing (SFT) as a preliminary step. The network use DeepSeek-V3-Base as the foundation and apply GRPO (a reinforcement learning framework). After thousands of RL steps, DeepSeek-R1-Zero exhibits super performance on reasoning benchmarks, showing strong reasoning performance, and matching OpenAI o1-0912.\nHowever, DeepSeek-R1-Zero suffers from poor readability and language mixing. To address these issues and further enhance reasoning performance, the DeepSeek introduce DeepSeek-R1, which incorporates a small amount of cold-start data and a multi-stage training pipeline.\nDeepSeek-R1-Zero → trained only with RL, no SFT (“pure RL from base model”). DeepSeek-R1 → adds extra cold-start SFT + synthetic data generation + another RL phase. Training pipeline:\nCollect thousands of cold-start data to fine-tune DeepSeek-V3-Base model. Perform reasoning-oriented RL like DeepSeek-R1-Zero. Near convergence in the RL process, Create new SFT(supervised fine-tuning) data through rejection sampling on the RL checkpoint, combined with supervised data from DeepSeek-V3 in domains such as writing, factual QA, and self-cognition, and then retrain the DeepSeek-V3-Base model. After fine-tuning with the new data, the checkpoint undergoes an additional RL process, taking into account prompts from all scenarios. After these steps, the obtained checkpoint referred to as DeepSeek-R1, which achieves performance on par with OpenAI-o1-1217.\nFinally, they perform distillation of DeepSeek-R1 into smaller models (based on Qwen2.5-32B). Even after removing RL, these distilled models retain reasoning skills, showing that large-model reasoning discoveries can be transferred. Notably, the 14B distilled model beats all open-source baselines on reasoning benchmarks.\nContributions Post-Training: Large-Scale Reinforcement Learning on the Base Model\nDeepSeek-R1-Zero: RL applied directly to base model without SFT → achieves self-verification, reflection, long CoT reasoning. DeepSeek-R1: Pipeline with 2 RL + 2 SFT stages → improves reasoning, alignment, and non-reasoning abilities. Distillation: Smaller Models Can Be Powerful Too\nReasoning patterns learned by large models can be distilled into smaller ones. The open-source DeepSeek-R1-Distill family (1.5B – 70B parameters) performs exceptionally well, matching or surpassing strong baselines like OpenAI o1-mini. DeepSeek-R1-Distill-Qwen-7B: 55.5% AIME 2024. DeepSeek-R1-Distill-Qwen-32B: 72.6% AIME 2024, 94.3% MATH-500, 57.2% LiveCodeBench. Summary of Evaluation Results Reasoning Tasks:\nDeepSeek-R1 reaches 79.8 % Pass@1 on AIME 2024 (≈ OpenAI o1-1217). On MATH-500 → 97.3 %, Codeforces → 2 029 Elo (\u003e 96 % human). Performs slightly below DeepSeek-V3 in engineering tasks. Knowledge Tasks:\nOn MMLU (90.8 %), MMLU-Pro (84 %), GPQA Diamond (71.5 %), DeepSeek-R1 beats DeepSeek-V3 and is close to OpenAI o1-1217.\nOther Abilities:\nExcels in writing, summarization, code generation, and instruction following. Achieves 87.6 % length-controlled win-rate (AlpacaEval 2.0) and 92.3 % win-rate (ArenaHard). Especially strong on long-context understanding and non-exam queries. Approach Previous work has heavily relied on large amounts of supervised data to enhance model performance. The DeepSeek team demonstrate that reasoning capabilities can be significantly improved through large-scale reinforcement learning (RL), even without using supervised fine-tuning (SFT) as a cold start. Furthermore, performance can be further enhanced with the inclusion of a small amount of cold-start data. The following sections introduce: (1) DeepSeek-R1-Zero, which applies RL directly to the base model without any SFT data, and (2) DeepSeek-R1, which applies RL starting from a checkpoint fine-tuned with thousands of long Chain-of-Thought (CoT) examples. 3) Distill the reasoning capability from DeepSeek-R1 to small dense models.\nDeepSeek-R1-Zero DeepSeek-R1-Zero: Reinforcement Learning on the Base Model\nProximal Policy Optimization (PPO) is the standard RL method used in LLM fine-tuning (e.g., RLHF). It involves three models: a policy model that generates responses, a reward(value) model that scores them, and a critic model that estimates a baseline (the expected reward) to compare with the reward. The policy and critic are trained together, using the difference between the actual reward and the baseline to encourage better-than-average outputs while maintaining training stability. But the reward model is fixed which only provides the scores. However, PPO requires a large critic network (often the same size as the policy model), which doubles computational cost.\nTo address this, Group Relative Policy Optimization (GRPO) simplifies the process by removing the critic and computing the baseline directly from the average reward of a group of sampled responses, making reinforcement learning more efficient for large LLMs like DeepSeek-R1-Zero.\nReinforcement Learning Algorithm Goal: Train the policy model $\\pi_\\theta$ to generate above-average answers while keeping training stable and close to a reference model.\nObjective Function:\n$$ J_{GRPO}(\\theta) = E[{q \\sim P(Q), \\{o_i\\}^G_{i=1} \\sim \\pi_{\\theta_{\\text{old}}}(O|q)}] \\\\ \\frac{1}{G} \\sum_{i=1}^{G} \\Big( \\min\\Big( \\frac{\\pi_\\theta(o_i|q)}{\\pi_{\\theta_{\\text{old}}}(o_i|q)} A_i, \\text{clip}\\Big(\\frac{\\pi_\\theta(o_i|q)}{\\pi_{\\theta_{\\text{old}}}(o_i|q)}, 1-\\varepsilon, 1+\\varepsilon\\Big)A_i \\Big) - \\beta D_{KL}(\\pi_\\theta||\\pi_{\\text{ref}}) \\Big) $$ $q∼P(Q)$: sample a question/prompt from the dataset. $ {o_i}^G_{i=1} \\sim \\pi_{\\theta_{\\text{old}}}(O|q)$: use the old model to generate G different answers to the same question. $\\frac{1}{G} \\sum_{i=1}^{G}$: averages the result over the G samples (the group). $\\frac{\\pi_\\theta}{\\pi_{\\theta_{old}}}$: probability ratio showing how the model’s belief changes. $A_i$: advantage, computed within the group, measures how much better each answer is than group average ($baseline=mean(r_1​,r_2​,…,r_G​)$): $$ A_i = \\frac{r_i - {mean}(r_1,\\dots,r_G)}{{std}(r_1,\\dots,r_G)} $$\n$r_i$: reward for response $o_i$. clip(·): limits updates to ensure stability (same as PPO). $D_{KL}(\\pi_\\theta||\\pi_{ref})$: KL penalty keeping the model close to a reference policy (e.g., base model). $$ D_{KL}(\\pi_\\theta || \\pi_{\\text{ref}}) = \\frac{\\pi_{\\text{ref}}(o_i|q)}{\\pi_\\theta(o_i|q)} -\\log\\frac{\\pi_{\\text{ref}}(o_i|q)}{\\pi_\\theta(o_i|q)} - 1 $$\n$\\varepsilon, \\beta$: hyperparameters controlling clipping and KL weight. Where do the rewards $r_i$ come from? → From Reward Modeling, which defines how to score each generated answer.\n$$ \\boxed{\\text{Total computations} \\propto O \\times G} $$\n$O$ = number of prompts/questions sampled in a batch $G$ = number of responses per prompt Reward Modeling To train DeepSeek-R1-Zero, a rule-based reward system was adopted that mainly consists of two types of rewards:\n$$ r_i=r_i(accuracy)+r_i(format) $$\nAccuracy rewards: The accuracy reward model evaluates whether the response is correct. For example, in the case of math problems with deterministic results, the model is required to provide the final answer in a specified format (e.g., within a box), enabling reliable rule-based verification of correctness. If the answer matches the correct one, reward = 1; else 0 (or scaled). Format rewards: In addition to the accuracy reward model, we employ a format reward model that enforces the model to put its thinking process between ‘’ and ‘’ tags. Reward = 1 if the output format is correct, else 0. Training Template To train DeepSeek-R1-Zero, begining by designing a straightforward template that guides the base model to follow to the specified instructions. This following template requires DeepSeek-R1-Zero to first produce a reasoning process, followed by the final answer. prompt will be replaced with the specific reasoning question during training. Limit the constraints to this structural format, avoiding any content-specific biases to ensure that the model’s natural progression can be observed accurately during the RL process.\nAlthough DeepSeek-R1-Zero exhibits strong reasoning capabilities and autonomously develops unexpected and powerful reasoning behaviors, it faces several issues. For instance, DeepSeek R1-Zero struggles with challenges like poor readability, and language mixing(the base model DeepSeek-V3 is multilingual, and RL doesn’t penalize mixing languages). To make reasoning processes more readable and share them with the open community, we explore DeepSeek-R1, a method that utilizes RL with human-friendly cold-start data.\nGood readability (_after_SFT):\nTo compute the sum of the first 5 even numbers: 2 + 4 + 6 + 8 + 10 = 30. 30 Poor readability (DeepSeek-R1-Zero):\nsum=2+4+6+8+10=\u003e=30?? yes right 30 correct result final output=30 30\nDeepSeek-R1 DeepSeek-R1: Reinforcement Learning with Cold Start\nInspired by the promising results of DeepSeek-R1-Zero, two natural questions arise: 1) Can reasoning performance be further improved or convergence accelerated by incorporating a small amount of high-quality data as a cold start? 2) How can we train a user-friendly model that not only produces clear and coherent Chains of Thought (CoT) but also demonstrates strong general capabilities? To address these questions, we design a pipeline to train DeepSeek-R1. The pipeline consists of four stages, outlined as follows.\nCold Start Construct and collect a small amount of long CoT data to fine-tune the model as the initial RL actor. The data can include reasoning examples in the prompt (few-shot) or detailed reasoning in the response, ensuring the model learns to generate readable, step-by-step solutions. To collect such data, there are several approaches: using few-shot prompting with a long CoT as an example, directly prompting models to generate detailed answers with reflection and verification, gathering DeepSeek-R1-Zero outputs in a readable format, and refining the results through post-processing by human annotators. In this work, they collect thousands of cold-start data to fine-tune the DeepSeek-V3-Base as the starting point for RL. Compared to DeepSeek-R1-Zero, the advantages of cold start data are readability of responses and better performance by designing a readable pattern that includes a summary at the end of each response.\nReasoning-oriented Reinforcement Learning After fine-tuning DeepSeek-V3-Base on cold-start data, the same GRPO-based RL process as DeepSeek-R1-Zero is applied to enhancing the model’s reasoning capabilities in math, logic, science, and coding tasks. However, RL caused language mixing in Chain-of-Thought reasoning, so they introduced a language-consistency reward, computed as the ratio of target-language words in the reasoning text. The final reward combines accuracy and language consistency: $r_{final} = r_{accuracy} + r_{lang}$Although this slightly reduces task performance, it produces more readable, human-preferred outputs. The model is trained until convergence, resulting in the final DeepSeek-R1 model.\nRejection Sampling and Supervised Fine-Tuning After reasoning-oriented RL training is finished, they use the RL-trained checkpoint to generate new supervised fine-tuning (SFT) data for the next round, aiming to improve model’s capabilities in writing, role-playing, and other general-purpose tasks. They produce two types of data: For reasoning data, they sample many responses (like 10–20 per question) from the RL checkpoint. then they perform rejection sampling. For each prompt, they sample multiple responses and retain only the correct ones. For non-reasoning data, they add general-purpose data reuse or regenerate these using DeepSeek-V3’s SFT data.\nReinforcement Learning for all Scenarios To further align the model with human preferences, they implement a secondary reinforcement learning stage aimed at improving the model’s helpfulness and harmlessness while simultaneously refining its reasoning capabilities.\nFor reasoning data, they follow to the methodology outlined in DeepSeek-R1-Zero, which utilizes rule-based rewards to guide the learning process. For general data, they resort to reward models to capture human preferences $r_i^{(preference)}∈[0,1]$. They build upon the DeepSeek-V3 pipeline and adopt a similar distribution of preference pairs and training prompts. For helpfulness, they focus exclusively on the final summary, ensuring that the assessment emphasizes the utility and relevance of the response to the user while minimizing interference with the underlying reasoning process. For harmlessness, they evaluate the entire response of the model, including both the reasoning process and the summary, to identify and mitigate any potential risks, biases, or harmful content that may arise during the generation process. Ultimately, the integration of reward signals and diverse data distributions enables to train a model that excels in reasoning while prioritizing helpfulness and harmlessness.\nDistillation: Empower Small Models with Reasoning Capability For distilled models, the team apply only SFT and do not include an RL stage, even though incorporating RL could substantially boost model performance.\nConclusion This paper shares how to enhancing model reasoning abilities through reinforcement learning. DeepSeek-R1-Zero represents a pure RL approach without relying on cold-start data, achieving strong performance across various tasks. DeepSeek-R1 is more powerful, leveraging cold-start data alongside iterative RL fine-tuning. Ultimately, DeepSeek-R1 achievesperformance comparable to OpenAI-o1-1217 on a range of tasks. They further explore distillation the reasoning capability to small dense models. They use DeepSeek-R1 as the teacher model to generate 800K training samples, and fine-tune several small dense models. The results are promising: DeepSeek-R1-Distill-Qwen-1.5B outperforms GPT-4o and Claude-3.5-Sonnet on math benchmarks with 28.9% on AIME and 83.9% on MATH. Other dense models also achieve impressive results, significantly outperforming other instruction-tuned models based on the same underlying checkpoints.\nIn the future, there are some research directions across the following directions for DeepSeek-R1.\nGeneral Capability: Currently, the capabilities of DeepSeek-R1 fall short of DeepSeek-V3 in tasks such as function calling, multi-turn, complex role-playing, and JSON output. Moving forward, we plan to explore how long CoT can be leveraged to enhance tasks in these fields. Language Mixing: DeepSeek-R1 is currently optimized for Chinese and English, which may result in language mixing issues when handling queries in other languages. For instance, DeepSeek-R1 might use English for reasoning and responses, even if the query is in a language other than English or Chinese. We aim to address this limitation in future updates. Prompting Engineering: When evaluating DeepSeek-R1, we observe that it is sensitive to prompts. Few-shot prompting consistently degrades its performance. Therefore, we recommend users directly describe the problem and specify the output format using a zero-shot setting for optimal results. Software Engineering Tasks: Due to the long evaluation times, which impact the efficiency of the RL process, large-scale RL has not been applied extensively in software engineering tasks. As a result, DeepSeek-R1 has not demonstrated a huge improvement over DeepSeek-V3 on software engineering benchmarks. Future versions will address this by implementing rejection sampling on software engineering data or incorporating asynchronous evaluations during the RL process to improve efficiency. ",
+  "wordCount" : "2299",
+  "inLanguage": "en",
+  "image": "http://localhost:1313/notes/deepseek-r1_incentivizing_reasoning_capability_in/43d9d8bb-ab88-4db1-98e7-84f74c71f242.png","datePublished": "2025-11-04T12:06:46Z",
+  "dateModified": "2025-11-04T12:06:46Z",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "http://localhost:1313/notes/deepseek-r1_incentivizing_reasoning_capability_in/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Home",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "http://localhost:1313/selfile.png"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="Home (Alt + H)">Home</a>
+            <div class="logo-switches">
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a class="tag-button" href="http://localhost:1313/tags/notes/">
+                    <span>Notes</span>
+                </a>
+            </li>
+            <li>
+                <a class="tag-button" href="http://localhost:1313/tags/thoughts/">
+                    <span>Thoughts</span>
+                </a>
+            </li>
+            <li>
+                <a class="tag-button" href="http://localhost:1313/tags/projects/">
+                    <span>Projects</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="http://localhost:1313/">Home</a>&nbsp;»&nbsp;<a href="/notes/">Notes</a></div>
+    <h1 class="post-title entry-hint-parent">
+      DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning
+    </h1>
+    <div class="post-description">
+      Paper-reading notes: DeepSeek-R1 - Incentivizing Reasoning Capability in LLMs via Reinforcement Learning
+    </div>
+    <div class="post-meta"><span title='2025-11-04 12:06:46 +0000 +0000'>November 4, 2025</span>&nbsp;·&nbsp;<span>2299 words</span>
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#introduction" aria-label="Introduction">Introduction</a><ul>
+                        
+                <li>
+                    <a href="#contributions" aria-label="Contributions">Contributions</a></li>
+                <li>
+                    <a href="#summary-of-evaluation-results" aria-label="Summary of Evaluation Results">Summary of Evaluation Results</a></li></ul>
+                </li>
+                <li>
+                    <a href="#approach" aria-label="Approach">Approach</a><ul>
+                        
+                <li>
+                    <a href="#deepseek-r1-zero" aria-label="DeepSeek-R1-Zero">DeepSeek-R1-Zero</a><ul>
+                        
+                <li>
+                    <a href="#reinforcement-learning-algorithm" aria-label="Reinforcement Learning Algorithm">Reinforcement Learning Algorithm</a></li>
+                <li>
+                    <a href="#reward-modeling" aria-label="Reward Modeling">Reward Modeling</a></li>
+                <li>
+                    <a href="#training-template" aria-label="Training Template">Training Template</a></li></ul>
+                </li>
+                <li>
+                    <a href="#deepseek-r1" aria-label="DeepSeek-R1">DeepSeek-R1</a><ul>
+                        
+                <li>
+                    <a href="#cold-start" aria-label="Cold Start">Cold Start</a></li>
+                <li>
+                    <a href="#reasoning-oriented-reinforcement-learning" aria-label="Reasoning-oriented Reinforcement Learning">Reasoning-oriented Reinforcement Learning</a></li>
+                <li>
+                    <a href="#rejection-sampling-and-supervised-fine-tuning" aria-label="Rejection Sampling and Supervised Fine-Tuning">Rejection Sampling and Supervised Fine-Tuning</a></li>
+                <li>
+                    <a href="#reinforcement-learning-for-all-scenarios" aria-label="Reinforcement Learning for all Scenarios">Reinforcement Learning for all Scenarios</a></li></ul>
+                </li>
+                <li>
+                    <a href="#distillation-empower-small-models-with-reasoning-capability" aria-label="Distillation: Empower Small Models with Reasoning Capability">Distillation: Empower Small Models with Reasoning Capability</a></li></ul>
+                </li>
+                <li>
+                    <a href="#conclusion" aria-label="Conclusion">Conclusion</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><p>Reinforcement Learning</p>
+<h1 id="introduction">Introduction<a hidden class="anchor" aria-hidden="true" href="#introduction">#</a></h1>
+<p>Recent LLMs are rapidly advancing toward AGI. <strong>Post-training</strong> has emerged as an important component of the full training pipeline, which enhances accuracy on reasoning tasks, align with social values, and adapt to user preferences, all while requiring relatively minimal computational resources against <strong>pre-training</strong>. In the context of reasoning capabilities, OpenAI’s o1 series models were the first to introduce <strong>inference-time scaling</strong> by increasing the length of the CoT reasoning process. This approach has achieved significant improvements in various reasoning tasks, such as mathematics, coding, and scientific reasoning.</p>
+<p>However, the challenge of effective <strong>test-time scaling (efficient reasoning at inference)</strong> remains an open question for the research community. Several prior works have explored various approaches, including process-based reward models, RL, and search algorithms such as MCTS and Beam Search. However, none of these methods has achieved general reasoning performance comparable to OpenAI’s o1 series models.</p>
+<p>This paper proposes a <strong>RL-only-based approach DeepSeek-R1-Zero</strong> which directly applied RL to the base model without relying on supervised fine-tuing (SFT) as a preliminary step. The network use <strong>DeepSeek-V3-Base</strong> as the foundation and apply <strong>GRPO</strong> (a reinforcement learning framework). After thousands of RL steps, <strong>DeepSeek-R1-Zero</strong> exhibits super performance on reasoning benchmarks, showing strong reasoning performance, and matching OpenAI o1-0912.</p>
+<p>However, <strong>DeepSeek-R1-Zero</strong> suffers from <strong>poor readability</strong> and <strong>language mixing</strong>. To address these issues and further enhance reasoning performance, the DeepSeek introduce
+<strong>DeepSeek-R1</strong>, which incorporates a small amount of <strong>cold-start data</strong> and a <strong>multi-stage training
+pipeline</strong>.</p>
+<aside>
+<ul>
+<li><strong>DeepSeek-R1-Zero</strong> → trained <strong>only with RL</strong>, no SFT (“pure RL from base model”).</li>
+<li><strong>DeepSeek-R1</strong> → adds extra <strong>cold-start SFT</strong> + <strong>synthetic data generation</strong> + <strong>another RL phase</strong>.</li>
+</ul>
+</aside>
+<p>Training pipeline:</p>
+<ol>
+<li>Collect thousands of <strong>cold-start data</strong> to <strong>fine-tune</strong> <strong>DeepSeek-V3-Base</strong> model.</li>
+<li>Perform reasoning-oriented <strong>RL</strong> like DeepSeek-R1-Zero.</li>
+<li>Near convergence in the RL process, Create new <strong>SFT(supervised fine-tuning) data</strong> through <strong>rejection sampling</strong> on the RL checkpoint, combined with supervised data from DeepSeek-V3 in domains such as writing, factual QA, and self-cognition, and then retrain the DeepSeek-V3-Base model.</li>
+<li>After fine-tuning with the new data, the checkpoint undergoes an additional RL process, taking into account prompts from all scenarios.</li>
+</ol>
+<p>After these steps, the obtained checkpoint referred to as <strong>DeepSeek-R1</strong>, which achieves performance on par with OpenAI-o1-1217.</p>
+<p>Finally, they perform <strong>distillation</strong> of DeepSeek-R1 into smaller models (based on <strong>Qwen2.5-32B</strong>). Even after removing RL, these distilled models retain reasoning skills, showing that <strong>large-model reasoning discoveries can be transferred</strong>. Notably, the <strong>14B distilled model</strong> beats all open-source baselines on reasoning benchmarks.</p>
+<aside>
+<h2 id="contributions">Contributions<a hidden class="anchor" aria-hidden="true" href="#contributions">#</a></h2>
+<p><strong>Post-Training: Large-Scale Reinforcement Learning on the Base Model</strong></p>
+<ul>
+<li><strong>DeepSeek-R1-Zero</strong>: RL applied directly to base model <strong>without SFT</strong> → achieves self-verification, reflection, long CoT reasoning.</li>
+<li><strong>DeepSeek-R1</strong>: Pipeline with <strong>2 RL + 2 SFT stages</strong> → improves reasoning, alignment, and non-reasoning abilities.</li>
+</ul>
+<p><strong>Distillation: Smaller Models Can Be Powerful Too</strong></p>
+<ul>
+<li>Reasoning patterns learned by large models can be <strong>distilled</strong> into smaller ones.</li>
+<li>The open-source <strong>DeepSeek-R1-Distill</strong> family (1.5B – 70B parameters) performs <strong>exceptionally well</strong>, matching or surpassing strong baselines like <strong>OpenAI o1-mini</strong>.
+<ul>
+<li><strong>DeepSeek-R1-Distill-Qwen-7B:</strong> 55.5% AIME 2024.</li>
+<li><strong>DeepSeek-R1-Distill-Qwen-32B:</strong> 72.6% AIME 2024, 94.3% MATH-500, 57.2% LiveCodeBench.</li>
+</ul>
+</li>
+</ul>
+<h2 id="summary-of-evaluation-results"><strong>Summary of Evaluation Results</strong><a hidden class="anchor" aria-hidden="true" href="#summary-of-evaluation-results">#</a></h2>
+<ul>
+<li>
+<p><strong>Reasoning Tasks:</strong></p>
+<ul>
+<li>DeepSeek-R1 reaches 79.8 % Pass@1 on AIME 2024 (≈ OpenAI o1-1217).</li>
+<li>On MATH-500 → 97.3 %, Codeforces → 2 029 Elo (&gt; 96 % human).</li>
+<li>Performs slightly below DeepSeek-V3 in engineering tasks.</li>
+</ul>
+</li>
+<li>
+<p><strong>Knowledge Tasks:</strong></p>
+<p>On MMLU (90.8 %), MMLU-Pro (84 %), GPQA Diamond (71.5 %), DeepSeek-R1 beats DeepSeek-V3 and is close to OpenAI o1-1217.</p>
+</li>
+<li>
+<p><strong>Other Abilities:</strong></p>
+<ul>
+<li>Excels in writing, summarization, code generation, and instruction following.</li>
+<li>Achieves 87.6 % length-controlled win-rate (AlpacaEval 2.0) and 92.3 % win-rate (ArenaHard).</li>
+<li>Especially strong on <strong>long-context understanding</strong> and <strong>non-exam queries</strong>.</li>
+</ul>
+</li>
+</ul>
+</aside>
+<h1 id="approach">Approach<a hidden class="anchor" aria-hidden="true" href="#approach">#</a></h1>
+<p>Previous work has heavily relied on large amounts of supervised data to enhance model
+performance. The DeepSeek team demonstrate that reasoning capabilities can be significantly
+improved through <strong>large-scale reinforcement learning (RL)</strong>, even without using supervised
+fine-tuning (SFT) as a cold start. Furthermore, performance can be further enhanced with
+the inclusion of a small amount of cold-start data. The following sections introduce: (1)
+DeepSeek-R1-Zero, which applies RL directly to the base model without any SFT data, and
+(2) DeepSeek-R1, which applies RL starting from a checkpoint fine-tuned with thousands of
+long Chain-of-Thought (CoT) examples. 3) Distill the reasoning capability from DeepSeek-R1 to
+small dense models.</p>
+<h2 id="deepseek-r1-zero">DeepSeek-R1-Zero<a hidden class="anchor" aria-hidden="true" href="#deepseek-r1-zero">#</a></h2>
+<aside>
+<p>DeepSeek-R1-Zero: <strong>Reinforcement Learning on the Base Model</strong></p>
+</aside>
+<p><strong>Proximal Policy Optimization (PPO)</strong> is the standard RL method used in LLM fine-tuning (e.g., RLHF). It involves three models: a <strong>policy model</strong> that generates responses, a <strong>reward(value) model</strong> that scores them, and a <strong>critic model</strong> that estimates a baseline (the expected reward) to compare with the reward. The policy and critic are trained together, using the difference between the actual reward and the baseline to encourage better-than-average outputs while maintaining training stability. But the <strong>reward model is fixed</strong> which only provides the scores. However, PPO requires a large critic network (often the same size as the policy model), which doubles computational cost.</p>
+<p>To address this, <strong>Group Relative Policy Optimization (GRPO)</strong> simplifies the process by removing the critic and computing the baseline directly from the <strong>average reward of a group of sampled responses</strong>, making reinforcement learning more efficient for large LLMs like DeepSeek-R1-Zero.</p>
+<h3 id="reinforcement-learning-algorithm"><strong>Reinforcement Learning Algorithm</strong><a hidden class="anchor" aria-hidden="true" href="#reinforcement-learning-algorithm">#</a></h3>
+<p><strong>Goal:</strong> Train the policy model $\pi_\theta$ to generate above-average answers while keeping training stable and close to a reference model.</p>
+<p><strong>Objective Function:</strong></p>
+<div class="math">
+$$
+J_{GRPO}(\theta)
+= E[{q \sim P(Q), \{o_i\}^G_{i=1} \sim \pi_{\theta_{\text{old}}}(O|q)}] \\
+\frac{1}{G} \sum_{i=1}^{G}
+\Big(
+\min\Big(
+\frac{\pi_\theta(o_i|q)}{\pi_{\theta_{\text{old}}}(o_i|q)} A_i,
+\text{clip}\Big(\frac{\pi_\theta(o_i|q)}{\pi_{\theta_{\text{old}}}(o_i|q)}, 1-\varepsilon, 1+\varepsilon\Big)A_i
+\Big) - \beta D_{KL}(\pi_\theta||\pi_{\text{ref}})
+\Big)
+$$
+<div>
+<ul>
+<li>$q∼P(Q)$: sample a <strong>question/prompt</strong> from the dataset.</li>
+<li>$ {o_i}^G_{i=1} \sim \pi_{\theta_{\text{old}}}(O|q)$: use the old model to generate <strong>G different answers</strong> to the same question.</li>
+<li>$\frac{1}{G} \sum_{i=1}^{G}$: averages the result over the G samples (the group).</li>
+<li>$\frac{\pi_\theta}{\pi_{\theta_{old}}}$: probability ratio showing how the model’s belief changes.</li>
+<li>$A_i$: <strong>advantage</strong>, computed within the group, measures how much better each answer is than group average ($baseline=mean(r_1​,r_2​,…,r_G​)$):</li>
+</ul>
+<p>$$
+A_i = \frac{r_i - {mean}(r_1,\dots,r_G)}{{std}(r_1,\dots,r_G)}
+$$</p>
+<ul>
+<li>$r_i$: reward for response $o_i$.</li>
+<li><strong>clip(·)</strong>: limits updates to ensure stability (same as PPO).</li>
+<li>$D_{KL}(\pi_\theta||\pi_{ref})$: KL penalty keeping the model close to a reference policy (e.g., base model).</li>
+</ul>
+<p>$$
+D_{KL}(\pi_\theta || \pi_{\text{ref}}) = \frac{\pi_{\text{ref}}(o_i|q)}{\pi_\theta(o_i|q)} -\log\frac{\pi_{\text{ref}}(o_i|q)}{\pi_\theta(o_i|q)} - 1
+$$</p>
+<ul>
+<li>$\varepsilon, \beta$: hyperparameters controlling clipping and KL weight.</li>
+</ul>
+<p>Where do the <strong>rewards $r_i$</strong> come from? → From <strong>Reward Modeling</strong>, which defines how to score each generated answer.</p>
+<p>$$
+\boxed{\text{Total computations} \propto O \times G}
+$$</p>
+<ul>
+<li>$O$ = number of <strong>prompts/questions</strong> sampled in a batch</li>
+<li>$G$ = number of <strong>responses per prompt</strong></li>
+</ul>
+<h3 id="reward-modeling">Reward Modeling<a hidden class="anchor" aria-hidden="true" href="#reward-modeling">#</a></h3>
+<p>To train DeepSeek-R1-Zero, a <strong>rule-based reward system</strong> was adopted that mainly consists of two types of rewards:</p>
+<p>$$
+r_i=r_i(accuracy)+r_i(format)
+$$</p>
+<ul>
+<li><strong>Accuracy rewards</strong>: The accuracy reward model evaluates whether the response is correct.
+For example, in the case of math problems with deterministic results, the model is required
+to provide the final answer in a specified format (e.g., within a box), enabling reliable
+rule-based verification of correctness. If the answer matches the correct one, reward = 1; else 0 (or scaled).</li>
+<li><strong>Format rewards</strong>: In addition to the accuracy reward model, we employ a format reward
+model that enforces the model to put its thinking process between ‘<think>’ and ‘</think>’
+tags. Reward = 1 if the output format is correct, else 0.</li>
+</ul>
+<h3 id="training-template">Training Template<a hidden class="anchor" aria-hidden="true" href="#training-template">#</a></h3>
+<p>To train DeepSeek-R1-Zero, begining by designing a straightforward template that guides
+the base model to follow to the specified instructions. This following template requires DeepSeek-R1-Zero to <strong>first produce a reasoning process, followed by the final answer. prompt</strong> will be replaced with the specific reasoning question during training.
+Limit the constraints to this structural format, avoiding any content-specific biases to ensure that the model’s natural progression can be observed accurately during the RL process.</p>
+<p><img alt="image.png" loading="lazy" src="/notes/deepseek-r1_incentivizing_reasoning_capability_in/43d9d8bb-ab88-4db1-98e7-84f74c71f242.png"></p>
+<p>Although DeepSeek-R1-Zero exhibits strong reasoning capabilities and autonomously develops unexpected and powerful reasoning behaviors, it faces several issues. For instance, DeepSeek R1-Zero struggles with challenges like <strong>poor readability</strong>, and <strong>language mixing</strong>(the base model DeepSeek-V3 is multilingual, and RL doesn’t penalize mixing languages). To make reasoning processes more readable and share them with the open community, we explore <strong>DeepSeek-R1</strong>, a method that utilizes RL with human-friendly cold-start data.</p>
+<blockquote>
+<p><strong>Good readability (_after_SFT):</strong></p>
+</blockquote>
+<aside>
+<think>
+To compute the sum of the first 5 even numbers:
+2 + 4 + 6 + 8 + 10 = 30.
+</think>
+<answer> 30 </answer>
+</aside>
+<blockquote>
+<p><strong>Poor readability (DeepSeek-R1-Zero):</strong></p>
+</blockquote>
+<aside>
+<p><think> sum=2+4+6+8+10=&gt;=30?? yes right 30 correct result final output=30 </think>
+<answer>30</answer></p>
+</aside>
+<h2 id="deepseek-r1">DeepSeek-R1<a hidden class="anchor" aria-hidden="true" href="#deepseek-r1">#</a></h2>
+<aside>
+<p>DeepSeek-R1: <strong>Reinforcement Learning with Cold Start</strong></p>
+</aside>
+<p>Inspired by the promising results of DeepSeek-R1-Zero, two natural questions arise: 1) Can reasoning performance be further improved or convergence accelerated by incorporating <strong>a small amount of high-quality data as a cold start</strong>? 2) How can we train a user-friendly model that not only produces clear and coherent Chains of Thought (CoT) but also demonstrates <strong>strong general capabilities</strong>? To address these questions, we design a pipeline to train DeepSeek-R1. The pipeline consists of four stages, outlined as follows.</p>
+<h3 id="cold-start">Cold Start<a hidden class="anchor" aria-hidden="true" href="#cold-start">#</a></h3>
+<p>Construct and collect a small amount of <strong>long CoT data</strong> to fine-tune the model as the initial RL actor. The data can include reasoning examples in the <strong>prompt</strong> (few-shot) or detailed reasoning in the <strong>response</strong>, ensuring the model learns to generate readable, step-by-step solutions. To collect such data, there are several approaches: using few-shot prompting with a long CoT as an example, directly prompting models to generate detailed answers with reflection and verification, gathering DeepSeek-R1-Zero outputs in a readable format, and refining the results through post-processing by human annotators.
+In this work, they collect thousands of <strong>cold-start data</strong> to fine-tune the DeepSeek-V3-Base as
+the starting point for RL. Compared to DeepSeek-R1-Zero, the advantages of cold start data are readability of responses and better performance by <strong>designing a readable pattern</strong> that includes a summary at the end of each response.</p>
+<h3 id="reasoning-oriented-reinforcement-learning">Reasoning-oriented Reinforcement Learning<a hidden class="anchor" aria-hidden="true" href="#reasoning-oriented-reinforcement-learning">#</a></h3>
+<p>After fine-tuning DeepSeek-V3-Base on cold-start data, the same GRPO-based RL process as DeepSeek-R1-Zero is applied to <strong>enhancing the model’s reasoning capabilities</strong> in math, logic, science, and coding tasks. However, RL caused language mixing in Chain-of-Thought reasoning, so they introduced a <strong>language-consistency reward</strong>, computed as the ratio of target-language words in the reasoning text. The final reward combines <strong>accuracy</strong> and <strong>language consistency</strong>: $r_{final} = r_{accuracy} + r_{lang}$Although this slightly reduces task performance, it produces more readable, human-preferred outputs. The model is trained until convergence, resulting in the final <strong>DeepSeek-R1</strong> model.</p>
+<h3 id="rejection-sampling-and-supervised-fine-tuning">Rejection Sampling and Supervised Fine-Tuning<a hidden class="anchor" aria-hidden="true" href="#rejection-sampling-and-supervised-fine-tuning">#</a></h3>
+<p>After reasoning-oriented RL training is finished, they use the <strong>RL-trained checkpoint</strong> to <strong>generate new supervised fine-tuning (SFT) data</strong> for the next round, aiming to improve model’s capabilities in writing, role-playing, and other general-purpose tasks. They produce <strong>two types of data</strong>: For reasoning data, they <strong>sample many responses</strong> (like 10–20 per question) from the <strong>RL checkpoint</strong>. then they <strong>perform rejection sampling</strong>. For each prompt, they sample multiple responses and <strong>retain only the correct ones</strong>. For non-reasoning data, they add general-purpose data reuse or regenerate these using <strong>DeepSeek-V3’s SFT data</strong>.</p>
+<h3 id="reinforcement-learning-for-all-scenarios">Reinforcement Learning for all Scenarios<a hidden class="anchor" aria-hidden="true" href="#reinforcement-learning-for-all-scenarios">#</a></h3>
+<p>To further align the model with human preferences, they implement a secondary reinforcement
+learning stage aimed at improving the model’s <strong>helpfulness and harmlessness</strong> while simultaneously refining its reasoning capabilities.</p>
+<p>For reasoning data, they follow to the methodology outlined in DeepSeek-R1-Zero, which utilizes <strong>rule-based rewards</strong> to guide the learning process. For general data, they resort to reward models to capture <strong>human preferences $r_i^{(preference)}∈[0,1]$</strong>. They build upon the DeepSeek-V3 pipeline and adopt a similar distribution of preference pairs and training prompts. <strong>For helpfulness</strong>, they focus exclusively on the final summary, ensuring that the assessment emphasizes the utility and relevance of the response to the user while minimizing interference with the underlying reasoning process. <strong>For harmlessness</strong>, they evaluate the entire response of the model, including both the reasoning process and the summary, to identify and mitigate any potential risks, biases, or harmful content that may arise during the generation process. Ultimately, the integration of reward signals and diverse data distributions enables to train a model that excels in <strong>reasoning while prioritizing helpfulness and harmlessness.</strong></p>
+<h2 id="distillation-empower-small-models-with-reasoning-capability">Distillation: Empower Small Models with Reasoning Capability<a hidden class="anchor" aria-hidden="true" href="#distillation-empower-small-models-with-reasoning-capability">#</a></h2>
+<p>For distilled models, the team apply <strong>only SFT</strong> and do not include an RL stage, even though
+incorporating RL could substantially boost model performance.</p>
+<h1 id="conclusion">Conclusion<a hidden class="anchor" aria-hidden="true" href="#conclusion">#</a></h1>
+<p>This paper shares how to enhancing model reasoning abilities through reinforcement learning. DeepSeek-R1-Zero represents a pure RL approach without relying on cold-start data, achieving strong performance across various tasks. DeepSeek-R1 is more powerful, leveraging cold-start data alongside iterative RL fine-tuning. Ultimately, DeepSeek-R1 achievesperformance comparable to OpenAI-o1-1217 on a range of tasks.
+They further explore distillation the reasoning capability to small dense models. They use DeepSeek-R1 as the teacher model to generate 800K training samples, and fine-tune several small dense models. The results are promising: DeepSeek-R1-Distill-Qwen-1.5B outperforms GPT-4o and Claude-3.5-Sonnet on math benchmarks with 28.9% on AIME and 83.9% on MATH. Other dense models also achieve impressive results, significantly outperforming other instruction-tuned models based on the same underlying checkpoints.</p>
+<p>In the future, there are some research directions across the following directions for DeepSeek-R1.</p>
+<ul>
+<li><strong>General Capability</strong>: Currently, the capabilities of DeepSeek-R1 fall short of DeepSeek-V3 in tasks such as function calling, multi-turn, complex role-playing, and JSON output. Moving forward, we plan to explore how long CoT can be leveraged to enhance tasks in these fields.</li>
+<li><strong>Language Mixing</strong>: DeepSeek-R1 is currently optimized for Chinese and English, which may result in language mixing issues when handling queries in other languages. For instance, DeepSeek-R1 might use English for reasoning and responses, even if the query is in a language other than English or Chinese. We aim to address this limitation in future updates.</li>
+<li><strong>Prompting Engineering</strong>: When evaluating DeepSeek-R1, we observe that it is sensitive to prompts. Few-shot prompting consistently degrades its performance. Therefore, we recommend users directly describe the problem and specify the output format using a zero-shot setting for optimal results.</li>
+<li><strong>Software Engineering Tasks</strong>: Due to the long evaluation times, which impact the efficiency of the RL process, large-scale RL has not been applied extensively in software engineering tasks. As a result, DeepSeek-R1 has not demonstrated a huge improvement over DeepSeek-V3 on software engineering benchmarks. Future versions will address this by implementing rejection sampling on software engineering data or incorporating asynchronous evaluations during the RL process to improve efficiency.</li>
+</ul>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

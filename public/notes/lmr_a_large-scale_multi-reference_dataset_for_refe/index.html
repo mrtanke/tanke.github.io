@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>LMR: A Large-Scale Multi-Reference Dataset for Reference-based Super-Resolution | Home</title>
+<meta name="keywords" content="">
+<meta name="description" content="Paper-reading notes: LMR - A Large-Scale Multi-Reference Dataset for Reference-based Super-Resolution">
+<meta name="author" content="">
+<link rel="canonical" href="http://localhost:1313/notes/lmr_a_large-scale_multi-reference_dataset_for_refe/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.9bb7abd44394c0e0d2cecd8ad4322626054cd3f5709a6d890d5a408efaf1fa90.css" integrity="sha256-m7er1EOUwODSzs2K1DImJgVM0/Vwmm2JDVpAjvrx&#43;pA=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/selfile.png">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/selfile.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/selfile.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/selfile.png">
+<link rel="mask-icon" href="http://localhost:1313/selfile.png">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/notes/lmr_a_large-scale_multi-reference_dataset_for_refe/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css" integrity="" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js" integrity="" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" integrity="" crossorigin="anonymous"></script>
+<script defer>
+  document.addEventListener("DOMContentLoaded", function() {
+    if (typeof renderMathInElement === 'function') {
+      renderMathInElement(document.body, {
+        
+        delimiters: [
+          {left: "$$", right: "$$", display: true},
+          {left: "\\[", right: "\\]", display: true},
+          {left: "$", right: "$", display: false},
+          {left: "\\(", right: "\\)", display: false}
+        ],
+        
+        throwOnError: false,
+        
+        ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      });
+    }
+  });
+</script>
+
+  
+  <style>
+     
+    ul#menu .tag-button {
+      background: none;
+      border: none;
+      padding: 0;
+      margin: 0;
+      font-weight: 500;
+      color: inherit;
+      cursor: pointer;
+      text-decoration: none;
+      opacity: 0.95;
+      display: inline-block;
+    }
+    ul#menu .tag-button:hover { text-decoration: underline; }
+    ul#menu .tag-button.active { text-decoration: underline; font-weight: 600; }
+
+     
+    body.is-home .post-entry { display: none; }
+    body.is-home .page-footer .pagination { display: none; }
+  </style>
+
+  
+  <script>
+    (function(){
+      function isRootPath() {
+        const p = location.pathname.replace(/\/+/g, '/');
+        return p === '/' || p === '' || p === '/index.html';
+      }
+
+      if (isRootPath()) document.body.classList.add('is-home');
+
+      
+      document.addEventListener('DOMContentLoaded', function(){
+        const menu = document.getElementById('menu');
+        if (!menu) return;
+        
+        if (menu.querySelector('.tag-button')) return;
+        const tags = ['Notes','Thoughts','Projects'];
+        tags.forEach(t => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+          a.className = 'tag-button';
+          a.href = `/tags/${t.toLowerCase()}/`;
+          a.textContent = t;
+          
+          if (location.pathname.toLowerCase().startsWith(`/tags/${t.toLowerCase()}`)) a.classList.add('active');
+          li.appendChild(a);
+          menu.appendChild(li);
+        });
+      });
+    })();
+  </script>
+<meta property="og:url" content="http://localhost:1313/notes/lmr_a_large-scale_multi-reference_dataset_for_refe/">
+  <meta property="og:site_name" content="Home">
+  <meta property="og:title" content="LMR: A Large-Scale Multi-Reference Dataset for Reference-based Super-Resolution">
+  <meta property="og:description" content="Paper-reading notes: LMR - A Large-Scale Multi-Reference Dataset for Reference-based Super-Resolution">
+  <meta property="og:locale" content="en-us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="notes">
+    <meta property="article:published_time" content="2025-11-07T08:38:54+00:00">
+    <meta property="article:modified_time" content="2025-11-07T08:38:54+00:00">
+      <meta property="og:image" content="http://localhost:1313/notes/lmr_a_large-scale_multi-reference_dataset_for_refe/dfd5588d-5a34-4967-ae59-df20cd7af107.png">
+      <meta property="og:image" content="http://localhost:1313/notes/lmr_a_large-scale_multi-reference_dataset_for_refe/e900f246-11cb-4a47-b327-8c1871462dee.png">
+      <meta property="og:image" content="http://localhost:1313/notes/lmr_a_large-scale_multi-reference_dataset_for_refe/image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://localhost:1313/notes/lmr_a_large-scale_multi-reference_dataset_for_refe/dfd5588d-5a34-4967-ae59-df20cd7af107.png">
+<meta name="twitter:title" content="LMR: A Large-Scale Multi-Reference Dataset for Reference-based Super-Resolution">
+<meta name="twitter:description" content="Paper-reading notes: LMR - A Large-Scale Multi-Reference Dataset for Reference-based Super-Resolution">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Notes",
+      "item": "http://localhost:1313/notes/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "LMR: A Large-Scale Multi-Reference Dataset for Reference-based Super-Resolution",
+      "item": "http://localhost:1313/notes/lmr_a_large-scale_multi-reference_dataset_for_refe/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "LMR: A Large-Scale Multi-Reference Dataset for Reference-based Super-Resolution",
+  "name": "LMR: A Large-Scale Multi-Reference Dataset for Reference-based Super-Resolution",
+  "description": "Paper-reading notes: LMR - A Large-Scale Multi-Reference Dataset for Reference-based Super-Resolution",
+  "keywords": [
+    
+  ],
+  "articleBody": "Introduction Single image super-resolution (SISR) aims to restore a low-resolution (LR) image into a high-resolution (HR) image with realistic textures. With the growth of deep learning, SISR performance has greatly improved in recent years.\nCompared to SISR, reference-based super-resolution (RefSR) makes use of additional high-resolution reference images that share similar textures with the target image. This allows RefSR to generate more detailed and realistic results. Because of these promising results, many researchers have focused on RefSR methods in recent years.\nHowever, all previous RefSR methods are trained with only a single reference image. In practice, there are often multiple reference images available, such as in the CUFED5 dataset, where each LR image has five reference images of varying similarity. Yet, CUFED5’s training set provides only one reference per LR input and contains relatively few and small images. As a result, previous methods cannot effectively use multiple references. To handle multiple references, they often merge them into one large image, which consumes much GPU memory and ignores the relationships between references.\nTherefore, a new dataset and method are needed for multi-reference super-resolution. To address this gap, the authors introduce a large-scale multi-reference dataset named LMR, containing 112,142 groups of 300×300 training images, each with five reference images. This dataset is ten times larger than CUFED5 and supports better generalization.\nBased on LMR, the authors propose a new method called MRefSR. It introduces two key components:\nMulti-Reference Attention Module (MAM) – fuses features from multiple reference images by treating the LR input as the query and aligned reference features as keys and values. Spatial Aware Filtering Module (SAFM) – selects the most relevant fused features to refine the output. Overall, the work contributes (1) the first large-scale multi-reference RefSR dataset, (2) a new baseline method MRefSR designed for multiple references, and (3) experimental results showing strong improvements over existing methods.\nMethod Dataset: Large-scale Multi-reference RefSR dataset LMR\nMethod: MRefSR\nConstruction of LMR The LMR dataset is built based on the MegaDepth dataset, which was originally created for single-view depth prediction. MegaDepth collected over one million Internet photos of landmarks and used COLMAP, a Structure-from-Motion (SfM) and Multi-View Stereo (MVS) system, to reconstruct 3D models and dense depth maps. Each landmark includes many photos taken from different viewpoints, making it suitable for creating image groups with overlapping content, just like reference-based super-resolution (RefSR) requires.\nTo construct the LMR dataset, the authors first preprocessed MegaDepth to form image pairs with controlled similarity. They used three filtering rules:\nThe PSNR between the target and candidate reference images must be lower than 30 dB to remove duplicates. The two images must share similar content, ensured by checking the overlap ratio (Rolp) of matched 3D keypoints. The size ratio (Rs) of the same object in both images must not be too small, so the reference provides enough detailed texture. These ratios were computed using the existing D2-Net code. Based on these measures, each image pair was labeled with a similarity level:\nHigh (H) if Rolp \u003e 30% and Rs \u003e 0.9 Medium (M) if Rolp \u003e 10% and Rs \u003e 0.66 Low (L) otherwise After filtering, the authors obtained large image groups — each with one target image and several reference images. Because training on full images is memory-intensive, they cropped smaller patches. For each group, they first randomly cropped a 300×300 patch from the target image. Then, using 3D keypoints, they located five nearby reference patches from images of different similarity levels (one H, two M, two L).\nFinally, this process produced 112,142 training groups, each containing one target patch and five reference patches. This dataset is about ten times larger than CUFED5 and offers much richer multi-reference diversity. For testing, the authors built another set of 142 groups, each with a target image and 2–6 reference images, with resolutions between 800 and 1600 pixels.\nMulti-Reference RefSR network The authors propose a multi-reference RefSR network, called MRefSR, to effectively use multiple reference images. The model is based on C2-Matching, which provides strong performance and open-source accessibility. Like C2-Matching, a Content Extractor (CE) extracts features $F_{LR}$ from the low-resolution $LR$ image, while a VGG extractor extracts multi-scale features $F_{Ref_i}$ from each reference image. The model also uses a pretrained Contrastive Correspondence Network (CCN) to estimate offsets $O_i$, aligning each reference image with the LR input.\nAfter feature extraction and alignment, the network includes two new modules: the Multi-Reference Attention Module (MAM) and the Spatial Aware Filtering Module (SAFM).\nThe MAM fuses features from multiple reference images. For each spatial location $(x, y)$, attention maps are generated to measure how similar each aligned reference feature $K_i(x, y)$ is to the LR feature $Q(x, y)$. The attention weights are computed with a softmax function, and all aligned reference features are combined into a fused reference feature $F_{fref}$ using a weighted sum. This allows the model to flexibly handle any number of reference images in both training and testing. Next, since not all fused features are reliable, the SAFM selects and refines them. It takes the concatenated features of $F_{LR}$ and $F_{fref}$ as input and generates two masks: a multiplicative mask $M_{mul}$ and an additive mask $M_{add}$. These masks are produced using convolution and Leaky ReLU layers, and $M_{mul}$ is passed through a sigmoid function to keep its values between 0 and 2. The final selected reference feature $F_{sref}$ is obtained by combining the fused feature with these masks. $$ M_{mul} = \\text{sigmoid}(f_1(F_{LR} || F_{fref})) \\cdot 2 $$\n$$ M_{add} = f_2(F_{LR}||F_{fref}) $$\n$$ F_{sref} = F_{fref} \\odot M_{mul} + M_{add} $$\n$$ X_{SR} = \\mathcal{G}(F_{LR}, F_{sref}) $$\nwhere\n$||$ denotes feature concatenation, $\\odot$ denotes element-wise multiplication, $f_1$ and $f_2$ are nonlinear mapping functions (convolutions + LeakyReLU), and $\\mathcal{G}$ is the restoration module that reconstructs the final super-resolved image. Finally, a restoration module $G$ takes both the LR features $F_{LR}$ and the selected reference features $F_{sref}$ to reconstruct the high-resolution output image $X_{SR}$.\nIn summary, MRefSR extends C2-Matching by adding multi-reference attention fusion and spatial-aware filtering, enabling flexible and effective use of multiple reference images for super-resolution.\nConclusion In this paper, the author proposed a large-scale multi-reference RefSR dataset: LMR. Unlike CUFED5, the only training RefSR dataset available before, LMR has 5 reference images for each LR input image. What’s more, LMR contains 112,142 groups of 300×300 training images, 10 times the number of CUFED5, and the image size is also much larger than CUFED5.\nBesides, the author proposed a new multi-reference baseline RefSR method, named MRefSR. A multi- reference attention module (MAM) for feature fusion of an arbitrary number of reference images, and a spatial aware filtering module (SAFM) for the fused feature selection. With LMR enabling multi-reference RefSR training, the method effectively models the relationship among multiple references, thus achieving significant improvements over SOTA approaches on both quantitative and qual- itative evaluations. And the method solves the mismatch problem of previous methods using a single reference image for training but testing with multiple reference images.\n",
+  "wordCount" : "1157",
+  "inLanguage": "en",
+  "image": "http://localhost:1313/notes/lmr_a_large-scale_multi-reference_dataset_for_refe/dfd5588d-5a34-4967-ae59-df20cd7af107.png","datePublished": "2025-11-07T08:38:54Z",
+  "dateModified": "2025-11-07T08:38:54Z",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "http://localhost:1313/notes/lmr_a_large-scale_multi-reference_dataset_for_refe/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Home",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "http://localhost:1313/selfile.png"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="Home (Alt + H)">Home</a>
+            <div class="logo-switches">
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a class="tag-button" href="http://localhost:1313/tags/notes/">
+                    <span>Notes</span>
+                </a>
+            </li>
+            <li>
+                <a class="tag-button" href="http://localhost:1313/tags/thoughts/">
+                    <span>Thoughts</span>
+                </a>
+            </li>
+            <li>
+                <a class="tag-button" href="http://localhost:1313/tags/projects/">
+                    <span>Projects</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="http://localhost:1313/">Home</a>&nbsp;»&nbsp;<a href="/notes/">Notes</a></div>
+    <h1 class="post-title entry-hint-parent">
+      LMR: A Large-Scale Multi-Reference Dataset for Reference-based Super-Resolution
+    </h1>
+    <div class="post-description">
+      Paper-reading notes: LMR - A Large-Scale Multi-Reference Dataset for Reference-based Super-Resolution
+    </div>
+    <div class="post-meta"><span title='2025-11-07 08:38:54 +0000 +0000'>November 7, 2025</span>&nbsp;·&nbsp;<span>1157 words</span>
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#introduction" aria-label="Introduction">Introduction</a></li>
+                <li>
+                    <a href="#method" aria-label="Method">Method</a><ul>
+                        
+                <li>
+                    <a href="#construction-of-lmr" aria-label="Construction of LMR">Construction of LMR</a></li>
+                <li>
+                    <a href="#multi-reference-refsr-network" aria-label="Multi-Reference RefSR network">Multi-Reference RefSR network</a></li></ul>
+                </li>
+                <li>
+                    <a href="#conclusion" aria-label="Conclusion">Conclusion</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><h1 id="introduction">Introduction<a hidden class="anchor" aria-hidden="true" href="#introduction">#</a></h1>
+<p><strong>Single image super-resolution</strong> <strong>(SISR)</strong> aims to restore a low-resolution (LR) image into a high-resolution (HR) image with realistic textures. With the growth of deep learning, SISR performance has greatly improved in recent years.</p>
+<p>Compared to SISR, <strong>reference-based super-resolution (RefSR)</strong> makes use of additional high-resolution reference images that share similar textures with the target image. This allows RefSR to generate more detailed and realistic results. Because of these promising results, many researchers have focused on RefSR methods in recent years.</p>
+<p>However, all previous RefSR methods are trained with only <strong>a single reference image</strong>. In practice, there are often multiple reference images available, such as in the CUFED5 dataset, where each LR image has five reference images of varying similarity. Yet, CUFED5’s training set provides only one reference per LR input and contains relatively few and small images. As a result, previous methods cannot effectively use multiple references. To handle multiple references, they often merge them into one large image, which consumes much GPU memory and ignores the relationships between references.</p>
+<p>Therefore, a new dataset and method are needed for multi-reference super-resolution. To address this gap, the authors introduce a large-scale multi-reference dataset named <strong>LMR</strong>, containing 112,142 groups of 300×300 training images, each with five reference images. This dataset is ten times larger than CUFED5 and supports better generalization.</p>
+<p>Based on LMR, the authors propose a new method called <strong>MRefSR</strong>. It introduces two key components:</p>
+<ol>
+<li><strong>Multi-Reference Attention Module (MAM)</strong> – fuses features from multiple reference images by treating the <strong>LR input</strong> as the query and <strong>aligned reference features</strong> as keys and values.</li>
+<li><strong>Spatial Aware Filtering Module (SAFM)</strong> – selects the most relevant fused features to refine the output.</li>
+</ol>
+<p>Overall, the work contributes (1) the first large-scale <strong>multi-reference RefSR dataset</strong>, (2) a new baseline method <strong>MRefSR</strong> designed for multiple references, and (3) experimental results showing strong improvements over existing methods.</p>
+<h1 id="method">Method<a hidden class="anchor" aria-hidden="true" href="#method">#</a></h1>
+<p>Dataset: Large-scale Multi-reference RefSR dataset <strong>LMR</strong></p>
+<p>Method: <strong>MRefSR</strong></p>
+<h2 id="construction-of-lmr">Construction of LMR<a hidden class="anchor" aria-hidden="true" href="#construction-of-lmr">#</a></h2>
+<p>The LMR dataset is built based on the <strong>MegaDepth</strong> dataset, which was originally created for single-view depth prediction. MegaDepth collected over one million Internet photos of landmarks and used <strong>COLMAP</strong>, a Structure-from-Motion (SfM) and Multi-View Stereo (MVS) system, to reconstruct 3D models and dense depth maps. Each landmark includes many photos taken from different viewpoints, making it suitable for creating image groups with overlapping content, just like reference-based super-resolution (RefSR) requires.</p>
+<p>To construct the <strong>LMR dataset</strong>, the authors first preprocessed MegaDepth to form image pairs with controlled similarity. They used three filtering rules:</p>
+<ol>
+<li>The PSNR between the target and candidate reference images must be lower than 30 dB to remove duplicates.</li>
+<li>The two images must share similar content, ensured by checking the <strong>overlap ratio (Rolp)</strong> of matched 3D keypoints.</li>
+<li>The <strong>size ratio (Rs)</strong> of the same object in both images must not be too small, so the reference provides enough detailed texture.</li>
+</ol>
+<p>These ratios were computed using the existing <strong>D2-Net</strong> code. Based on these measures, each image pair was labeled with a <strong>similarity level</strong>:</p>
+<ul>
+<li><strong>High (H)</strong> if Rolp &gt; 30% and Rs &gt; 0.9</li>
+<li><strong>Medium (M)</strong> if Rolp &gt; 10% and Rs &gt; 0.66</li>
+<li><strong>Low (L)</strong> otherwise</li>
+</ul>
+<p>After filtering, the authors obtained large image groups — each with one target image and several reference images. Because training on full images is memory-intensive, they cropped smaller patches. For each group, they first randomly cropped a <strong>300×300 patch</strong> from the target image. Then, using <strong>3D keypoints</strong>, they located five nearby reference patches from images of different similarity levels (one H, two M, two L).</p>
+<p>Finally, this process produced <strong>112,142 training groups</strong>, each containing one target patch and five reference patches. This dataset is about ten times larger than CUFED5 and offers much richer multi-reference diversity. For testing, the authors built another set of <strong>142 groups</strong>, each with a target image and 2–6 reference images, with resolutions between 800 and 1600 pixels.</p>
+<h2 id="multi-reference-refsr-network">Multi-Reference RefSR network<a hidden class="anchor" aria-hidden="true" href="#multi-reference-refsr-network">#</a></h2>
+<p><img alt="image.png" loading="lazy" src="/notes/lmr_a_large-scale_multi-reference_dataset_for_refe/dfd5588d-5a34-4967-ae59-df20cd7af107.png"></p>
+<p>The authors propose a <strong>multi-reference RefSR network</strong>, called <strong>MRefSR</strong>, to effectively use multiple reference images. The model is based on <strong>C2-Matching</strong>, which provides strong performance and open-source accessibility. Like C2-Matching, a <strong>Content Extractor (CE)</strong> extracts features $F_{LR}$ from the low-resolution $LR$ image, while a <strong>VGG extractor</strong> extracts multi-scale features $F_{Ref_i}$ from each reference image. The model also uses a pretrained <strong>Contrastive Correspondence Network (CCN)</strong> to estimate offsets $O_i$, aligning each reference image with the LR input.</p>
+<p>After feature extraction and alignment, the network includes two new modules: the <strong>Multi-Reference Attention Module (MAM)</strong> and the <strong>Spatial Aware Filtering Module (SAFM)</strong>.</p>
+<ul>
+<li>The <strong>MAM</strong> fuses features from multiple reference images. For each spatial location $(x, y)$, attention maps are generated to measure how similar each aligned reference feature $K_i(x, y)$ is to the LR feature $Q(x, y)$. The attention weights are computed with a <strong>softmax function</strong>, and all aligned reference features are combined into a fused reference feature $F_{fref}$ using a weighted sum. This allows the model to flexibly handle any number of reference images in both training and testing.</li>
+</ul>
+<p><img alt="image.png" loading="lazy" src="/notes/lmr_a_large-scale_multi-reference_dataset_for_refe/image.png"></p>
+<ul>
+<li>Next, since not all fused features are reliable, the <strong>SAFM</strong> selects and refines them. It takes the concatenated features of $F_{LR}$ and $F_{fref}$ as input and generates two masks: a <strong>multiplicative mask</strong> $M_{mul}$ and an <strong>additive mask</strong> $M_{add}$. These masks are produced using convolution and Leaky ReLU layers, and $M_{mul}$ is passed through a sigmoid function to keep its values between 0 and 2. The final selected reference feature $F_{sref}$  is obtained by combining the fused feature with these masks.</li>
+</ul>
+<p>$$
+M_{mul} = \text{sigmoid}(f_1(F_{LR} || F_{fref})) \cdot 2
+$$</p>
+<p>$$
+M_{add} = f_2(F_{LR}||F_{fref})
+$$</p>
+<p>$$
+F_{sref} = F_{fref} \odot M_{mul} + M_{add}
+$$</p>
+<p>$$
+X_{SR} = \mathcal{G}(F_{LR}, F_{sref})
+$$</p>
+<p>where</p>
+<ul>
+<li>$||$ denotes feature concatenation,</li>
+<li>$\odot$ denotes element-wise multiplication,</li>
+<li>$f_1$ and $f_2$ are nonlinear mapping functions (convolutions + LeakyReLU), and</li>
+<li>$\mathcal{G}$ is the restoration module that reconstructs the final super-resolved image.</li>
+</ul>
+<p><img alt="image.png" loading="lazy" src="/notes/lmr_a_large-scale_multi-reference_dataset_for_refe/e900f246-11cb-4a47-b327-8c1871462dee.png"></p>
+<p>Finally, a <strong>restoration module $G$</strong> takes both the LR features $F_{LR}$ and the selected reference features $F_{sref}$ to reconstruct the high-resolution output image $X_{SR}$.</p>
+<p>In summary, MRefSR extends C2-Matching by adding <strong>multi-reference attention fusion</strong> and <strong>spatial-aware filtering</strong>, enabling flexible and effective use of multiple reference images for super-resolution.</p>
+<h1 id="conclusion">Conclusion<a hidden class="anchor" aria-hidden="true" href="#conclusion">#</a></h1>
+<p>In this paper, the author proposed a large-scale multi-reference RefSR dataset: <strong>LMR</strong>. Unlike CUFED5, the only training RefSR dataset available before, LMR has 5 reference images for each LR input image. What’s more, LMR contains 112,142 groups of 300×300 training images, 10 times the number of CUFED5, and the image size is also much larger than CUFED5.</p>
+<p>Besides, the author proposed a new multi-reference baseline RefSR method, named <strong>MRefSR</strong>. A multi- reference attention module (<strong>MAM</strong>) for feature fusion of an arbitrary number of reference images, and a spatial aware filtering module (<strong>SAFM</strong>) for the fused feature selection. With LMR enabling multi-reference RefSR training, the method effectively models the relationship among multiple references, thus achieving significant improvements over SOTA approaches on both quantitative and qual- itative evaluations. And the method solves the mismatch problem of previous methods using a single reference image for training but testing with multiple reference images.</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

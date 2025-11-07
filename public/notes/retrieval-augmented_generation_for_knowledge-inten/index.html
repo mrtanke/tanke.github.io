@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks | Home</title>
+<meta name="keywords" content="">
+<meta name="description" content="Paper-reading notes: Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks">
+<meta name="author" content="">
+<link rel="canonical" href="http://localhost:1313/notes/retrieval-augmented_generation_for_knowledge-inten/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.9bb7abd44394c0e0d2cecd8ad4322626054cd3f5709a6d890d5a408efaf1fa90.css" integrity="sha256-m7er1EOUwODSzs2K1DImJgVM0/Vwmm2JDVpAjvrx&#43;pA=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/selfile.png">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/selfile.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/selfile.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/selfile.png">
+<link rel="mask-icon" href="http://localhost:1313/selfile.png">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/notes/retrieval-augmented_generation_for_knowledge-inten/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css" integrity="" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js" integrity="" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" integrity="" crossorigin="anonymous"></script>
+<script defer>
+  document.addEventListener("DOMContentLoaded", function() {
+    if (typeof renderMathInElement === 'function') {
+      renderMathInElement(document.body, {
+        
+        delimiters: [
+          {left: "$$", right: "$$", display: true},
+          {left: "\\[", right: "\\]", display: true},
+          {left: "$", right: "$", display: false},
+          {left: "\\(", right: "\\)", display: false}
+        ],
+        
+        throwOnError: false,
+        
+        ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      });
+    }
+  });
+</script>
+
+  
+  <style>
+     
+    ul#menu .tag-button {
+      background: none;
+      border: none;
+      padding: 0;
+      margin: 0;
+      font-weight: 500;
+      color: inherit;
+      cursor: pointer;
+      text-decoration: none;
+      opacity: 0.95;
+      display: inline-block;
+    }
+    ul#menu .tag-button:hover { text-decoration: underline; }
+    ul#menu .tag-button.active { text-decoration: underline; font-weight: 600; }
+
+     
+    body.is-home .post-entry { display: none; }
+    body.is-home .page-footer .pagination { display: none; }
+  </style>
+
+  
+  <script>
+    (function(){
+      function isRootPath() {
+        const p = location.pathname.replace(/\/+/g, '/');
+        return p === '/' || p === '' || p === '/index.html';
+      }
+
+      if (isRootPath()) document.body.classList.add('is-home');
+
+      
+      document.addEventListener('DOMContentLoaded', function(){
+        const menu = document.getElementById('menu');
+        if (!menu) return;
+        
+        if (menu.querySelector('.tag-button')) return;
+        const tags = ['Notes','Thoughts','Projects'];
+        tags.forEach(t => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+          a.className = 'tag-button';
+          a.href = `/tags/${t.toLowerCase()}/`;
+          a.textContent = t;
+          
+          if (location.pathname.toLowerCase().startsWith(`/tags/${t.toLowerCase()}`)) a.classList.add('active');
+          li.appendChild(a);
+          menu.appendChild(li);
+        });
+      });
+    })();
+  </script>
+<meta property="og:url" content="http://localhost:1313/notes/retrieval-augmented_generation_for_knowledge-inten/">
+  <meta property="og:site_name" content="Home">
+  <meta property="og:title" content="Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks">
+  <meta property="og:description" content="Paper-reading notes: Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks">
+  <meta property="og:locale" content="en-us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="notes">
+    <meta property="article:published_time" content="2025-10-15T09:43:53+00:00">
+    <meta property="article:modified_time" content="2025-10-15T09:43:53+00:00">
+      <meta property="og:image" content="http://localhost:1313/notes/retrieval-augmented_generation_for_knowledge-inten/image.png">
+      <meta property="og:image" content="http://localhost:1313/notes/retrieval-augmented_generation_for_knowledge-inten/image_1.png">
+      <meta property="og:image" content="http://localhost:1313/notes/retrieval-augmented_generation_for_knowledge-inten/image_2.png">
+      <meta property="og:image" content="http://localhost:1313/notes/retrieval-augmented_generation_for_knowledge-inten/image_3.png">
+      <meta property="og:image" content="http://localhost:1313/notes/retrieval-augmented_generation_for_knowledge-inten/image_4.png">
+      <meta property="og:image" content="http://localhost:1313/notes/retrieval-augmented_generation_for_knowledge-inten/image_5.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://localhost:1313/notes/retrieval-augmented_generation_for_knowledge-inten/image.png">
+<meta name="twitter:title" content="Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks">
+<meta name="twitter:description" content="Paper-reading notes: Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Notes",
+      "item": "http://localhost:1313/notes/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks",
+      "item": "http://localhost:1313/notes/retrieval-augmented_generation_for_knowledge-inten/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks",
+  "name": "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks",
+  "description": "Paper-reading notes: Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks",
+  "keywords": [
+    
+  ],
+  "articleBody": "Abstract Pre-trained models with a differentiable access mechanism to explicit non-parametric memory have so far been only investigated for extractive downstream tasks. pre-trained models non-parametric memory differentiable access mechanism - In soft differentiable access mechanism, we don’t discard any chunks. - In Hard retrieval (standard RAG), the retriever picks the top-k passages We introduce RAG models where the parametric memory is a pre-trained seq2seq model and the non-parametric memory is a dense vector index of Wikipedia, accessed with a pre-trained neural retriever. pre-trained models → seq2seq model non-parametric memory → a dense vector index of Wikipedia differentiable access mechanism → a pre-trained neural retriever 1. Prompt (question) arrives. 2. Seq2seq encoder turns it into query vector q. 3. Retriever compares q to all memory keys k_i (Wikipedia passage vectors). 4. Compute similarity scores s_i = q ⋅ k_i. 5. Apply softmax → attention weights α_i. 6. Read vector r = Σ α_i v_i (weighted mixture of passage info). 7. Feed r (plus q) into seq2seq decoder → generate answer token by token. 8. Gradients flow through α_i → retriever learns to attend to more relevant chunks. text chunk → retriever encoder → key/value → FAISS index → query embedding → top-k retrieval → generator We compare two RAG formulations, one which conditions on the same retrieved passages across the whole generated sequence, and another which can use different passages per token. same retrieved passages → RAG-Sequence different passages per token → RAG-Token It’s often used for knowledge-intensive tasks, not free-form story generation. Discussion We conducted an thorough investigation of the learned retrieval component, validating its effectiveness, and we illustrated how the retrieval index can be hot-swapped to update the model without requiring any retraining.\nThis is one of RAG’s biggest advantages over standard language models: - You can update its knowledge base without retraining its parameters. The retriever learns the mapping → parametric The index just holds the results → non-parametric Retriever model A neural network that encodes queries and documents into vectors. Parametric — it has learnable weights (parameters) Retrieval index (memory) The database of all document embeddings (keys + values) Non-parametric — stored outside the model’s paras Index = structure that accelerates similarity search using ANN methods (cluster-and-search) (ANN -\u003e Approximate nearest neighbor). Key = pre-computed document embedding; Value = original text (encoded later when used). Hard retrieval = pick top-k texts → concatenate → generator sees text. Soft retrieval = mix all embeddings by attention → generator sees one read vector. Generator (e.g., BART or T5): a Transformer-based seq2seq model. 1. Introduction RAG can be fine-tuned on any seq2seq task, whereby both the generator and retriever are jointly learned.\nWe can make an anology: - RAG's retriever is like encoder, because it summarizes what info the model should pay attention to before generation. - RAG's generator is like decoder, because it generate the sequence token-by-token. Steps The retriever (Dense Passage Retriever, henceforth DPR) provides latent documents conditioned on the input, The seq2seq model (BART) then conditions on these latent documents together with the input to generate the output. 2. Methods Our models leverage 2 components:\na retriever $p_η(z|x)$ a generator $p_θ(y_i|x, z, y_{1:i−1})$ x = the query (e.g., a question or a sentence you want to search with) z = a text passage (a possible relevant document) η = the parameters of the model/retriever **p(z∣x) = the prob that passage z is relevant to the query x** --- y1:i-1 = the previous i-1 tokens z = the retrieved passage x = the original input **pθ(yi|x, z, y1:i−1) = the prob that generating token yi, give three inputs.** We propose 2 models (based on the average of the latent documents in different ways to produce a distribution over generated text) :\nRAG-Token → can predict each target token based on a different doc/chunk. RAG-Sequence → the model uses the same doc/chunk to predict each target token. 2.1 Models RAG-Sequence Model: The RAG-Sequence model uses the same retrieved doc/chunk to generate the complete seq.\nRAG-Token Model: we can draw a different latent document for each target token and marginalize accordingly.\n2.2 Retriever: DPR We use a pre-trained bi-encoder from DPR to initialize our retriever and to build the document index. We refer to the document index as the non-parametric memory.\nDPR (Dense Passage Retriever): a bi-encoder architecture: d(z) = a dense representation of a document produced by a BERT document encoder. q(x) = a query representation produced by a query encoder, also based on BERT. MIPS (Maximum Inner Product Search) → The operation of finding top-k documents by inner product between query and every docs. 2.3 Generator: BART We use BART-large, a pre-trained seq2seq transformer with 400M parameters. We simply concatenate the input x and the retrieved content z.\nBART combines the strengths of BERT and GPT: - BERT: bidirectional understanding (encoder) - GPT: left-to-right generation (decoder) 2.4 Training We jointly train the retriever and generator components without any direct supervision on what document should be retrieved.\nUpdating the document encoder **BERTd** during training is costly as it requires the document index to be periodically updated as **REALM** does during pre-training. We do not find this step necessary for strong performance, and keep the document encoder (and index) fixed, only fine-tuning the query encoder **BERTq** and the **BART generator**. BERTd = document encoder BERTq = query encoder REALM = Retrieval-Enhanced Adaptive Language Model update the doc encoder required re-encoding all documents every few steps — which made it extremely slow and hard to scale. 2.5 Decoding At test time, RAG-Sequence and RAG-Token require different ways to approximate $arg max_y p(y|x)$.\nRAG-Token Model: standard beam search RAG-Sequence Model: Thorough Decoding or Fast Decoding An autoregressive model = predicts the next token based on all previous tokens. - Thorough Decoding = Generate and score candidate answers for every retrieved document, then combine their probabilities - most accurate but slow. - Fast Decoding = Only score candidates that were actually generated during beam search, skipping others — much faster but approximate. RAG-Token 在生成过程中，模型会参考每个 chunk 下的条件概率分布：$p_\\theta(y_i \\mid x, z, y_{1:i-1})$ 来预测下一个 token 的可能性。 然后根据检索器给出的每个 chunk 的权重 $p_\\eta(z|x)$，对这些分布进行加权融合，得到一个综合的下一词概率分布：$p’(y_i \\mid x, y_{1:i-1}) = \\sum_z p_\\eta(z|x),p_\\theta(y_i \\mid x, z, y_{1:i-1})$ 模型从这个融合分布中选出概率最高的 token，再将其加入到已生成的序列中。 重复该步骤，直到生成完整句子。 💡 This makes generation very fast, but because it can borrow inconsistent or partially incorrect evidence from different chunks, the final sentence may contain blended or wrong facts, even though the decoding itself is efficient.\nRAG-Sequence (Thorough Decoding) 先在每个 chunk 下独立运行 beam search，得到概率最高的候选句子； 然后将这些候选句分别在其他 chunk 上重新计算生成概率 $p_\\theta(y|x,z)$（使用 teacher forcing 强制生成）， 最后根据每个 chunk 的检索权重 $p_\\eta(z|x)$ 对句子概率进行加权求和：$p(y|x) = \\sum_z p_\\eta(z|x),p_\\theta(y|x,z)$ 最终选出整体概率最高的句子作为输出。 💡 This “global reconsideration” allows the model to filter out wrong or inconsistent sentences and select the most related one overall. However, because it must compute the probability of every candidate on every chunk, the process is extremely slow.\nRAG-Sequence (Fast Decoding) 先在每个 chunk 下生成概率最高的候选句子， 但只在生成过该句子的 chunk上计算概率， 未生成该句子的 chunk 直接忽略（认为概率≈0）， 再进行同样的加权求和。 💡 This method is a trade-off between the two. It still generates separate sentences for each chunk, but it skips the expensive re-evaluation on other chunks—only using the chunks that actually produced each sentence.\nAs a result, it’s much faster than thorough decoding while keeping almost the same accuracy, though it’s still slower than RAG-Token.\nComparison Item RAG-Token RAG-Sequence (Thorough) RAG-Sequence (Fast) Fusion Timing Dynamically fuses predictions from all chunks at each token Uses a fixed chunk for the whole sentence, then re-evaluates globally Uses a fixed chunk for the whole sentence, then re-evaluates locally Fusion Granularity Token-level Sentence-level Sentence-level Decoding Method Single beam search Multiple beam searches + full re-evaluation Multiple beam searches + partial re-evaluation Cross-chunk Generation ✅ Allowed ❌ Not allowed ❌ Not allowed Accuracy Medium Highest High Speed Fast Slow Faster Typical Usage Common for online inference Mainly theoretical analysis / small-scale experiments Practical trade-off in real applications Probability Computation Sum across chunks at each token Sum across chunks after full sentence generation Sum across chunks after full sentence generation Core Idea Fuse multiple chunk predictions at every step Generate each sentence independently, then globally combine Generate each sentence independently, then combine locally Key Characteristics Each word leverages all chunks — very fast but may produce inconsistent sentences Theoretically most accurate but computationally slow Approximate yet efficient — widely used in practice 3. Experiments For all experiments:\nNon-parametric knowledge source: the December 2018 dump Each Wikipedia article is split into disjoint 100-word chunks, to make a total of 21M docs. Build a single MIPS index using FAISS with a Hierarchical Navigable Small World approximation for fast retrieval. During training:\nWe retrieve the top k documents for each query. We consider k ∈ {5, 10} for training and set k for test time using dev data. 3.1 Open-domain Question Answering Compare with:\nThe extractive QA paradigm – extracts short answer spans directly from retrieved documents, relying mainly on non-parametric knowledge. The Closed-Book QA approaches – generate answers without retrieval, depending only on parametric knowledge stored in the model. Consider four popular open-domain QA datasets:\nNatural Questions (NQ) TriviaQA (TQA) WebQuestions (WQ) CuratedTrec (CT) (CT and WQ are small; models are initialized from the NQ-trained RAG model.)\nEvaluate:\nPerformance is measured using Exact Match (EM) – a metric that checks whether the generated answer exactly matches the reference answer. 💡 Focus: finding facts from retrieval, not writing sentences.\n3.2 Abstractive Question Answering Evaluate:\nThe MSMARCO NLG v2.1 task, which tests RAG’s ability to generate free-form, natural language answers in a knowledge-intensive setting. Setup:\nEach example includes a question, ten gold retrieved passages, and a full-sentence human-written answer. RAG ignores the supplied passages and treats MSMARCO as an open-domain QA task (retrieving from Wikipedia instead). Note:\nSome questions cannot be answered correctly without the gold passages (e.g., “What is the weather in Volcano, CA?”). In such cases, RAG relies on its parametric knowledge to generate reasonable responses. 💡 Focus: natural, fluent language generation (NLG).\n3.3 Jeopardy Question Generation Task:\nGiven an answer entity, generate a factual Jeopardy-style question (reverse QA). Dataset:\nSearchQA, with 100K train / 14K dev / 27K test examples. Compare:\nRAG vs BART (baseline model). Evaluate:\nQ-BLEU-1 metric (favors entity matching and factual accuracy). Human evaluation on two criteria: Factuality — whether the question is factually correct. Specificity — whether the question is closely related to the given answer. 💡 Focus: evaluate RAG’s generation abilities in a non-QA setting.\n3.4 Fact Verification Task:\nGiven a claim, classify whether it is supported, refuted, or not enough info using evidence from Wikipedia. Dataset:\nFEVER benchmark. Method:\nMap each class label to a single output token, treating the task as sequence classification. RAG trains without supervision on retrieved evidence, learning retrieval and reasoning jointly. Evaluate:\nReport label accuracy for both: 3-way classification: supports / refutes / not enough info 2-way classification: supports / refutes Purpose:\nTest RAG’s capability for reasoning-based classification, not just text generation. 💡 Focus: reasoning and classification with retrieval (not generation)\n4. Results Open-domain Question Answering Abstractive Question Answering Jeopardy Question Generation Fact Verification Table 1 \u0026 2 💡 Table 1:\nTo show that RAG outperforms previous retrieval-based QA systems (like DPR and REALM) and even large closed-book models (like T5), Proving that retrieval + generation can achieve state-of-the-art results without re-rankers or extractive readers. Table 2:\nTo demonstrate that RAG generalizes beyond simple QA: it performs strongly on abstractive answer generation (MSMARCO), question generation (Jeopardy), and fact verification (FEVER) showing it works for both generation and classification tasks, even without gold evidence Table 3 Table 4 \u0026 5 💡 Table 4:\nTo verify through human judgment that RAG’s generated questions are more factual and more specific than those from BART, confirming that retrieval grounding improves accuracy and relevance in text generation. Table 5:\nTo measure linguistic diversity of generated text — showing that RAG’s outputs are less repetitive and more varied (closer to human text) than BART’s, thanks to diverse retrieved contexts. Factuality → Is the question factually correct? Specificity → Does the question precisely match its given answer (not too generic)? Table 6 “Ablation” means removing or changing a part of the model to test how much it matters.\n💡 Table 6 shows that RAG’s learned dense retriever is essential\nreplacing it with BM25 or freezing it significantly hurts performance. proving that jointly learned retrieval is key for strong open-domain generation and QA results. Figure 2 The heatmap (right) shows which retrieved document (y-axis) the model relies on when generating each token (x-axis) of a sentence.\nThe heatmap shows a dark blue cell at (Doc 2, “Sun”), which means Doc 2 — the one containing “The Sun Also Rises” — is strongly influencing this token. (The model correctly “looks up” the document that mentions that book.)\nAfter that, the dark blue (posterior weight) flattens — it spreads out across documents. That means: once the model has started generating “The Sun…”, it can finish “Also Rises” without continuing to depend on that document.\n💡 After seeing one or two key words from retrieval chunks (non-parametric memory), the generator’s parametric knowledge is enough to recall and complete the title.\nThe non-parametric component helps to guide the generation, drawing out specific knowledge stored in the parametric memory.\n",
+  "wordCount" : "2177",
+  "inLanguage": "en",
+  "image": "http://localhost:1313/notes/retrieval-augmented_generation_for_knowledge-inten/image.png","datePublished": "2025-10-15T09:43:53Z",
+  "dateModified": "2025-10-15T09:43:53Z",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "http://localhost:1313/notes/retrieval-augmented_generation_for_knowledge-inten/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Home",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "http://localhost:1313/selfile.png"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="Home (Alt + H)">Home</a>
+            <div class="logo-switches">
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a class="tag-button" href="http://localhost:1313/tags/notes/">
+                    <span>Notes</span>
+                </a>
+            </li>
+            <li>
+                <a class="tag-button" href="http://localhost:1313/tags/thoughts/">
+                    <span>Thoughts</span>
+                </a>
+            </li>
+            <li>
+                <a class="tag-button" href="http://localhost:1313/tags/projects/">
+                    <span>Projects</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="http://localhost:1313/">Home</a>&nbsp;»&nbsp;<a href="/notes/">Notes</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks
+    </h1>
+    <div class="post-description">
+      Paper-reading notes: Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks
+    </div>
+    <div class="post-meta"><span title='2025-10-15 09:43:53 +0000 +0000'>October 15, 2025</span>&nbsp;·&nbsp;<span>2177 words</span>
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#abstract" aria-label="Abstract">Abstract</a></li>
+                <li>
+                    <a href="#discussion" aria-label="Discussion">Discussion</a></li>
+                <li>
+                    <a href="#1-introduction" aria-label="1. Introduction">1. Introduction</a><ul>
+                        
+                <li>
+                    <a href="#steps" aria-label="Steps">Steps</a></li></ul>
+                </li>
+                <li>
+                    <a href="#2-methods" aria-label="2. Methods">2. Methods</a><ul>
+                        
+                <li>
+                    <a href="#21-models" aria-label="2.1 Models">2.1 Models</a></li>
+                <li>
+                    <a href="#22-retriever-dpr" aria-label="2.2 Retriever: DPR">2.2 Retriever: DPR</a></li>
+                <li>
+                    <a href="#23-generator-bart" aria-label="2.3 Generator: BART">2.3 Generator: BART</a></li>
+                <li>
+                    <a href="#24-training" aria-label="2.4 Training">2.4 Training</a></li>
+                <li>
+                    <a href="#25-decoding" aria-label="2.5 Decoding">2.5 Decoding</a><ul>
+                        
+                <li>
+                    <a href="#rag-token" aria-label="RAG-Token">RAG-Token</a></li>
+                <li>
+                    <a href="#rag-sequence-thorough-decoding" aria-label="RAG-Sequence (Thorough Decoding)">RAG-Sequence (Thorough Decoding)</a></li>
+                <li>
+                    <a href="#rag-sequence-fast-decoding" aria-label="RAG-Sequence (Fast Decoding)">RAG-Sequence (Fast Decoding)</a></li></ul>
+                </li></ul>
+                </li>
+                <li>
+                    <a href="#3-experiments" aria-label="3. Experiments">3. Experiments</a><ul>
+                        
+                <li>
+                    <a href="#31-open-domain-question-answering" aria-label="3.1 Open-domain Question Answering">3.1 Open-domain Question Answering</a></li>
+                <li>
+                    <a href="#32-abstractive-question-answering" aria-label="3.2 Abstractive Question Answering">3.2 Abstractive Question Answering</a></li>
+                <li>
+                    <a href="#33-jeopardy-question-generation" aria-label="3.3 Jeopardy Question Generation">3.3 Jeopardy Question Generation</a></li>
+                <li>
+                    <a href="#34-fact-verification" aria-label="3.4 Fact Verification">3.4 Fact Verification</a></li></ul>
+                </li>
+                <li>
+                    <a href="#4-results" aria-label="4. Results">4. Results</a><ul>
+                        
+                <li>
+                    <a href="#table-1--2" aria-label="Table 1 &amp; 2">Table 1 &amp; 2</a></li>
+                <li>
+                    <a href="#table-3" aria-label="Table 3">Table 3</a></li>
+                <li>
+                    <a href="#table-4--5" aria-label="Table 4 &amp; 5">Table 4 &amp; 5</a></li>
+                <li>
+                    <a href="#table-6" aria-label="Table 6">Table 6</a></li>
+                <li>
+                    <a href="#figure-2" aria-label="Figure 2">Figure 2</a>
+                </li>
+            </ul>
+            </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><h1 id="abstract">Abstract<a hidden class="anchor" aria-hidden="true" href="#abstract">#</a></h1>
+<ol>
+<li><strong>Pre-trained models</strong> with a <strong>differentiable access mechanism</strong> to <strong>explicit non-parametric memory</strong> have so far been only investigated for extractive downstream tasks.
+<ul>
+<li>pre-trained models</li>
+<li>non-parametric memory</li>
+<li>differentiable access mechanism</li>
+</ul>
+</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="line"><span class="cl">- In soft differentiable access mechanism, we don’t discard any chunks.
+</span></span><span class="line"><span class="cl">- In Hard retrieval (standard RAG), the retriever picks the top-k passages
+</span></span></code></pre></div><ol>
+<li>We introduce RAG models where the parametric memory is <strong>a pre-trained seq2seq model</strong> and the non-parametric memory is <strong>a dense vector index of Wikipedia</strong>, accessed with <strong>a pre-trained neural retriever</strong>.
+<ul>
+<li>pre-trained models → seq2seq model</li>
+<li>non-parametric memory → a dense vector index of Wikipedia</li>
+<li>differentiable access mechanism → a pre-trained neural retriever</li>
+</ul>
+</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="line"><span class="cl">1. Prompt (question) arrives.
+</span></span><span class="line"><span class="cl">2. Seq2seq encoder turns it into query vector q.
+</span></span><span class="line"><span class="cl">3. Retriever compares q to all memory keys k_i (Wikipedia passage vectors).
+</span></span><span class="line"><span class="cl">4. Compute similarity scores s_i = q ⋅ k_i.
+</span></span><span class="line"><span class="cl">5. Apply softmax → attention weights α_i.
+</span></span><span class="line"><span class="cl">6. Read vector r = Σ α_i v_i  (weighted mixture of passage info).
+</span></span><span class="line"><span class="cl">7. Feed r (plus q) into seq2seq decoder → generate answer token by token.
+</span></span><span class="line"><span class="cl">8. Gradients flow through α_i → retriever learns to attend to more relevant chunks.
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">text chunk → retriever encoder → key/value → FAISS index → query embedding → top-k retrieval → generator
+</span></span></code></pre></div><ol>
+<li>We compare two RAG formulations, one which conditions on the <strong>same retrieved passages</strong> across the whole generated sequence, and another which can use <strong>different passages</strong> per token.
+<ul>
+<li>same retrieved passages → RAG-Sequence</li>
+<li>different passages per token → RAG-Token</li>
+</ul>
+</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="line"><span class="cl">It’s often used for knowledge-intensive tasks, not free-form story generation.
+</span></span></code></pre></div><h1 id="discussion">Discussion<a hidden class="anchor" aria-hidden="true" href="#discussion">#</a></h1>
+<p>We conducted an thorough investigation of the learned retrieval component, validating
+its effectiveness, and we illustrated how the retrieval index can be <strong>hot-swapped</strong> to update the model without requiring any retraining.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="line"><span class="cl">This is one of RAG’s biggest advantages over standard language models:
+</span></span><span class="line"><span class="cl">	- You can update its knowledge base without retraining its parameters.
+</span></span><span class="line"><span class="cl">	
+</span></span><span class="line"><span class="cl">The retriever learns the mapping → parametric
+</span></span><span class="line"><span class="cl">The index just holds the results → non-parametric
+</span></span></code></pre></div><table>
+  <thead>
+      <tr>
+          <th><strong>Retriever model</strong></th>
+          <th>A <strong>neural network</strong> that encodes queries and documents into vectors.</th>
+          <th><strong>Parametric</strong> — it has learnable weights (parameters)</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>Retrieval index (memory)</strong></td>
+          <td>The <strong>database</strong> of all document embeddings (keys + values)</td>
+          <td><strong>Non-parametric</strong> — stored outside the model’s paras</td>
+      </tr>
+  </tbody>
+</table>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="line"><span class="cl">Index = structure that accelerates similarity search using ANN methods (cluster-and-search) (ANN -&gt; Approximate nearest neighbor).
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Key = pre-computed document embedding; 
+</span></span><span class="line"><span class="cl">Value = original text (encoded later when used).
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Hard retrieval = pick top-k texts → concatenate → generator sees text.
+</span></span><span class="line"><span class="cl">Soft retrieval = mix all embeddings by attention → generator sees one read vector.
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Generator (e.g., BART or T5): a Transformer-based seq2seq model.
+</span></span></code></pre></div><h1 id="1-introduction">1. Introduction<a hidden class="anchor" aria-hidden="true" href="#1-introduction">#</a></h1>
+<p><img alt="image.png" loading="lazy" src="/notes/retrieval-augmented_generation_for_knowledge-inten/image.png"></p>
+<p>RAG can be fine-tuned on any seq2seq task, whereby both the generator and retriever are jointly learned.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="line"><span class="cl">We can make an anology:
+</span></span><span class="line"><span class="cl">- RAG&#39;s retriever is like encoder, because it summarizes what info the model should pay attention to before generation.
+</span></span><span class="line"><span class="cl">- RAG&#39;s generator is like decoder, because it generate the sequence token-by-token.
+</span></span></code></pre></div><h2 id="steps">Steps<a hidden class="anchor" aria-hidden="true" href="#steps">#</a></h2>
+<ol>
+<li>The retriever (Dense Passage Retriever, henceforth DPR) provides latent documents conditioned on the input,</li>
+<li>The seq2seq model (BART) then conditions on these latent documents together with
+the input to generate the output.</li>
+</ol>
+<h1 id="2-methods">2. Methods<a hidden class="anchor" aria-hidden="true" href="#2-methods">#</a></h1>
+<p><img alt="image.png" loading="lazy" src="/notes/retrieval-augmented_generation_for_knowledge-inten/image.png"></p>
+<p>Our models leverage 2 components:</p>
+<ol>
+<li><strong>a retriever  $p_η(z|x)$</strong></li>
+<li><strong>a generator  $p_θ(y_i|x, z, y_{1:i−1})$</strong></li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="line"><span class="cl">x = the query (e.g., a question or a sentence you want to search with)
+</span></span><span class="line"><span class="cl">z = a text passage (a possible relevant document)
+</span></span><span class="line"><span class="cl">η = the parameters of the model/retriever  
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">**p(z∣x) = the prob that passage z is relevant to the query x**
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl">y1:i-1 = the previous i-1 tokens
+</span></span><span class="line"><span class="cl">z = the retrieved passage
+</span></span><span class="line"><span class="cl">x = the original input
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">**pθ(yi|x, z, y1:i−1) = the prob that generating token yi, give three inputs.**
+</span></span></code></pre></div><p>We propose 2 models (based on the average of the latent documents in different ways to produce a distribution over generated text) :</p>
+<ul>
+<li>RAG-Token → can predict each target token based on a different doc/chunk.</li>
+<li>RAG-Sequence → the model uses the same doc/chunk to predict each target token.</li>
+</ul>
+<h2 id="21-models">2.1 Models<a hidden class="anchor" aria-hidden="true" href="#21-models">#</a></h2>
+<p><strong>RAG-Sequence Model:</strong> The RAG-Sequence model uses the same retrieved doc/chunk to generate the complete seq.</p>
+<p><img alt="image.png" loading="lazy" src="/notes/retrieval-augmented_generation_for_knowledge-inten/image_1.png"></p>
+<p><strong>RAG-Token Model:</strong> we can draw a different latent document for each target token and marginalize accordingly.</p>
+<p><img alt="image.png" loading="lazy" src="/notes/retrieval-augmented_generation_for_knowledge-inten/image_2.png"></p>
+<h2 id="22-retriever-dpr">2.2 Retriever: DPR<a hidden class="anchor" aria-hidden="true" href="#22-retriever-dpr">#</a></h2>
+<p>We use <strong>a pre-trained bi-encoder from DPR</strong> to initialize our retriever and to build the document index. We refer to the document index as the non-parametric memory.</p>
+<ol>
+<li><strong>DPR</strong> (Dense Passage Retriever): a bi-encoder architecture:</li>
+</ol>
+<p><img alt="image.png" loading="lazy" src="/notes/retrieval-augmented_generation_for_knowledge-inten/image_3.png"></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="line"><span class="cl">d(z) = a dense representation of a document produced by a BERT document encoder.
+</span></span><span class="line"><span class="cl">q(x) = a query representation produced by a query encoder, also based on BERT.
+</span></span></code></pre></div><ol>
+<li><strong>MIPS</strong> (<em>Maximum Inner Product Search) →</em> The operation of finding top-k documents by inner product between <em>query</em> and every <em>docs</em>.</li>
+</ol>
+<h2 id="23-generator-bart">2.3 Generator: BART<a hidden class="anchor" aria-hidden="true" href="#23-generator-bart">#</a></h2>
+<p>We use <strong>BART-large</strong>, a pre-trained seq2seq transformer with 400M parameters. We simply concatenate the input x and the retrieved content z.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="line"><span class="cl">BART combines the strengths of BERT and GPT:
+</span></span><span class="line"><span class="cl">	- BERT: bidirectional understanding (encoder)
+</span></span><span class="line"><span class="cl">	- GPT: left-to-right generation (decoder)
+</span></span></code></pre></div><h2 id="24-training">2.4 Training<a hidden class="anchor" aria-hidden="true" href="#24-training">#</a></h2>
+<p>We jointly train the retriever and generator components without any direct supervision on what
+document should be retrieved.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="line"><span class="cl">Updating the document encoder **BERTd** during training is costly as it requires 
+</span></span><span class="line"><span class="cl">	the document index to be periodically updated as **REALM** does during pre-training.
+</span></span><span class="line"><span class="cl">We do not find this step necessary for strong performance, and 
+</span></span><span class="line"><span class="cl">	keep the document encoder (and index) fixed, 
+</span></span><span class="line"><span class="cl">	only fine-tuning the query encoder **BERTq** and the **BART generator**.
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">BERTd = document encoder
+</span></span><span class="line"><span class="cl">BERTq = query encoder
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">REALM = Retrieval-Enhanced Adaptive Language Model
+</span></span><span class="line"><span class="cl">update the doc encoder required re-encoding all documents every few steps —
+</span></span><span class="line"><span class="cl">which made it extremely slow and hard to scale.
+</span></span></code></pre></div><h2 id="25-decoding">2.5 Decoding<a hidden class="anchor" aria-hidden="true" href="#25-decoding">#</a></h2>
+<p>At test time, <strong>RAG-Sequence</strong> and <strong>RAG-Token</strong> require different ways to approximate $arg max_y p(y|x)$.</p>
+<ul>
+<li><strong>RAG-Token Model:</strong> standard beam search</li>
+<li><strong>RAG-Sequence Model:</strong> Thorough Decoding or Fast Decoding</li>
+</ul>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="line"><span class="cl">An autoregressive model = predicts the next token based on all previous tokens.
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">- Thorough Decoding = Generate and score candidate answers for every retrieved document, then combine their probabilities - most accurate but slow. 
+</span></span><span class="line"><span class="cl">- Fast Decoding = Only score candidates that were actually generated during beam search, skipping others — much faster but approximate.
+</span></span></code></pre></div><h3 id="rag-token"><strong>RAG-Token</strong><a hidden class="anchor" aria-hidden="true" href="#rag-token">#</a></h3>
+<ol>
+<li>在生成过程中，模型会参考每个 chunk 下的条件概率分布：$p_\theta(y_i \mid x, z, y_{1:i-1})$ 来预测下一个 token 的可能性。</li>
+<li>然后根据检索器给出的每个 chunk 的权重 $p_\eta(z|x)$，对这些分布进行加权融合，得到一个综合的下一词概率分布：$p&rsquo;(y_i \mid x, y_{1:i-1}) = \sum_z p_\eta(z|x),p_\theta(y_i \mid x, z, y_{1:i-1})$</li>
+<li>模型从这个融合分布中选出概率最高的 token，再将其加入到已生成的序列中。</li>
+<li>重复该步骤，直到生成完整句子。</li>
+</ol>
+<aside>
+💡
+<p>This makes generation very <strong>fast</strong>, but because it can borrow inconsistent or partially incorrect evidence from different chunks, the final sentence may contain blended or wrong facts, even though the decoding itself is efficient.</p>
+</aside>
+<h3 id="rag-sequence-thorough-decoding"><strong>RAG-Sequence (Thorough Decoding)</strong><a hidden class="anchor" aria-hidden="true" href="#rag-sequence-thorough-decoding">#</a></h3>
+<ol>
+<li>先在每个 chunk 下独立运行 beam search，得到概率最高的候选句子；</li>
+<li>然后将这些候选句分别在其他 chunk 上重新计算生成概率 $p_\theta(y|x,z)$（使用 teacher forcing 强制生成），</li>
+<li>最后根据每个 chunk 的检索权重 $p_\eta(z|x)$ 对句子概率进行加权求和：$p(y|x) = \sum_z p_\eta(z|x),p_\theta(y|x,z)$</li>
+<li>最终选出整体概率最高的句子作为输出。</li>
+</ol>
+<aside>
+💡
+<p>This “global reconsideration” allows the model to filter out wrong or inconsistent sentences and select the most related one overall.
+However, because it must compute the probability of every candidate on every chunk, the process is extremely slow.</p>
+</aside>
+<h3 id="rag-sequence-fast-decoding"><strong>RAG-Sequence (Fast Decoding)</strong><a hidden class="anchor" aria-hidden="true" href="#rag-sequence-fast-decoding">#</a></h3>
+<ol>
+<li>先在每个 chunk 下生成概率最高的候选句子，</li>
+<li>但只在<strong>生成过该句子的 chunk</strong>上计算概率，</li>
+<li>未生成该句子的 chunk 直接忽略（认为概率≈0），</li>
+<li>再进行同样的加权求和。</li>
+</ol>
+<aside>
+💡
+<p>This method is a trade-off between the two.
+It still generates separate sentences for each chunk, but it skips the expensive re-evaluation on other chunks—only using the chunks that actually produced each sentence.</p>
+<p>As a result, it’s much faster than thorough decoding while keeping almost the same accuracy, though it’s still slower than RAG-Token.</p>
+</aside>
+<table>
+  <thead>
+      <tr>
+          <th>Comparison Item</th>
+          <th><strong>RAG-Token</strong></th>
+          <th><strong>RAG-Sequence (Thorough)</strong></th>
+          <th><strong>RAG-Sequence (Fast)</strong></th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>Fusion Timing</strong></td>
+          <td>Dynamically fuses predictions from all chunks at each token</td>
+          <td>Uses a fixed chunk for the whole sentence, then re-evaluates globally</td>
+          <td>Uses a fixed chunk for the whole sentence, then re-evaluates locally</td>
+      </tr>
+      <tr>
+          <td><strong>Fusion Granularity</strong></td>
+          <td>Token-level</td>
+          <td>Sentence-level</td>
+          <td>Sentence-level</td>
+      </tr>
+      <tr>
+          <td><strong>Decoding Method</strong></td>
+          <td>Single beam search</td>
+          <td>Multiple beam searches + full re-evaluation</td>
+          <td>Multiple beam searches + partial re-evaluation</td>
+      </tr>
+      <tr>
+          <td><strong>Cross-chunk Generation</strong></td>
+          <td>✅ Allowed</td>
+          <td>❌ Not allowed</td>
+          <td>❌ Not allowed</td>
+      </tr>
+      <tr>
+          <td><strong>Accuracy</strong></td>
+          <td>Medium</td>
+          <td>Highest</td>
+          <td>High</td>
+      </tr>
+      <tr>
+          <td><strong>Speed</strong></td>
+          <td>Fast</td>
+          <td>Slow</td>
+          <td>Faster</td>
+      </tr>
+      <tr>
+          <td><strong>Typical Usage</strong></td>
+          <td>Common for online inference</td>
+          <td>Mainly theoretical analysis / small-scale experiments</td>
+          <td>Practical trade-off in real applications</td>
+      </tr>
+      <tr>
+          <td><strong>Probability Computation</strong></td>
+          <td>Sum across chunks at each token</td>
+          <td>Sum across chunks after full sentence generation</td>
+          <td>Sum across chunks after full sentence generation</td>
+      </tr>
+      <tr>
+          <td><strong>Core Idea</strong></td>
+          <td>Fuse multiple chunk predictions at every step</td>
+          <td>Generate each sentence independently, then globally combine</td>
+          <td>Generate each sentence independently, then combine locally</td>
+      </tr>
+      <tr>
+          <td><strong>Key Characteristics</strong></td>
+          <td>Each word leverages all chunks — very fast but may produce inconsistent sentences</td>
+          <td>Theoretically most accurate but computationally slow</td>
+          <td>Approximate yet efficient — widely used in practice</td>
+      </tr>
+  </tbody>
+</table>
+<h1 id="3-experiments">3. Experiments<a hidden class="anchor" aria-hidden="true" href="#3-experiments">#</a></h1>
+<p><strong>For all experiments:</strong></p>
+<ul>
+<li>Non-parametric knowledge source: <strong>the December 2018 dump</strong>
+<ul>
+<li>Each Wikipedia article is split into disjoint 100-word chunks, to make a total of 21M docs.</li>
+</ul>
+</li>
+<li>Build a single <strong>MIPS</strong> index using FAISS with a Hierarchical Navigable Small World approximation for fast retrieval.</li>
+</ul>
+<p><strong>During training:</strong></p>
+<ul>
+<li>We retrieve the top k documents for each query.</li>
+<li>We consider k ∈ {5, 10} for training and set k for test time using dev data.</li>
+</ul>
+<h2 id="31-open-domain-question-answering"><strong>3.1 Open-domain Question Answering</strong><a hidden class="anchor" aria-hidden="true" href="#31-open-domain-question-answering">#</a></h2>
+<p><strong>Compare with:</strong></p>
+<ul>
+<li>The <strong>extractive QA paradigm</strong> – extracts short answer spans directly from retrieved documents, relying mainly on <strong>non-parametric knowledge</strong>.</li>
+<li>The <strong>Closed-Book QA</strong> approaches – generate answers <strong>without retrieval</strong>, depending only on <strong>parametric knowledge</strong> stored in the model.</li>
+</ul>
+<p><strong>Consider four popular open-domain QA datasets:</strong></p>
+<ul>
+<li><strong>Natural Questions (NQ)</strong></li>
+<li><strong>TriviaQA (TQA)</strong></li>
+<li><strong>WebQuestions (WQ)</strong></li>
+<li><strong>CuratedTrec (CT)</strong></li>
+</ul>
+<p><em>(CT and WQ are small; models are initialized from the NQ-trained RAG model.)</em></p>
+<p><strong>Evaluate:</strong></p>
+<ul>
+<li>Performance is measured using <strong>Exact Match (EM)</strong> –
+<ul>
+<li>a metric that checks whether the generated answer <strong>exactly matches</strong> the reference answer.</li>
+</ul>
+</li>
+</ul>
+<aside>
+💡
+<p><strong>Focus:</strong> <strong>finding facts</strong> from retrieval, not writing sentences.</p>
+</aside>
+<hr>
+<h2 id="32-abstractive-question-answering"><strong>3.2 Abstractive Question Answering</strong><a hidden class="anchor" aria-hidden="true" href="#32-abstractive-question-answering">#</a></h2>
+<p><strong>Evaluate:</strong></p>
+<ul>
+<li>The <strong>MSMARCO NLG v2.1</strong> task, which tests RAG’s ability to generate <strong>free-form, natural language answers</strong> in a knowledge-intensive setting.</li>
+</ul>
+<p><strong>Setup:</strong></p>
+<ul>
+<li>Each example includes a question, ten gold retrieved passages, and a full-sentence human-written answer.</li>
+<li>RAG ignores the supplied passages and treats MSMARCO as an <strong>open-domain</strong> QA task (retrieving from Wikipedia instead).</li>
+</ul>
+<p><strong>Note:</strong></p>
+<ul>
+<li>Some questions cannot be answered correctly without the gold passages (e.g., “What is the weather in Volcano, CA?”).</li>
+<li>In such cases, RAG relies on its <strong>parametric knowledge</strong> to generate reasonable responses.</li>
+</ul>
+<aside>
+💡
+<p><strong>Focus: natural, fluent language generation</strong> (NLG).</p>
+</aside>
+<hr>
+<h2 id="33-jeopardy-question-generation">3.3 Jeopardy Question Generation<a hidden class="anchor" aria-hidden="true" href="#33-jeopardy-question-generation">#</a></h2>
+<p><strong>Task:</strong></p>
+<ul>
+<li>Given an <strong>answer entity</strong>, generate a <strong>factual Jeopardy-style question</strong> (reverse QA).</li>
+</ul>
+<p><strong>Dataset:</strong></p>
+<ul>
+<li><strong>SearchQA</strong>, with 100K train / 14K dev / 27K test examples.</li>
+</ul>
+<p><strong>Compare:</strong></p>
+<ul>
+<li>RAG vs <strong>BART</strong> (baseline model).</li>
+</ul>
+<p><strong>Evaluate:</strong></p>
+<ul>
+<li><strong>Q-BLEU-1</strong> metric (favors entity matching and factual accuracy).</li>
+<li><strong>Human evaluation</strong> on two criteria:
+<ul>
+<li><strong>Factuality</strong> — whether the question is factually correct.</li>
+<li><strong>Specificity</strong> — whether the question is closely related to the given answer.</li>
+</ul>
+</li>
+</ul>
+<aside>
+💡
+<p><strong>Focus:</strong> evaluate RAG’s generation abilities in a <strong>non-QA setting.</strong></p>
+</aside>
+<hr>
+<h2 id="34-fact-verification">3.4 Fact Verification<a hidden class="anchor" aria-hidden="true" href="#34-fact-verification">#</a></h2>
+<p><strong>Task:</strong></p>
+<ul>
+<li>Given a <strong>claim</strong>, classify whether it is <em>supported</em>, <em>refuted</em>, or <em>not enough info</em> using evidence from Wikipedia.</li>
+</ul>
+<p><strong>Dataset:</strong></p>
+<ul>
+<li><strong>FEVER</strong> benchmark.</li>
+</ul>
+<p><strong>Method:</strong></p>
+<ul>
+<li>Map each class label to a <strong>single output token</strong>, treating the task as sequence classification.</li>
+<li>RAG trains <strong>without supervision on retrieved evidence</strong>, learning retrieval and reasoning jointly.</li>
+</ul>
+<p><strong>Evaluate:</strong></p>
+<ul>
+<li>Report <strong>label accuracy</strong> for both:
+<ul>
+<li><strong>3-way classification:</strong> supports / refutes / not enough info</li>
+<li><strong>2-way classification:</strong> supports / refutes</li>
+</ul>
+</li>
+</ul>
+<p><strong>Purpose:</strong></p>
+<ul>
+<li>Test RAG’s capability for <strong>reasoning-based classification</strong>, not just text generation.</li>
+</ul>
+<aside>
+💡
+<p>Focus: <strong>reasoning and classification</strong> with retrieval (not generation)</p>
+</aside>
+<h1 id="4-results">4. Results<a hidden class="anchor" aria-hidden="true" href="#4-results">#</a></h1>
+<ol>
+<li>Open-domain Question Answering</li>
+<li>Abstractive Question Answering</li>
+<li>Jeopardy Question Generation</li>
+<li>Fact Verification</li>
+</ol>
+<h2 id="table-1--2">Table 1 &amp; 2<a hidden class="anchor" aria-hidden="true" href="#table-1--2">#</a></h2>
+<aside>
+💡
+<p><strong>Table 1:</strong></p>
+<ul>
+<li>To show that <strong>RAG outperforms previous retrieval-based QA systems</strong> (like DPR and REALM) and even large closed-book models (like T5),</li>
+<li>Proving that <strong>retrieval + generation</strong> can achieve state-of-the-art results <strong>without re-rankers or extractive readers.</strong></li>
+</ul>
+<p><strong>Table 2:</strong></p>
+<ul>
+<li>To demonstrate that <strong>RAG generalizes</strong> beyond simple QA:
+<ul>
+<li>it performs strongly on <strong>abstractive answer generation (MSMARCO)</strong>, <strong>question generation (Jeopardy)</strong>, and <strong>fact verification (FEVER)</strong></li>
+</ul>
+</li>
+<li>showing it works for both <strong>generation</strong> and <strong>classification</strong> tasks, even <strong>without gold evidence</strong></li>
+</ul>
+</aside>
+<p><img alt="image.png" loading="lazy" src="/notes/retrieval-augmented_generation_for_knowledge-inten/image_4.png"></p>
+<hr>
+<h2 id="table-3">Table 3<a hidden class="anchor" aria-hidden="true" href="#table-3">#</a></h2>
+<p><img alt="image.png" loading="lazy" src="/notes/retrieval-augmented_generation_for_knowledge-inten/image_5.png"></p>
+<hr>
+<h2 id="table-4--5">Table 4 &amp; 5<a hidden class="anchor" aria-hidden="true" href="#table-4--5">#</a></h2>
+<aside>
+💡
+<p><strong>Table 4:</strong></p>
+<ul>
+<li>To verify through <strong>human judgment</strong> that RAG’s generated questions are <strong>more factual and more specific</strong> than those from BART,</li>
+<li>confirming that retrieval grounding improves <strong>accuracy and relevance</strong> in text generation.</li>
+</ul>
+<p><strong>Table 5:</strong></p>
+<ul>
+<li>To measure <strong>linguistic diversity</strong> of generated text —</li>
+<li>showing that RAG’s outputs are <strong>less repetitive</strong> and <strong>more varied</strong> (closer to human text) than BART’s, thanks to diverse retrieved contexts.</li>
+</ul>
+</aside>
+<p><img alt="image.png" loading="lazy" src="/notes/retrieval-augmented_generation_for_knowledge-inten/image_6.png"></p>
+<ul>
+<li><strong>Factuality →</strong> Is the question factually correct?</li>
+<li><strong>Specificity →</strong> Does the question precisely match its given answer (not too generic)?</li>
+</ul>
+<hr>
+<h2 id="table-6">Table 6<a hidden class="anchor" aria-hidden="true" href="#table-6">#</a></h2>
+<p><img alt="“Ablation” means <strong>removing or changing a part of the model to test how much it matters</strong>." loading="lazy" src="/notes/retrieval-augmented_generation_for_knowledge-inten/image_7.png"></p>
+<p>“Ablation” means <strong>removing or changing a part of the model to test how much it matters</strong>.</p>
+<aside>
+💡
+<p>Table 6 shows that <strong>RAG’s learned dense retriever is essential</strong></p>
+<ul>
+<li>replacing it with BM25 or freezing it significantly hurts performance.</li>
+<li>proving that <strong>jointly learned retrieval</strong> is key for strong open-domain generation and QA results.</li>
+</ul>
+</aside>
+<hr>
+<h2 id="figure-2">Figure 2<a hidden class="anchor" aria-hidden="true" href="#figure-2">#</a></h2>
+<p><img alt="The heatmap (right) shows <strong>which retrieved document (y-axis)</strong> the model relies on when generating <strong>each token (x-axis)</strong> of a sentence." loading="lazy" src="/notes/retrieval-augmented_generation_for_knowledge-inten/image_8.png"></p>
+<p>The heatmap (right) shows <strong>which retrieved document (y-axis)</strong> the model relies on when generating <strong>each token (x-axis)</strong> of a sentence.</p>
+<p>The heatmap shows a <strong>dark blue cell</strong> at (Doc 2, “Sun”), which means <strong>Doc 2</strong> — the one containing <em>“The Sun Also Rises”</em> — is strongly influencing this token. (The model correctly “looks up” the document that mentions that book.)</p>
+<p>After that, the dark blue (posterior weight) <strong>flattens</strong> — it spreads out across documents. That means: once the model has started generating <em>“The Sun…”</em>, it can <strong>finish “Also Rises”</strong> without continuing to depend on that document.</p>
+<aside>
+💡
+<p>After seeing one or two key words from <strong>retrieval chunks</strong> <em>(non-parametric memory)</em>, the generator’s <em><strong>parametric knowledge</strong></em> is enough to recall and complete the title.</p>
+<p><strong>The non-parametric component helps to guide the generation, drawing out specific knowledge stored in the parametric memory.</strong></p>
+</aside>
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

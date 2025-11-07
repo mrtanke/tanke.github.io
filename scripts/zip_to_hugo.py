@@ -4,7 +4,6 @@ from urllib.parse import unquote
 import zipfile
 import shutil
 import datetime
-import yaml
 from pathlib import Path
 
 
@@ -162,7 +161,7 @@ def fix_markdown_image_links(md_text: str) -> str:
     return protected
 
 
-def create_hugo_bundle(md_file: Path, assets_folder: Path, description: str) -> Path:
+def create_hugo_bundle(md_file: Path, assets_folder: Path, description: str, tag: str) -> Path:
     # 1) compute slug from file name
     raw_name = md_file.stem
     slug = sanitize_name(raw_name)
@@ -214,12 +213,15 @@ def create_hugo_bundle(md_file: Path, assets_folder: Path, description: str) -> 
 
     now = datetime.datetime.now(datetime.timezone.utc).replace(microsecond=0).isoformat()
 
+    # include the single `tag` field in front matter so templates can use it
+    esc_tag = tag.replace("'", "''") if tag else 'Notes'
     front = (
         '---\n'
         f"title: '{esc_title}'\n"
         f"date: {now}\n"
         "draft: false\n"
         f"description: '{esc_desc}'\n"
+        f"tag: '{esc_tag}'\n"
         "ShowWordCount: true\n"
         "ShowReadingTime: false\n"
         '---\n\n'
@@ -232,15 +234,18 @@ def create_hugo_bundle(md_file: Path, assets_folder: Path, description: str) -> 
     return dest_folder
 
 
-def main(description: str = ''):
+def main(description: str = '', tag: str = 'Notes'):
     extracted = unzip_notion()
     md_file, assets_folder = find_md_and_assets(extracted)
-    dest = create_hugo_bundle(md_file, assets_folder, description)
+    dest = create_hugo_bundle(md_file, assets_folder, description, tag)
     print('Created Hugo bundle at', dest)
 
 
 if __name__ == '__main__':
-    import sys
+    import argparse
 
-    desc = sys.argv[2] if len(sys.argv) > 2 else ''
-    main(desc)
+    p = argparse.ArgumentParser(description='Unzip Notion export and create Hugo post bundle')
+    p.add_argument('description', nargs='?', default='', help='optional description to use in front matter')
+    p.add_argument('--tag', dest='tag', default='Notes', help='Tag to add to the generated post front matter (e.g. Notes, Thoughts, Projects)')
+    args = p.parse_args()
+    main(args.description, args.tag)

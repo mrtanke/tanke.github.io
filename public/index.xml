@@ -2,129 +2,129 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>Home</title>
-    <link>https://my-blog-alpha-vert.vercel.app/</link>
+    <link>http://localhost:1313/</link>
     <description>Recent content on Home</description>
     <generator>Hugo -- 0.152.1</generator>
     <language>en-us</language>
     <lastBuildDate>Fri, 07 Nov 2025 09:32:10 +0000</lastBuildDate>
-    <atom:link href="https://my-blog-alpha-vert.vercel.app/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Reference-Based Face Super-Resolution Using the Spatial Transformer</title>
-      <link>https://my-blog-alpha-vert.vercel.app/posts/reference-based_face_super-resolution_using_the_sp/</link>
+      <link>http://localhost:1313/notes/reference-based_face_super-resolution_using_the_sp/</link>
       <pubDate>Fri, 07 Nov 2025 09:32:10 +0000</pubDate>
-      <guid>https://my-blog-alpha-vert.vercel.app/posts/reference-based_face_super-resolution_using_the_sp/</guid>
+      <guid>http://localhost:1313/notes/reference-based_face_super-resolution_using_the_sp/</guid>
       <description>Paper-reading notes: Reference-Based Face Super-Resolution Using the Spatial Transformer</description>
     </item>
     <item>
       <title>LMR: A Large-Scale Multi-Reference Dataset for Reference-based Super-Resolution</title>
-      <link>https://my-blog-alpha-vert.vercel.app/posts/lmr_a_large-scale_multi-reference_dataset_for_refe/</link>
+      <link>http://localhost:1313/notes/lmr_a_large-scale_multi-reference_dataset_for_refe/</link>
       <pubDate>Fri, 07 Nov 2025 08:38:54 +0000</pubDate>
-      <guid>https://my-blog-alpha-vert.vercel.app/posts/lmr_a_large-scale_multi-reference_dataset_for_refe/</guid>
+      <guid>http://localhost:1313/notes/lmr_a_large-scale_multi-reference_dataset_for_refe/</guid>
       <description>Paper-reading notes: LMR - A Large-Scale Multi-Reference Dataset for Reference-based Super-Resolution</description>
     </item>
     <item>
       <title>Latent Diffusion Models</title>
-      <link>https://my-blog-alpha-vert.vercel.app/posts/high-resolution_image_synthesis_with_latent_diffus/</link>
+      <link>http://localhost:1313/notes/high-resolution_image_synthesis_with_latent_diffus/</link>
       <pubDate>Thu, 06 Nov 2025 21:19:54 +0000</pubDate>
-      <guid>https://my-blog-alpha-vert.vercel.app/posts/high-resolution_image_synthesis_with_latent_diffus/</guid>
+      <guid>http://localhost:1313/notes/high-resolution_image_synthesis_with_latent_diffus/</guid>
       <description>Paper-reading notes: High-Resolution Image Synthesis with Latent Diffusion Models</description>
     </item>
     <item>
       <title>DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning</title>
-      <link>https://my-blog-alpha-vert.vercel.app/posts/deepseek-r1_incentivizing_reasoning_capability_in/</link>
+      <link>http://localhost:1313/notes/deepseek-r1_incentivizing_reasoning_capability_in/</link>
       <pubDate>Tue, 04 Nov 2025 12:06:46 +0000</pubDate>
-      <guid>https://my-blog-alpha-vert.vercel.app/posts/deepseek-r1_incentivizing_reasoning_capability_in/</guid>
+      <guid>http://localhost:1313/notes/deepseek-r1_incentivizing_reasoning_capability_in/</guid>
       <description>Paper-reading notes: DeepSeek-R1 - Incentivizing Reasoning Capability in LLMs via Reinforcement Learning</description>
     </item>
     <item>
       <title>An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale</title>
-      <link>https://my-blog-alpha-vert.vercel.app/posts/vit/</link>
+      <link>http://localhost:1313/notes/vit/</link>
       <pubDate>Mon, 03 Nov 2025 12:36:53 +0000</pubDate>
-      <guid>https://my-blog-alpha-vert.vercel.app/posts/vit/</guid>
+      <guid>http://localhost:1313/notes/vit/</guid>
       <description>Paper-reading notes: ViT</description>
     </item>
     <item>
       <title>A Tutorial on Bayesian Optimization</title>
-      <link>https://my-blog-alpha-vert.vercel.app/posts/a_tutorial_on_bayesian_optimization/</link>
+      <link>http://localhost:1313/notes/a_tutorial_on_bayesian_optimization/</link>
       <pubDate>Sat, 01 Nov 2025 23:05:46 +0000</pubDate>
-      <guid>https://my-blog-alpha-vert.vercel.app/posts/a_tutorial_on_bayesian_optimization/</guid>
+      <guid>http://localhost:1313/notes/a_tutorial_on_bayesian_optimization/</guid>
       <description>Paper-reading notes: A Tutorial on Bayesian Optimization</description>
     </item>
     <item>
       <title>CrossNet&#43;&#43;: Cross-Scale Large-Parallax Warping for Reference-Based Super-Resolution</title>
-      <link>https://my-blog-alpha-vert.vercel.app/posts/crossnet&#43;&#43;_cross-scale_large-parallax_warping_for/</link>
+      <link>http://localhost:1313/notes/crossnet&#43;&#43;_cross-scale_large-parallax_warping_for/</link>
       <pubDate>Wed, 29 Oct 2025 08:23:31 +0000</pubDate>
-      <guid>https://my-blog-alpha-vert.vercel.app/posts/crossnet&#43;&#43;_cross-scale_large-parallax_warping_for/</guid>
+      <guid>http://localhost:1313/notes/crossnet&#43;&#43;_cross-scale_large-parallax_warping_for/</guid>
       <description>Paper-reading notes: CrossNet&#43;&#43;: Cross-Scale Large-Parallax Warping for Reference-Based Super-Resolution</description>
     </item>
     <item>
       <title>xLSTM: Extended Long Short-Term Memory</title>
-      <link>https://my-blog-alpha-vert.vercel.app/posts/xlstm_extended_long_short-term_memory/</link>
+      <link>http://localhost:1313/notes/xlstm_extended_long_short-term_memory/</link>
       <pubDate>Tue, 28 Oct 2025 13:18:30 +0000</pubDate>
-      <guid>https://my-blog-alpha-vert.vercel.app/posts/xlstm_extended_long_short-term_memory/</guid>
+      <guid>http://localhost:1313/notes/xlstm_extended_long_short-term_memory/</guid>
       <description>Paper-reading notes: xLSTM Extended Long Short-Term Memory</description>
     </item>
     <item>
       <title>RWKV: Reinventing RNNs for the Transformer Era</title>
-      <link>https://my-blog-alpha-vert.vercel.app/posts/rwkv/</link>
+      <link>http://localhost:1313/notes/rwkv/</link>
       <pubDate>Mon, 27 Oct 2025 22:50:43 +0000</pubDate>
-      <guid>https://my-blog-alpha-vert.vercel.app/posts/rwkv/</guid>
+      <guid>http://localhost:1313/notes/rwkv/</guid>
       <description>Paper-reading notes: RWKV: Reinventing RNNs for the Transformer Era</description>
     </item>
     <item>
       <title>Mastering the game of Go with MCTS and Deep Neural Networks</title>
-      <link>https://my-blog-alpha-vert.vercel.app/posts/mastering-go-mcts/</link>
+      <link>http://localhost:1313/notes/mastering-go-mcts/</link>
       <pubDate>Fri, 24 Oct 2025 10:00:00 +0000</pubDate>
-      <guid>https://my-blog-alpha-vert.vercel.app/posts/mastering-go-mcts/</guid>
+      <guid>http://localhost:1313/notes/mastering-go-mcts/</guid>
       <description>Paper-reading notes: Mastering the game of Go with MCTS and Deep Neural Networks</description>
     </item>
     <item>
       <title>CrossNet: An End-to-end Reference-based Super Resolution Network using Cross-scale Warping</title>
-      <link>https://my-blog-alpha-vert.vercel.app/posts/crossnet_an_end-to-end_reference-based_super_resol/</link>
+      <link>http://localhost:1313/notes/crossnet_an_end-to-end_reference-based_super_resol/</link>
       <pubDate>Tue, 21 Oct 2025 09:40:06 +0000</pubDate>
-      <guid>https://my-blog-alpha-vert.vercel.app/posts/crossnet_an_end-to-end_reference-based_super_resol/</guid>
+      <guid>http://localhost:1313/notes/crossnet_an_end-to-end_reference-based_super_resol/</guid>
       <description>Paper-reading notes: CrossNet: An End-to-end Reference-based Super Resolution Network using Cross-scale Warping</description>
     </item>
     <item>
       <title>Chain-of-Thought Prompting Elicits Reasoning in Large Language Models</title>
-      <link>https://my-blog-alpha-vert.vercel.app/posts/chain-of-thought-prompting/</link>
+      <link>http://localhost:1313/notes/chain-of-thought-prompting/</link>
       <pubDate>Mon, 20 Oct 2025 13:58:55 +0200</pubDate>
-      <guid>https://my-blog-alpha-vert.vercel.app/posts/chain-of-thought-prompting/</guid>
+      <guid>http://localhost:1313/notes/chain-of-thought-prompting/</guid>
       <description>Paper-reading notes: Chain-of-Thought Prompting Elicits Reasoning in Large Language Models</description>
     </item>
     <item>
       <title>Learning‑based light field imaging</title>
-      <link>https://my-blog-alpha-vert.vercel.app/posts/learningbased_light_field_imaging/</link>
+      <link>http://localhost:1313/notes/learningbased_light_field_imaging/</link>
       <pubDate>Mon, 20 Oct 2025 09:50:58 +0000</pubDate>
-      <guid>https://my-blog-alpha-vert.vercel.app/posts/learningbased_light_field_imaging/</guid>
+      <guid>http://localhost:1313/notes/learningbased_light_field_imaging/</guid>
       <description>Paper-reading notes: Learning‑based light field imaging</description>
     </item>
     <item>
       <title>From Local to Global A GraphRAG Approach to Query-</title>
-      <link>https://my-blog-alpha-vert.vercel.app/posts/from_local_to_global_a_graphrag_approach_to_query-/</link>
+      <link>http://localhost:1313/notes/from_local_to_global_a_graphrag_approach_to_query-/</link>
       <pubDate>Thu, 16 Oct 2025 19:42:01 +0000</pubDate>
-      <guid>https://my-blog-alpha-vert.vercel.app/posts/from_local_to_global_a_graphrag_approach_to_query-/</guid>
+      <guid>http://localhost:1313/notes/from_local_to_global_a_graphrag_approach_to_query-/</guid>
       <description>Paper-reading notes: From Local to Global A GraphRAG Approach to Query-</description>
     </item>
     <item>
       <title>Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks</title>
-      <link>https://my-blog-alpha-vert.vercel.app/posts/retrieval-augmented_generation_for_knowledge-inten/</link>
+      <link>http://localhost:1313/notes/retrieval-augmented_generation_for_knowledge-inten/</link>
       <pubDate>Wed, 15 Oct 2025 09:43:53 +0000</pubDate>
-      <guid>https://my-blog-alpha-vert.vercel.app/posts/retrieval-augmented_generation_for_knowledge-inten/</guid>
+      <guid>http://localhost:1313/notes/retrieval-augmented_generation_for_knowledge-inten/</guid>
       <description>Paper-reading notes: Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks</description>
     </item>
     <item>
       <title>A Bridging Model for Parallel Computation</title>
-      <link>https://my-blog-alpha-vert.vercel.app/posts/a_bridging_model_for_parallel_computation/</link>
+      <link>http://localhost:1313/notes/a_bridging_model_for_parallel_computation/</link>
       <pubDate>Fri, 10 Oct 2025 12:30:04 +0000</pubDate>
-      <guid>https://my-blog-alpha-vert.vercel.app/posts/a_bridging_model_for_parallel_computation/</guid>
+      <guid>http://localhost:1313/notes/a_bridging_model_for_parallel_computation/</guid>
       <description>Paper-reading notes: A Bridging Model for Parallel Computation</description>
     </item>
     <item>
       <title>Attention is All You Need</title>
-      <link>https://my-blog-alpha-vert.vercel.app/posts/attention_is_all_you_need/</link>
+      <link>http://localhost:1313/notes/attention_is_all_you_need/</link>
       <pubDate>Wed, 01 Oct 2025 00:36:58 +0000</pubDate>
-      <guid>https://my-blog-alpha-vert.vercel.app/posts/attention_is_all_you_need/</guid>
+      <guid>http://localhost:1313/notes/attention_is_all_you_need/</guid>
       <description>Paper-reading notes: Attention is All You Need</description>
     </item>
   </channel>
