@@ -6,8 +6,15 @@
     <description>Recent content in Notes on Home</description>
     <generator>Hugo -- 0.152.1</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 16 Dec 2025 08:40:53 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 28 Dec 2025 15:32:18 +0000</lastBuildDate>
     <atom:link href="https://my-blog-alpha-vert.vercel.app/notes/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Diffusion Policy: Visuomotor Policy Learning via Action Diffusion</title>
+      <link>https://my-blog-alpha-vert.vercel.app/notes/diffusion_policy_visuomotor_policy_learning_via_ac/</link>
+      <pubDate>Sun, 28 Dec 2025 15:32:18 +0000</pubDate>
+      <guid>https://my-blog-alpha-vert.vercel.app/notes/diffusion_policy_visuomotor_policy_learning_via_ac/</guid>
+      <description>Paper-reading notes: Diffusion Policy</description>
+    </item>
     <item>
       <title>Synthesizer: Rethinking Self-Attention for Transformer Models</title>
       <link>https://my-blog-alpha-vert.vercel.app/notes/synthesizer_rethinking_self-attention_for_transfor/</link>
