@@ -1,6 +1,6 @@
 import os
 import re
-from urllib.parse import unquote
+from urllib.parse import unquote, urlparse
 import zipfile
 import shutil
 import datetime
@@ -127,24 +127,25 @@ def fix_markdown_image_links(md_text: str) -> str:
         base = base.replace(' ', '_')
         return f'![{alt}]({base})'
 
-    md_text = re.sub(r'!\[([^\]]*)\]\(([^)]+)\)', repl_image, md_text)
-    # Then handle any explicit occurrences of assets/... in normal links
+    protected = re.sub(r'!\[([^\]]*)\]\(([^)]+)\)', repl_image, protected)
+
+    # Then handle markdown links `[text](assets/...)` while leaving external URLs untouched.
     def repl_assets_link(match):
-        inner = match.group(1)
+        text = match.group(1)
+        inner = match.group(2).strip()
         try:
             decoded = unquote(inner)
         except Exception:
             decoded = inner
-        # Skip external URLs (http, https, protocol-relative) to avoid mangling them
-        if re.match(r'^[a-zA-Z][a-zA-Z0-9+.-]*://', decoded) or decoded.startswith('//'):
+        parsed = urlparse(decoded)
+        if parsed.scheme or parsed.netloc or decoded.startswith('//'):
             return match.group(0)
-        # Only rewrite when it looks like a local asset path or contains path components
-        if 'assets/' in decoded or decoded.startswith('./') or os.path.dirname(decoded):
+        if decoded.startswith('assets/') or decoded.startswith('./') or decoded.startswith('../') or os.path.dirname(decoded):
             base = os.path.basename(decoded).replace(' ', '_')
-            return f'({base})'
+            return f'[{text}]({base})'
         return match.group(0)
 
-    protected = re.sub(r'\(([^)]+)\)', repl_assets_link, protected)
+    protected = re.sub(r'(?<!!)\[([^\]]+)\]\(([^)]+)\)', repl_assets_link, protected)
 
     # restore math blocks
     def _restore_math(match):
