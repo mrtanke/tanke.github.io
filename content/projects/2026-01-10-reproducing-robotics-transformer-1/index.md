@@ -3,7 +3,6 @@ title: 'Reproducing Robotics Transformer 1'
 date: 2026-01-10T10:14:01+00:00
 draft: false
 description: ''
-tag: 'Projects'
 ShowWordCount: true
 ShowReadingTime: false
 tags:

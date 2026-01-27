@@ -6,8 +6,29 @@
     <description>Recent content on Re:Log</description>
     <generator>Hugo -- 0.152.1</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 10 Jan 2026 10:14:01 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 17 Jan 2026 15:06:44 +0000</lastBuildDate>
     <atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>UrbanLF: A Comprehensive Light Field Dataset for Semantic Segmentation of Urban Scenes</title>
+      <link>http://localhost:1313/posts/2026-01-17-urbanlf-a-comprehensive-light-field-dataset-for-se/</link>
+      <pubDate>Sat, 17 Jan 2026 15:06:44 +0000</pubDate>
+      <guid>http://localhost:1313/posts/2026-01-17-urbanlf-a-comprehensive-light-field-dataset-for-se/</guid>
+      <description>Paper-reading notes: UrbanLF</description>
+    </item>
+    <item>
+      <title>Large Concept Models: Language Modeling in a Sentence Representation Space</title>
+      <link>http://localhost:1313/posts/2026-01-15-large-concept-models-language-modeling-in-a-senten/</link>
+      <pubDate>Thu, 15 Jan 2026 14:54:13 +0000</pubDate>
+      <guid>http://localhost:1313/posts/2026-01-15-large-concept-models-language-modeling-in-a-senten/</guid>
+      <description>Paper-reading notes: Large Concept Models: Language Modeling in a Sentence Representation Space</description>
+    </item>
+    <item>
+      <title>From Tokens To Thoughts: How LLMs And Humans Trade Compression For Meaning</title>
+      <link>http://localhost:1313/posts/2026-01-12-from-tokens-to-thoughts-how-llms-and-humans-trade/</link>
+      <pubDate>Mon, 12 Jan 2026 14:49:45 +0000</pubDate>
+      <guid>http://localhost:1313/posts/2026-01-12-from-tokens-to-thoughts-how-llms-and-humans-trade/</guid>
+      <description>Paper-reading notes: From Tokens To Thoughts: How LLMs And Humans Trade Compression For Meaning</description>
+    </item>
     <item>
       <title>Reproducing Robotics Transformer 1</title>
       <link>http://localhost:1313/projects/2026-01-10-reproducing-robotics-transformer-1/</link>

@@ -2,26 +2,47 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
+    <loc>http://localhost:1313/tags/light-field/</loc>
+    <lastmod>2026-01-17T15:06:44+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/posts/</loc>
+    <lastmod>2026-01-17T15:06:44+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/</loc>
+    <lastmod>2026-01-17T15:06:44+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/tags/</loc>
+    <lastmod>2026-01-17T15:06:44+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/posts/2026-01-17-urbanlf-a-comprehensive-light-field-dataset-for-se/</loc>
+    <lastmod>2026-01-17T15:06:44+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/tags/attention/</loc>
+    <lastmod>2026-01-15T14:54:13+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/posts/2026-01-15-large-concept-models-language-modeling-in-a-senten/</loc>
+    <lastmod>2026-01-15T14:54:13+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/tags/reasoning/</loc>
+    <lastmod>2026-01-15T14:54:13+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/posts/2026-01-12-from-tokens-to-thoughts-how-llms-and-humans-trade/</loc>
+    <lastmod>2026-01-12T14:49:45+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/tags/reasnoing/</loc>
+    <lastmod>2026-01-12T14:49:45+00:00</lastmod>
+  </url><url>
     <loc>http://localhost:1313/tags/embodied-intelligence/</loc>
     <lastmod>2026-01-10T10:14:01+00:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/projects/</loc>
     <lastmod>2026-01-10T10:14:01+00:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/</loc>
-    <lastmod>2026-01-10T10:14:01+00:00</lastmod>
-  </url><url>
     <loc>http://localhost:1313/projects/2026-01-10-reproducing-robotics-transformer-1/</loc>
-    <lastmod>2026-01-10T10:14:01+00:00</lastmod>
-  </url><url>
-    <loc>http://localhost:1313/tags/</loc>
     <lastmod>2026-01-10T10:14:01+00:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/tags/vision-language-action/</loc>
     <lastmod>2026-01-10T10:14:01+00:00</lastmod>
-  </url><url>
-    <loc>http://localhost:1313/posts/</loc>
-    <lastmod>2026-01-09T09:23:14+00:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/posts/2026-01-09-rt-series/</loc>
     <lastmod>2026-01-09T09:23:14+00:00</lastmod>
@@ -31,9 +52,6 @@
   </url><url>
     <loc>http://localhost:1313/posts/2025-12-28-diffusion-policy-visuomotor-policy-learning-via-action-diffusion/</loc>
     <lastmod>2025-12-28T15:32:18+00:00</lastmod>
-  </url><url>
-    <loc>http://localhost:1313/tags/attention/</loc>
-    <lastmod>2025-12-16T08:40:53+00:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/tags/efficient-llms/</loc>
     <lastmod>2025-12-16T08:40:53+00:00</lastmod>
@@ -45,9 +63,6 @@
     <lastmod>2025-12-15T08:38:28+00:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/posts/2025-12-15-learning-transformer-programs/</loc>
-    <lastmod>2025-12-15T08:38:28+00:00</lastmod>
-  </url><url>
-    <loc>http://localhost:1313/tags/reasoning/</loc>
     <lastmod>2025-12-15T08:38:28+00:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/posts/2025-12-14-reformer-the-efficient-transformer/</loc>
@@ -126,9 +141,6 @@
     <lastmod>2025-11-24T08:38:30+00:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/posts/2025-11-19-disentangling-light-fields-for-super-resolution-and-disparity-estimation/</loc>
-    <lastmod>2025-11-19T07:42:14+00:00</lastmod>
-  </url><url>
-    <loc>http://localhost:1313/tags/light-field/</loc>
     <lastmod>2025-11-19T07:42:14+00:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/tags/super-resolution/</loc>

@@ -1,6 +1,6 @@
 import os
 import re
-from urllib.parse import unquote
+from urllib.parse import unquote, urlparse
 import zipfile
 import shutil
 import datetime
@@ -170,11 +170,10 @@ def create_hugo_bundle(
     bundle_name = f"{date_prefix}-{slug}"
 
     # decide destination base based on tag so generated posts go to the matching
-    # top-level folder (e.g. content/notes, content/thoughts, content/projects).
+    # top-level folder (e.g. content/posts, content/projects).
     tag_key = (tag or '').strip().lower()
     tag_map = {
-        'notes': 'notes', 'note': 'notes',
-        'thoughts': 'thoughts', 'thought': 'thoughts',
+        'posts': 'posts', 'post': 'posts',
         'projects': 'projects', 'project': 'projects',
     }
     base = tag_map.get(tag_key, 'posts')
@@ -229,14 +228,14 @@ def create_hugo_bundle(
 
     now = datetime.datetime.now(datetime.timezone.utc).replace(microsecond=0).isoformat()
 
-    esc_tag = tag.replace("'", "''") if tag else 'Notes'
+    esc_tag = tag.replace("'", "''") if tag else 'Posts'
     cleaned_tags = []
     for item in tags or []:
         item = item.strip()
         if item:
             cleaned_tags.append(item)
     if not cleaned_tags:
-        cleaned_tags = [tag or 'Notes']
+        cleaned_tags = [tag or 'Posts']
     escaped_tags = [t.replace("'", "''") for t in cleaned_tags]
     tags_block = "tags:\n" + ''.join(f"  - '{t}'\n" for t in escaped_tags)
     front = (
@@ -259,7 +258,7 @@ def create_hugo_bundle(
     return dest_folder
 
 
-def main(description: str = '', tag: str = 'Notes', tags: list[str] | None = None):
+def main(description: str = '', tag: str = 'Posts', tags: list[str] | None = None):
     extracted = unzip_notion()
     md_file, assets_folder = find_md_and_assets(extracted)
     dest = create_hugo_bundle(md_file, assets_folder, description, tag, tags)
@@ -271,7 +270,7 @@ if __name__ == '__main__':
 
     p = argparse.ArgumentParser(description='Unzip Notion export and create Hugo post bundle')
     p.add_argument('--description', nargs='?', default='', help='optional description to use in front matter')
-    p.add_argument('--tag', dest='tag', default='Notes', help='Section selector (Notes, Thoughts, Projects) used for the bundle path and fallback tag')
+    p.add_argument('--tag', dest='tag', default='Posts', help='Section selector (Posts, Projects) used for the bundle path and fallback tag')
     p.add_argument('--tags', nargs='*', default=None, help='Space- or comma-separated tags to include in front matter (e.g. --tags vision-model rag)')
     args = p.parse_args()
 
